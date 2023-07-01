@@ -2,61 +2,40 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreSubCategoryRequest;
-use App\Http\Requests\UpdateSubCategoryRequest;
 use App\Models\SubCategory;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class SubCategoryController extends Controller
 {
-    /**
+    /*
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return SubCategory::all();
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \App\Http\Requests\StoreSubCategoryRequest  $request
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return Response
      */
-    public function store(StoreSubCategoryRequest $request)
+    public function store(Request $request)
     {
-        //
+        return SubCategory::create($request->validate(['name' => 'required|string']));
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\SubCategory  $subCategory
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     * @return Response
      */
-    public function show(SubCategory $subCategory)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\SubCategory  $subCategory
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(SubCategory $subCategory)
+    public function show($id)
     {
         //
     }
@@ -64,11 +43,11 @@ class SubCategoryController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \App\Http\Requests\UpdateSubCategoryRequest  $request
-     * @param  \App\Models\SubCategory  $subCategory
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param int $id
+     * @return Response
      */
-    public function update(UpdateSubCategoryRequest $request, SubCategory $subCategory)
+    public function update(Request $request, $id)
     {
         //
     }
@@ -76,10 +55,10 @@ class SubCategoryController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\SubCategory  $subCategory
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     * @return Response
      */
-    public function destroy(SubCategory $subCategory)
+    public function destroy($id)
     {
         //
     }

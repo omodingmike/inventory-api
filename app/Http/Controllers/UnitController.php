@@ -2,61 +2,42 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreUnitRequest;
-use App\Http\Requests\UpdateUnitRequest;
 use App\Models\Unit;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use LaravelIdea\Helper\App\Models\_IH_Unit_C;
 
 class UnitController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Unit[]|Collection|Response|_IH_Unit_C
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return Unit::all();
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \App\Http\Requests\StoreUnitRequest  $request
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return Response
      */
-    public function store(StoreUnitRequest $request)
+    public function store(Request $request)
     {
-        //
+        return Unit::create($request->validate(['name' => 'required|string', 'symbol' => 'required|string']));
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Unit  $unit
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     * @return Response
      */
-    public function show(Unit $unit)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Unit  $unit
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Unit $unit)
+    public function show($id)
     {
         //
     }
@@ -64,11 +45,11 @@ class UnitController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \App\Http\Requests\UpdateUnitRequest  $request
-     * @param  \App\Models\Unit  $unit
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param int $id
+     * @return Response
      */
-    public function update(UpdateUnitRequest $request, Unit $unit)
+    public function update(Request $request, $id)
     {
         //
     }
@@ -76,10 +57,10 @@ class UnitController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Unit  $unit
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     * @return Response
      */
-    public function destroy(Unit $unit)
+    public function destroy($id)
     {
         //
     }
