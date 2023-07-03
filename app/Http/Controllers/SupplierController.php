@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\helpers\Uploads;
 use App\Models\Supplier;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
@@ -28,9 +29,9 @@ class SupplierController extends Controller
      */
     public function store(Request $request)
     {
-        return Supplier::create($request->validate([
-            'name' => 'required|string'
-        ]));
+        $validated          = $request->validate(['name' => 'required|string', 'photo' => 'required|image',]);
+        $validated['photo'] = Uploads::upload_image($request);
+        return Supplier::create($validated);
     }
 
     /**
@@ -48,7 +49,7 @@ class SupplierController extends Controller
      * Update the specified resource in storage.
      *
      * @param Request $request
-     * @param int $id
+     * @param int     $id
      * @return Response
      */
     public function update(Request $request, $id)
