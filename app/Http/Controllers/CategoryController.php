@@ -16,7 +16,7 @@ class CategoryController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return Category[]|Collection|Response|_IH_Category_C
+     * @return _IH_Category_C|Category[]|Collection
      */
     public function index()
     {
