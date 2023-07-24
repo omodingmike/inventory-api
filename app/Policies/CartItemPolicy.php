@@ -2,12 +2,12 @@
 
     namespace App\Policies;
 
-    use App\Models\inventory\Supplier;
+    use App\Models\inventory\CartItem;
     use App\Models\inventory\User;
     use Illuminate\Auth\Access\HandlesAuthorization;
     use Illuminate\Auth\Access\Response;
 
-    class SupplierPolicy
+    class CartItemPolicy
     {
         use HandlesAuthorization;
 
@@ -26,10 +26,10 @@
          * Determine whether the user can view the model.
          *
          * @param User     $user
-         * @param Supplier $supplier
+         * @param CartItem $cartItem
          * @return Response|bool
          */
-        public function view (User $user, Supplier $supplier)
+        public function view (User $user, CartItem $cartItem)
         {
             //
         }
@@ -49,10 +49,10 @@
          * Determine whether the user can update the model.
          *
          * @param User     $user
-         * @param Supplier $supplier
+         * @param CartItem $cartItem
          * @return Response|bool
          */
-        public function update (User $user, Supplier $supplier)
+        public function update (User $user, CartItem $cartItem)
         {
             //
         }
@@ -61,10 +61,10 @@
          * Determine whether the user can delete the model.
          *
          * @param User     $user
-         * @param Supplier $supplier
+         * @param CartItem $cartItem
          * @return Response|bool
          */
-        public function delete (User $user, Supplier $supplier)
+        public function delete (User $user, CartItem $cartItem)
         {
             //
         }
@@ -73,10 +73,10 @@
          * Determine whether the user can restore the model.
          *
          * @param User     $user
-         * @param Supplier $supplier
+         * @param CartItem $cartItem
          * @return Response|bool
          */
-        public function restore (User $user, Supplier $supplier)
+        public function restore (User $user, CartItem $cartItem)
         {
             //
         }
@@ -85,10 +85,10 @@
          * Determine whether the user can permanently delete the model.
          *
          * @param User     $user
-         * @param Supplier $supplier
+         * @param CartItem $cartItem
          * @return Response|bool
          */
-        public function forceDelete (User $user, Supplier $supplier)
+        public function forceDelete (User $user, CartItem $cartItem)
         {
             //
         }

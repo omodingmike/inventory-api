@@ -4,7 +4,7 @@
     use Illuminate\Database\Schema\Blueprint;
     use Illuminate\Support\Facades\Schema;
 
-    class CreateCategoriesTable extends Migration
+    class CreateContactsTable extends Migration
     {
         /**
          * Run the migrations.
@@ -13,10 +13,11 @@
          */
         public function up ()
         {
-            Schema ::create( 'inv_categories', function (Blueprint $table) {
+            Schema ::create( 'inv_contacts', function (Blueprint $table) {
                 $table -> id();
                 $table -> string( 'name' );
-                $table -> string( 'photo' );
+                $table -> string( 'phone' );
+                $table -> string( 'email' );
                 $table -> timestamps();
             } );
         }
@@ -28,6 +29,6 @@
          */
         public function down ()
         {
-            Schema ::dropIfExists( 'categories' );
+            Schema ::dropIfExists( 'contacts' );
         }
     }

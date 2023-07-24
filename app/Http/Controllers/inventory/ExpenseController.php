@@ -1,11 +1,12 @@
 <?php
 
-    namespace App\Http\Controllers;
+    namespace App\Http\Controllers\inventory;
 
-    use App\Models\Expense;
+    use App\Models\inventory\Expense;
     use Illuminate\Database\Eloquent\Collection;
     use Illuminate\Http\Request;
     use Illuminate\Http\Response;
+    use Illuminate\Support\Carbon;
     use LaravelIdea\Helper\App\Models\_IH_Expense_C;
 
     class ExpenseController extends Controller
@@ -13,7 +14,7 @@
         /**
          * Display a listing of the resource.
          *
-         * @return Expense[]|Collection|Response|_IH_Expense_C
+         * @return _IH_Expense_C|Collection|Expense[]
          */
         public function index ()
         {
@@ -24,13 +25,38 @@
          * Store a newly created resource in storage.
          *
          * @param Request $request
-         * @return Response
+         * @return string[]
          */
         public function store (Request $request)
         {
             $validated = $request -> validate( [ 'name' => 'required', 'amount' => 'required', 'date' => 'required' ] );
             $validated[ 'date' ] = date( 'Y-m-d', strtotime( $request -> date ) );
-            return Expense ::create( $validated );
+            $expense = Expense ::create( $validated );
+
+            if ( $expense ) {
+                return [
+                    'status'  => 'ok',
+                    'message' => 'success'
+                ];
+            } else {
+                return [
+                    'status'  => 'failed',
+                    'message' => 'Operation failed'
+                ];
+            }
+        }
+
+        public function filterExpenses (Request $request)
+        {
+            $startDate = Carbon ::parse( $request -> query( 'from' ) ) -> startOfDay();
+            $endDate = Carbon ::parse( $request -> query( 'to' ) ) -> endOfDay();
+
+            return Expense ::whereBetween( 'created_at', [ $startDate, $endDate ] )
+                           -> get();
+
+//            return DB ::table( 'expenses' )
+//                      -> whereBetween( 'created_at', [ $startDate, $endDate ] )
+//                      -> get();
         }
 
         /**
