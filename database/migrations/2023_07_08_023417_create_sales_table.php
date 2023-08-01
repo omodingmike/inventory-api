@@ -18,7 +18,8 @@
                 $table -> string( 'sale_id' );
                 $table -> string( 'mode' );
                 $table -> string( 'grand_total' );
-                $table -> string( 'contact_id' );
+                $table -> integer( 'contact_id' );
+                $table -> integer( 'user_id' );
                 $table -> timestamps();
             } );
         }

@@ -17,6 +17,7 @@
                 $table -> id();
                 $table -> string( 'name' );
                 $table -> integer( 'amount' );
+                $table -> integer( 'user_id' );
                 $table -> dateTime( 'date' );
                 $table -> timestamps();
             } );

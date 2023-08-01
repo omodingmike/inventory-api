@@ -13,9 +13,10 @@
          */
         public function up ()
         {
-            Schema ::create( 'inv_products', function (Blueprint $table) {
+            Schema ::create( 'inv_products' , function ( Blueprint $table ) {
                 $table -> id();
                 $table -> string( 'productName' );
+                $table -> integer( 'user_id' );
                 $table -> integer( 'productCategory' );
                 $table -> integer( 'productSubCategory' );
                 $table -> string( 'productCode' );

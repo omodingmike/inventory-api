@@ -13,38 +13,39 @@
 //    protected $dateFormat = 'd-m-Y';
 
         protected $fillable = [
-            'productName', 'productCode', 'productCategory', 'productSubCategory', 'discount', 'retailPrice', 'purchasePrice', 'wholeSalePrice', 'photo', 'quantity', 'units', 'supplier',
+            'productName' , 'productCode' , 'productCategory' , 'productSubCategory' , 'discount' , 'retailPrice' , 'purchasePrice' , 'wholeSalePrice' , 'photo' , 'quantity' , 'units' , 'supplier' ,
         ];
         protected $hidden   = [ 'updated_at' ];
         protected $table    = 'inv_products';
 
 
-        public function getCreatedAtAttribute ($value)
+        public function getCreatedAtAttribute ( $value )
         {
             if ( $value ) {
-                return date( 'd-m-Y', strtotime( $value ) );
+                return date( 'd-m-Y' , strtotime( $value ) );
             }
             return null;
         }
 
         public function productCategory () : BelongsTo
         {
-            return $this -> belongsTo( Category::class, 'productCategory', 'id' );
+            return $this -> belongsTo( Category::class , 'productCategory' , 'id' );
         }
+
 
         public function productSubCategory () : BelongsTo
         {
-            return $this -> belongsTo( Category::class, 'productSubCategory', 'id' );
+            return $this -> belongsTo( SubCategory::class , 'productSubCategory' , 'id' );
         }
 
 
         public function supplier () : BelongsTo
         {
-            return $this -> belongsTo( Supplier::class, 'supplier', 'id' );
+            return $this -> belongsTo( Supplier::class , 'supplier' , 'id' );
         }
 
         public function units () : BelongsTo
         {
-            return $this -> belongsTo( Unit::class, 'units', 'id' );
+            return $this -> belongsTo( Unit::class , 'units' , 'id' );
         }
     }

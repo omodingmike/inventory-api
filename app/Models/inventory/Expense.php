@@ -9,13 +9,14 @@
     {
         use HasFactory;
 
-        protected $fillable = [ 'amount', 'name', 'date' ];
-        protected $hidden   = [ 'created_at', 'updated_at' ];
+        protected $fillable = [ 'amount' , 'name' , 'date' , 'user_id' ];
+        protected $hidden   = [ 'created_at' , 'updated_at' ];
+        protected $table    = 'inv_expenses';
 
-        public function getDateAttribute ($value)
+        public function getDateAttribute ( $value )
         {
             if ( $value ) {
-                return date( 'd-m-Y', strtotime( $value ) );
+                return date( 'd-m-Y' , strtotime( $value ) );
             }
             return null;
         }

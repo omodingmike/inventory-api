@@ -3,21 +3,51 @@
     namespace App\Http\Controllers\inventory;
 
     use App\Models\inventory\Contact;
-    use Illuminate\Database\Eloquent\Collection;
+    use App\Models\inventory\Sale;
+    use Exception;
     use Illuminate\Http\Request;
-    use Illuminate\Http\Response;
-    use LaravelIdea\Helper\App\Models\_IH_Contact_C;
 
     class ContactController extends Controller
     {
         /**
          * Display a listing of the resource.
          *
-         * @return _IH_Contact_C|Collection|Contact[]
+         * @return Contact[]
          */
-        public function index ()
+        public function index ( Request $request )
         {
-            return Contact ::with( 'sales.data' ) -> get();
+            $user_id = $request -> user_id;
+            try {
+                $sales = Sale ::with( 'saleItems' )
+                              -> where( 'user_id' , $request -> user_id )
+                              -> get();
+
+                $data     = [];
+                $contacts = Contact ::where( 'user_id' , $user_id ) -> get();
+                foreach ( $contacts as $contact ) {
+                    $total_products = 0;
+                    foreach ( $sales as $sale ) {
+                        foreach ( $sale -> data as $item ) {
+                            if ( $sale -> contact_id == $contact -> id ) {
+                                $total_products += $item -> quantity;
+                            }
+                        }
+                    }
+                    $collection = collect( $contact );
+                    $collection -> put( 'products' , $total_products );
+                    $data[] = $collection;
+                }
+                return [
+                    'status' => '1' ,
+                    'data'   => $data
+                ];
+            }
+            catch ( Exception $exception ) {
+                return [
+                    'status'  => '0' ,
+                    'message' => $exception -> getMessage()
+                ];
+            }
         }
 
         /**
@@ -26,53 +56,19 @@
          * @param Request $request
          * @return string[]
          */
-        public function store (Request $request)
+        public function store ( Request $request )
         {
             $contact = Contact ::create( $request -> all() );
             if ( $contact ) {
                 return [
-                    'status'  => 'ok',
+                    'status'  => 'ok' ,
                     'message' => 'success'
                 ];
             } else {
                 return [
-                    'status'  => 'failed',
+                    'status'  => 'failed' ,
                     'message' => 'Contact could not be created'
                 ];
             }
-        }
-
-        /**
-         * Display the specified resource.
-         *
-         * @param int $id
-         * @return Response
-         */
-        public function show ($id)
-        {
-            //
-        }
-
-        /**
-         * Update the specified resource in storage.
-         *
-         * @param Request $request
-         * @param int     $id
-         * @return Response
-         */
-        public function update (Request $request, $id)
-        {
-            //
-        }
-
-        /**
-         * Remove the specified resource from storage.
-         *
-         * @param int $id
-         * @return Response
-         */
-        public function destroy ($id)
-        {
-            //
         }
     }

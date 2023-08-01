@@ -10,12 +10,12 @@
     {
         use HasFactory;
 
-        protected $fillable = [ 'name', 'phone', 'email' ];
-        protected $hidden   = [ 'created_at', 'updated_at' ];
+        protected $fillable = [ 'name' , 'phone' , 'email' , 'user_id' ];
+        protected $hidden   = [ 'created_at' , 'updated_at' , 'user_id' ];
         protected $table    = 'inv_contacts';
 
         public function sales () : HasMany
         {
-            return $this -> hasMany( Sale::class, 'contact_id', 'id' );
+            return $this -> hasMany( Sale::class , 'contact_id' , 'id' );
         }
     }

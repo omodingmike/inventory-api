@@ -14,7 +14,7 @@
         /**
          * Display a listing of the resource.
          *
-         * @return Supplier[]|Collection|Response|_IH_Supplier_C
+         * @return Collection|Supplier[]
          */
         public function index ()
         {
@@ -27,44 +27,10 @@
          * @param Request $request
          * @return Response
          */
-        public function store (Request $request)
+        public function store ( Request $request )
         {
-            $validated = $request -> validate( [ 'name' => 'required|string', 'photo' => 'required|image', ] );
+            $validated            = $request -> validate( [ 'name' => 'required|string' , 'photo' => 'required|image' , ] );
             $validated[ 'photo' ] = Uploads ::upload_image( $request );
             return Supplier ::create( $validated );
-        }
-
-        /**
-         * Display the specified resource.
-         *
-         * @param int $id
-         * @return Response
-         */
-        public function show ($id)
-        {
-            //
-        }
-
-        /**
-         * Update the specified resource in storage.
-         *
-         * @param Request $request
-         * @param int     $id
-         * @return Response
-         */
-        public function update (Request $request, $id)
-        {
-            //
-        }
-
-        /**
-         * Remove the specified resource from storage.
-         *
-         * @param int $id
-         * @return Response
-         */
-        public function destroy ($id)
-        {
-            //
         }
     }

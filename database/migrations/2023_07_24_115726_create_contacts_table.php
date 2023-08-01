@@ -13,11 +13,12 @@
          */
         public function up ()
         {
-            Schema ::create( 'inv_contacts', function (Blueprint $table) {
+            Schema ::create( 'inv_contacts' , function ( Blueprint $table ) {
                 $table -> id();
                 $table -> string( 'name' );
                 $table -> string( 'phone' );
                 $table -> string( 'email' );
+                $table -> integer( 'user_id' );
                 $table -> timestamps();
             } );
         }

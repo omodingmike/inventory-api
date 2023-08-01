@@ -22,17 +22,19 @@
     |
     */
 
-    Route ::resource( 'products', ProductController::class );
-    Route ::resource( 'categories', CategoryController::class );
-    Route ::resource( 'sales', SaleController::class );
-    Route ::resource( 'revenues', RevenueController::class );
-    Route ::resource( 'expenses', ExpenseController::class );
-    Route ::resource( 'contacts', ContactController::class );
-    Route ::get( 'filter-category-products', [ ProductController::class, 'filterProducts' ] );                          //category-products?category_id=1&from=01-07-2023&to=01-07-2023
-    Route ::post( 'update-product', [ ProductController::class, 'update' ] );                                           //category-products?category_id=1&from=01-07-2023&to=01-07-2023
-    Route ::get( 'filter-expenses', [ ExpenseController::class, 'filterExpenses' ] );                                   //category-products?category_id=1&from=01-07-2023&to=01-07-2023
-    Route ::get( 'getProductCategories', [ CategoryController::class, 'getCategoryProducts' ] );                        //
+    Route ::resource( 'products' , ProductController::class );
+    Route ::resource( 'categories' , CategoryController::class );
+    Route ::resource( 'sales' , SaleController::class );
+    Route ::resource( 'revenues' , RevenueController::class );
+    Route ::resource( 'expenses' , ExpenseController::class );
+    Route ::resource( 'contacts' , ContactController::class );
+    Route ::resource( 'suppliers' , SupplierController::class );
+    Route ::resource( 'subcategories' , SubCategoryController::class );
+    Route ::resource( 'units' , UnitController::class );
+    Route ::get( 'filter-category-products' , [ ProductController::class , 'filterProducts' ] );                               //category-products?category_id=1&from=01-07-2023&to=01-07-2023
+    Route ::get( 'sale' , [ SaleController::class , 'show' ] );                                                                //category-products?category_id=1&from=01-07-2023&to=01-07-2023
+    Route ::post( 'update-product' , [ ProductController::class , 'update' ] );                                                //category-products?category_id=1&from=01-07-2023&to=01-07-2023
+    Route ::get( 'expenses-incomes' , [ ExpenseController::class , 'expensesAndIncomes' ] );                                   //category-products?category_id=1&from=01-07-2023&to=01-07-2023
+    Route ::get( 'getProductCategories' , [ CategoryController::class , 'getCategoryProducts' ] );                        //
     //category-products?category_id=1&from=01-07-2023&to=01-07-2023
-    Route ::resource( 'suppliers', SupplierController::class );
-    Route ::resource( 'subcategories', SubCategoryController::class );
-    Route ::resource( 'units', UnitController::class );
+
