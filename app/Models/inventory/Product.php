@@ -48,4 +48,14 @@
         {
             return $this -> belongsTo( Unit::class , 'units' , 'id' );
         }
+
+        public function scopeOfUserID ( $query , $user_id )
+        {
+            return $query -> where( 'user_id' , $user_id );
+        }
+
+        public function scopeDuration ( $query , $start_date , $end_date )
+        {
+            return $query -> whereBetween( 'created_at' , [ $start_date , $end_date ] );
+        }
     }

@@ -13,11 +13,11 @@
          */
         public function up ()
         {
-            Schema ::create( 'inv_sales', function (Blueprint $table) {
+            Schema ::create( 'inv_sales' , function ( Blueprint $table ) {
                 $table -> id();
-                $table -> string( 'sale_id' );
+                $table -> integer( 'sale_id' );
                 $table -> string( 'mode' );
-                $table -> string( 'grand_total' );
+                $table -> integer( 'grand_total' );
                 $table -> integer( 'contact_id' );
                 $table -> integer( 'user_id' );
                 $table -> timestamps();

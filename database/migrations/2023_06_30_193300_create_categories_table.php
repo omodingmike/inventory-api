@@ -13,9 +13,10 @@
          */
         public function up ()
         {
-            Schema ::create( 'inv_categories', function (Blueprint $table) {
+            Schema ::create( 'inv_categories' , function ( Blueprint $table ) {
                 $table -> id();
                 $table -> string( 'name' );
+                $table -> string( 'description' );
                 $table -> string( 'photo' );
                 $table -> timestamps();
             } );

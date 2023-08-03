@@ -20,4 +20,14 @@
             }
             return null;
         }
+
+        public function scopeOfUserID ( $query , $user_id )
+        {
+            return $query -> where( 'user_id' , $user_id );
+        }
+
+        public function scopeDuration ( $query , $start_date , $end_date )
+        {
+            return $query -> whereBetween( 'date' , [ $start_date , $end_date ] );
+        }
     }
