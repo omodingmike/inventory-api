@@ -4,7 +4,6 @@
 
     use App\Models\inventory\SubCategory;
     use Illuminate\Http\Request;
-    use Illuminate\Http\Response;
 
     class SubCategoryController extends Controller
     {
@@ -15,17 +14,25 @@
          */
         public function index ()
         {
-            return SubCategory ::all();
+            return [
+                'status'  => 1 ,
+                'message' => 'success' ,
+                'data'    => SubCategory ::all()
+            ];
+
         }
 
         /**
          * Store a newly created resource in storage.
          *
          * @param Request $request
-         * @return Response
+         * @return array
          */
         public function store ( Request $request )
         {
-            return SubCategory ::create( $request -> validate( [ 'name' => 'required|string' ] ) );
+            return [
+                'status'  => 1 ,
+                'message' => 'success' ,
+                'data'    => SubCategory ::create( $request -> validate( [ 'name' => 'required|string' ] ) ) ];
         }
     }

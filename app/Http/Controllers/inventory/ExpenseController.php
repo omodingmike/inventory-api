@@ -31,12 +31,14 @@
             $user    = User ::find( $request -> user_id );
             if ( $user ) {
                 return [
-                    'status' => 1 ,
-                    'data'   => $user -> expenses ];
+                    'status'  => 1 ,
+                    'message' => 'success' ,
+                    'data'    => $user -> expenses ];
             } else {
                 return [
-                    'status'  => 'failed' ,
-                    'message' => 'No expenses found'
+                    'status'  => 0 ,
+                    'message' => 'No expenses found' ,
+                    'data'    => []
                 ];
             }
         }
@@ -60,13 +62,15 @@
 
             if ( $expense ) {
                 return [
-                    'status'  => 'ok' ,
-                    'message' => 'success'
+                    'status'  => 1 ,
+                    'message' => 'success' ,
+                    'data'    => $expense
                 ];
             } else {
                 return [
-                    'status'  => 'failed' ,
-                    'message' => 'Operation failed'
+                    'status'  => 0 ,
+                    'message' => 'Operation failed' ,
+                    'data'    => []
                 ];
             }
         }
@@ -159,8 +163,9 @@
             catch
             ( Exception $exception ) {
                 return [
-                    'status'  => 'failed' ,
-                    'message' => $exception -> getMessage()
+                    'status'  => 0 ,
+                    'message' => $exception -> getMessage() ,
+                    'data'    => []
                 ];
             }
         }

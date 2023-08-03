@@ -39,21 +39,29 @@
                 ];
             } else {
                 return [
-                    'status'  => 'failed' ,
-                    'message' => 'User not found'
+                    'status'  => 0 ,
+                    'message' => 'User not found' ,
+                    'data'    => []
                 ];
             }
         }
 
         public function show ( Request $request )
         {
-            return Sale ::where(
-                [
-                    'user_id' => $request -> user_id ,
-                    'sale_id' => $request -> sale_id
-                ] )
-                        -> with( 'customer' )
-                        -> with( 'saleItems.product' ) -> first();
+            return [
+                'status'  => 1 ,
+                'message' => 'success' ,
+                'data'    =>
+                    Sale ::where(
+                        [
+                            'user_id' => $request -> user_id ,
+                            'sale_id' => $request -> sale_id
+                        ] )
+                         -> with( 'customer' )
+                         -> with( 'saleItems.product' ) -> first()
+            ];
+
+
         }
 
         /**
@@ -81,16 +89,18 @@
                 }
                 DB ::commit();
                 return [
-                    'status'  => '1' ,
-                    'message' => 'success'
+                    'status'  => 1 ,
+                    'message' => 'success' ,
+                    'data'    => $sale
                 ];
 
             }
             catch ( QueryException $exception ) {
                 DB ::rollBack();
                 return [
-                    'status'  => '0' ,
-                    'message' => $exception -> getMessage()
+                    'status'  => 0 ,
+                    'message' => $exception -> getMessage() ,
+                    'data'    => []
                 ];
             }
         }

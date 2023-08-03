@@ -38,14 +38,16 @@
                     $data[] = $collection;
                 }
                 return [
-                    'status' => '1' ,
-                    'data'   => $data
+                    'status'  => 1 ,
+                    'message' => 'success' ,
+                    'data'    => $data
                 ];
             }
             catch ( Exception $exception ) {
                 return [
-                    'status'  => '0' ,
-                    'message' => $exception -> getMessage()
+                    'status'  => 0 ,
+                    'message' => $exception -> getMessage() ,
+                    'data'    => []
                 ];
             }
         }
@@ -61,13 +63,15 @@
             $contact = Contact ::create( $request -> all() );
             if ( $contact ) {
                 return [
-                    'status'  => 'ok' ,
-                    'message' => 'success'
+                    'status'  => 1 ,
+                    'message' => 'success' ,
+                    'data'    => $contact
                 ];
             } else {
                 return [
-                    'status'  => 'failed' ,
-                    'message' => 'Contact could not be created'
+                    'status'  => 0 ,
+                    'message' => 'Contact could not be created' ,
+                    'data'    => []
                 ];
             }
         }

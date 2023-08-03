@@ -24,13 +24,15 @@
                                 -> get();
             if ( $products ) {
                 return [
-                    'status' => '1' ,
-                    'data'   => $products
+                    'status'  => 1 ,
+                    'message' => 'success' ,
+                    'data'    => $products
                 ];
             } else {
                 return [
-                    'status'  => '0' ,
-                    'message' => 'No products found for this user'
+                    'status'  => 0 ,
+                    'message' => 'No products found for this user' ,
+                    'data'    => []
                 ];
             }
         }
@@ -72,17 +74,21 @@
 
             $startDate = Carbon ::parse( $request -> query( 'from' ) ) -> startOfDay();
             $endDate   = Carbon ::parse( $request -> query( 'to' ) ) -> endOfDay();
-            return Product ::with( 'supplier' , 'units' , 'productCategory' , 'productSubCategory' )
-                           -> where( 'productCategory' , $request -> query( 'productCategory' ) )
-                           -> whereBetween( 'created_at' , [ $startDate , $endDate ] )
-                           -> get();
+            return [
+                'status'  => 1 ,
+                'message' => 'success' ,
+                'data'    => Product ::with( 'supplier' , 'units' , 'productCategory' , 'productSubCategory' )
+                                     -> where( 'productCategory' , $request -> query( 'productCategory' ) )
+                                     -> whereBetween( 'created_at' , [ $startDate , $endDate ] )
+                                     -> get()
+            ];
+
         }
 
         /**
          * Update the specified resource in storage.
          *
          * @param Request $request
-         * @param int     $id
          * @return string[]
          */
         public function update ( Request $request )
@@ -116,15 +122,17 @@
 
                 DB ::commit();
                 return [
-                    'status'  => 'ok' ,
-                    'message' => 'success'
+                    'status'  => 1 ,
+                    'message' => 'success' ,
+                    'data'    => []
                 ];
             }
             catch ( QueryException $exception ) {
                 DB ::rollBack();
                 return [
-                    'status'  => 'failed' ,
-                    'message' => 'Update failed'
+                    'status'  => 0 ,
+                    'message' => 'Update failed' ,
+                    'data'    => []
                 ];
             }
 

@@ -178,7 +178,8 @@
             } else {
                 return [
                     'status'  => 0 ,
-                    'message' => 'User not found'
+                    'message' => 'User not found' ,
+                    'data'    => []
                 ];
             }
 
