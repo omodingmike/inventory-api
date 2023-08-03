@@ -2,6 +2,7 @@
 
     namespace App\Http\Controllers\inventory;
 
+    use App\Http\Controllers\Controller;
     use Illuminate\Http\Request;
     use Illuminate\Http\Response;
 
@@ -23,7 +24,7 @@
          * @param Request $request
          * @return Response
          */
-        public function store (Request $request)
+        public function store ( Request $request )
         {
             //
         }
@@ -34,7 +35,7 @@
          * @param int $id
          * @return Response
          */
-        public function show ($id)
+        public function show ( $id )
         {
             //
         }
@@ -46,7 +47,7 @@
          * @param int     $id
          * @return Response
          */
-        public function update (Request $request, $id)
+        public function update ( Request $request , $id )
         {
             //
         }
@@ -57,7 +58,7 @@
          * @param int $id
          * @return Response
          */
-        public function destroy ($id)
+        public function destroy ( $id )
         {
             //
         }

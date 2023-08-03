@@ -3,7 +3,7 @@
     namespace App\Policies;
 
     use App\Models\inventory\Revenue;
-    use App\Models\inventory\User;
+    use App\Models\User;
     use Illuminate\Auth\Access\HandlesAuthorization;
     use Illuminate\Auth\Access\Response;
 
@@ -17,7 +17,7 @@
          * @param User $user
          * @return Response|bool
          */
-        public function viewAny (User $user)
+        public function viewAny ( User $user )
         {
             //
         }
@@ -29,7 +29,7 @@
          * @param Revenue $revenue
          * @return Response|bool
          */
-        public function view (User $user, Revenue $revenue)
+        public function view ( User $user , Revenue $revenue )
         {
             //
         }
@@ -40,7 +40,7 @@
          * @param User $user
          * @return Response|bool
          */
-        public function create (User $user)
+        public function create ( User $user )
         {
             //
         }
@@ -52,7 +52,7 @@
          * @param Revenue $revenue
          * @return Response|bool
          */
-        public function update (User $user, Revenue $revenue)
+        public function update ( User $user , Revenue $revenue )
         {
             //
         }
@@ -64,7 +64,7 @@
          * @param Revenue $revenue
          * @return Response|bool
          */
-        public function delete (User $user, Revenue $revenue)
+        public function delete ( User $user , Revenue $revenue )
         {
             //
         }
@@ -76,7 +76,7 @@
          * @param Revenue $revenue
          * @return Response|bool
          */
-        public function restore (User $user, Revenue $revenue)
+        public function restore ( User $user , Revenue $revenue )
         {
             //
         }
@@ -88,7 +88,7 @@
          * @param Revenue $revenue
          * @return Response|bool
          */
-        public function forceDelete (User $user, Revenue $revenue)
+        public function forceDelete ( User $user , Revenue $revenue )
         {
             //
         }

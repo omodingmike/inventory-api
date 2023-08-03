@@ -2,6 +2,7 @@
 
     namespace App\Http\Controllers\inventory;
 
+    use App\Http\Controllers\Controller;
     use App\Models\inventory\SubCategory;
     use Illuminate\Http\Request;
 

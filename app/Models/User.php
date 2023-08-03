@@ -1,7 +1,9 @@
 <?php
 
-    namespace App\Models\inventory;
+    namespace App\Models;
 
+    use App\Models\inventory\Expense;
+    use App\Models\inventory\Sale;
     use Illuminate\Database\Eloquent\Factories\HasFactory;
     use Illuminate\Database\Eloquent\Relations\HasMany;
     use Illuminate\Foundation\Auth\User as Authenticatable;

@@ -3,6 +3,7 @@
     namespace App\Http\Controllers\inventory;
 
     use App\helpers\Uploads;
+    use App\Http\Controllers\Controller;
     use App\Models\inventory\Supplier;
     use Illuminate\Http\Request;
 

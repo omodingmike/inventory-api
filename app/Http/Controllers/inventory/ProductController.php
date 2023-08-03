@@ -3,6 +3,7 @@
     namespace App\Http\Controllers\inventory;
 
     use App\helpers\Uploads;
+    use App\Http\Controllers\Controller;
     use App\Models\inventory\Product;
     use Illuminate\Database\QueryException;
     use Illuminate\Http\Request;

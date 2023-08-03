@@ -3,7 +3,7 @@
     namespace App\Policies;
 
     use App\Models\inventory\Product;
-    use App\Models\inventory\User;
+    use App\Models\User;
     use Illuminate\Auth\Access\HandlesAuthorization;
     use Illuminate\Auth\Access\Response;
 
@@ -17,7 +17,7 @@
          * @param User $user
          * @return Response|bool
          */
-        public function viewAny (User $user)
+        public function viewAny ( User $user )
         {
             //
         }
@@ -29,7 +29,7 @@
          * @param Product $product
          * @return Response|bool
          */
-        public function view (User $user, Product $product)
+        public function view ( User $user , Product $product )
         {
             //
         }
@@ -40,7 +40,7 @@
          * @param User $user
          * @return Response|bool
          */
-        public function create (User $user)
+        public function create ( User $user )
         {
             //
         }
@@ -52,7 +52,7 @@
          * @param Product $product
          * @return Response|bool
          */
-        public function update (User $user, Product $product)
+        public function update ( User $user , Product $product )
         {
             //
         }
@@ -64,7 +64,7 @@
          * @param Product $product
          * @return Response|bool
          */
-        public function delete (User $user, Product $product)
+        public function delete ( User $user , Product $product )
         {
             //
         }
@@ -76,7 +76,7 @@
          * @param Product $product
          * @return Response|bool
          */
-        public function restore (User $user, Product $product)
+        public function restore ( User $user , Product $product )
         {
             //
         }
@@ -88,7 +88,7 @@
          * @param Product $product
          * @return Response|bool
          */
-        public function forceDelete (User $user, Product $product)
+        public function forceDelete ( User $user , Product $product )
         {
             //
         }

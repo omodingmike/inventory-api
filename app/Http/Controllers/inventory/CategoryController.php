@@ -2,6 +2,7 @@
 
     namespace App\Http\Controllers\inventory;
 
+    use App\Http\Controllers\Controller;
     use App\Models\inventory\Category;
     use Exception;
     use Illuminate\Database\QueryException;

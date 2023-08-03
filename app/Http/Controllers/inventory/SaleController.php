@@ -2,10 +2,11 @@
 
     namespace App\Http\Controllers\inventory;
 
+    use App\Http\Controllers\Controller;
     use App\Models\inventory\CartItem;
     use App\Models\inventory\Product;
     use App\Models\inventory\Sale;
-    use App\Models\inventory\User;
+    use App\Models\User;
     use Illuminate\Database\QueryException;
     use Illuminate\Http\Request;
     use Illuminate\Support\Arr;

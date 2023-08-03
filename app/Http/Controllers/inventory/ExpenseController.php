@@ -2,9 +2,10 @@
 
     namespace App\Http\Controllers\inventory;
 
+    use App\Http\Controllers\Controller;
     use App\Models\inventory\Expense;
     use App\Models\inventory\Sale;
-    use App\Models\inventory\User;
+    use App\Models\User;
     use Exception;
     use Illuminate\Http\Request;
     use Illuminate\Support\Carbon;
