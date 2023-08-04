@@ -2,7 +2,9 @@
 
     namespace App\Models;
 
+    use App\Models\inventory\Contact;
     use App\Models\inventory\Expense;
+    use App\Models\inventory\Product;
     use App\Models\inventory\Sale;
     use Illuminate\Database\Eloquent\Factories\HasFactory;
     use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -54,5 +56,15 @@
         public function sales () : HasMany
         {
             return $this -> hasMany( Sale::class , 'user_id' , 'id' );
+        }
+
+        public function products () : HasMany
+        {
+            return $this -> hasMany( Product::class , 'user_id' , 'id' );
+        }
+
+        public function contacts () : HasMany
+        {
+            return $this -> hasMany( Contact::class , 'user_id' , 'id' );
         }
     }

@@ -15,7 +15,7 @@
         {
             Schema ::create( 'inv_sales' , function ( Blueprint $table ) {
                 $table -> id();
-                $table -> integer( 'sale_id' );
+                $table -> string( 'sale_id' );
                 $table -> string( 'mode' );
                 $table -> integer( 'grand_total' );
                 $table -> integer( 'contact_id' );
