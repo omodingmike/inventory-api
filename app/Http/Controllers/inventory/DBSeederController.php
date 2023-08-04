@@ -9,7 +9,7 @@
     {
         public function seed ()
         {
-            Artisan ::call( 'migrate:fresh' );
+//            Artisan ::call( 'migrate:fresh' );
             Artisan ::call( 'db:seed' );
         }
     }

@@ -12,22 +12,15 @@
     use App\Models\User;
     use Illuminate\Database\Seeder;
 
-    class DatabaseSeeder extends Seeder
+    class InventorySeeder1 extends Seeder
     {
         /**
-         * Seed the application's database.
+         * Run the database seeds.
          *
          * @return void
          */
         public function run ()
         {
-//            User ::factory()
-//                 -> hasProducts( 10 )
-//                 -> hasSales( 50 )
-//                 -> hasExpenses( 50 )
-//                 -> hasContacts( 10 )
-//                 -> count( 50 )
-//                 -> create();
             $user = User ::find( 1 );
             $user -> products() -> saveMany( Product ::factory( 10 ) -> create() );
             $user -> sales() -> saveMany( Sale ::factory( 50 ) -> create() );
