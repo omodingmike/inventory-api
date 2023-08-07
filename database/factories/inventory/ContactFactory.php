@@ -16,8 +16,8 @@
             return [
                 'name'    => $this -> faker -> name() ,
                 'phone'   => $this -> faker -> phoneNumber() ,
-                'email'   => $this -> faker -> unique() -> safeEmail() ,
-                'user_id' => $this -> faker -> numberBetween( 1 , 50 ) ,
+                'email'   => $this -> faker -> safeEmail() ,
+                'user_id' => $this -> faker -> numberBetween( 1 , 10 ) ,
             ];
         }
     }

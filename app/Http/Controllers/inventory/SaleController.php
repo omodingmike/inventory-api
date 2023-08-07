@@ -6,10 +6,11 @@
     use App\Models\inventory\CartItem;
     use App\Models\inventory\Product;
     use App\Models\inventory\Sale;
-    use App\Models\User;
+    use Exception;
     use Illuminate\Database\QueryException;
     use Illuminate\Http\Request;
     use Illuminate\Support\Arr;
+    use Illuminate\Support\Carbon;
     use Illuminate\Support\Facades\DB;
 
     class SaleController extends Controller
@@ -22,23 +23,35 @@
          */
         public function index ( Request $request )
         {
-            $user = User ::find( $request -> user_id );
-            if ( $user ) {
+            try {
+                $user_id        = $request -> user_id;
+                $startDate      = Carbon ::parse( $request -> query( 'from' ) ) -> startOfDay();
+                $endDate        = Carbon ::parse( $request -> query( 'to' ) ) -> endOfDay();
+                $sales          = Sale :: ofUserID( $user_id )
+                                       -> without( 'saleItems' )
+                                       -> duration( $startDate -> copy() -> startOfDay() , $endDate -> copy() -> endOfDay() )
+                                       -> get();
                 $total_products = 0;
-                $all_sales      = $user -> sales;
-                foreach ( $all_sales as $sale ) {
-                    $total_products += CartItem ::where( 'sale_id' , $sale -> id ) -> sum( 'quantity' );
+                foreach ( $sales as $sale ) {
+                    $items = $sale -> saleItems;
+                    if ( count( $items ) > 0 ) {
+                        foreach ( $items as $sale_item ) {
+                            $total_products += $sale_item -> quantity;
+                        }
+                    }
                 }
                 return [
                     'status'  => 1 ,
                     'message' => 'success' ,
                     'data'    => [
                         'products_sold' => $total_products ,
-                        'sales'         => $all_sales
+                        'sales'         => $sales -> each( function ( $sale ) { $sale -> makeHidden( 'saleItems' ); } )
                     ]
 
                 ];
-            } else {
+
+            }
+            catch ( Exception $exception ) {
                 return [
                     'status'  => 0 ,
                     'message' => 'User not found' ,

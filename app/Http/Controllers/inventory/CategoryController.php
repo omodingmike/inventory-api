@@ -25,7 +25,7 @@
                 return [
                     'status'  => 1 ,
                     'message' => 'success' ,
-                    'data'    => Category ::with( 'products.supplier' , 'products.units' ) -> get() ];
+                    'data'    => Category ::with( 'products.supplier' , 'products.units' , 'products.productSubCategory' ) -> get() ];
             }
             catch ( Exception $exception ) {
                 return [
@@ -42,7 +42,7 @@
                 return [
                     'status'  => 1 ,
                     'message' => 'success' ,
-                    'data'    => Category ::with( 'products.supplier' , 'products.units' ) -> get()
+                    'data'    => Category ::has( 'products' ) -> with( 'products.supplier' , 'products.units' ) -> get()
 
                 ];
             }

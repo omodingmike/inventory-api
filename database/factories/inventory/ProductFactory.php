@@ -15,7 +15,7 @@
         {
             return [
                 'productName'        => $this -> faker -> name() ,
-                'user_id'            => $this -> faker -> numberBetween( 1 , 50 ) ,
+                'user_id'            => $this -> faker -> numberBetween( 1 , 10 ) ,
                 'productCategory'    => $this -> faker -> numberBetween( 1 , 10 ) ,
                 'productSubCategory' => $this -> faker -> numberBetween( 1 , 10 ) ,
                 'productCode'        => $this -> faker -> postcode() ,
@@ -28,6 +28,7 @@
                 'balance'            => $this -> faker -> numberBetween( 10000 , 100000 ) ,
                 'quantity'           => $this -> faker -> numberBetween( 50 , 1000 ) ,
                 'discount'           => $this -> faker -> numberBetween( 10 , 60 ) ,
+                'created_at'         => $this -> faker -> dateTimeBetween( '-3 years' ) ,
             ];
         }
     }

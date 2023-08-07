@@ -27,6 +27,22 @@
             return null;
         }
 
+//        public function getUnitsAttribute ( $value )
+//        {
+//            if ( $value ) {
+//                return $this -> attributes[ 'units' ] = $this -> unit -> name;
+//            }
+//            return null;
+//        }
+
+        public function getBalanceAttribute ( $value )
+        {
+            if ( $value ) {
+                return $this -> attributes[ 'balance' ] = $this -> attributes[ 'quantity' ] * $this -> attributes[ 'purchasePrice' ];
+            }
+            return null;
+        }
+
         public function productCategory () : BelongsTo
         {
             return $this -> belongsTo( Category::class , 'productCategory' , 'id' );

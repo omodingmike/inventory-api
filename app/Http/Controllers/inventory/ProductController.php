@@ -72,16 +72,26 @@
 
         public function filterProducts ( Request $request )
         {
-
-            $startDate = Carbon ::parse( $request -> query( 'from' ) ) -> startOfDay();
-            $endDate   = Carbon ::parse( $request -> query( 'to' ) ) -> endOfDay();
+            $startDate      = Carbon ::parse( $request -> query( 'from' ) ) -> copy() -> startOfDay();
+            $endDate        = Carbon ::parse( $request -> query( 'to' ) ) -> copy() -> endOfDay();
+            $products       = Product ::with( 'supplier' , 'units' , 'productCategory' , 'productSubCategory' )
+                                      -> where( 'productCategory' , $request -> query( 'productCategory' ) )
+                                      -> whereBetween( 'created_at' , [ $startDate , $endDate ] )
+                                      -> get();
+            $total_quantity = 0;
+            $total_balance  = 0;
+            foreach ( $products as $product ) {
+                $total_quantity += $product -> quantity;
+                $total_balance  += $product -> balance;
+            }
             return [
                 'status'  => 1 ,
                 'message' => 'success' ,
-                'data'    => Product ::with( 'supplier' , 'units' , 'productCategory' , 'productSubCategory' )
-                                     -> where( 'productCategory' , $request -> query( 'productCategory' ) )
-                                     -> whereBetween( 'created_at' , [ $startDate , $endDate ] )
-                                     -> get()
+                'data'    => [
+                    'total_quantity' => $total_quantity ,
+                    'total_balance'  => $total_balance ,
+                    'products'       => $products
+                ]
             ];
 
         }
