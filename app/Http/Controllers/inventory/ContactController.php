@@ -19,16 +19,15 @@
         {
             $user_id = $request -> user_id;
             try {
-                $sales = Sale ::with( 'saleItems' )
-                              -> where( 'user_id' , $request -> user_id )
-                              -> get();
-
+                $sales    = Sale ::ofUserID( $user_id )
+                                 -> with( 'saleItems' )
+                                 -> get();
                 $data     = [];
-                $contacts = Contact ::where( 'user_id' , $user_id ) -> get();
+                $contacts = Contact ::ofUserID( $user_id ) -> get();
                 foreach ( $contacts as $contact ) {
                     $total_products = 0;
                     foreach ( $sales as $sale ) {
-                        foreach ( $sale -> data as $item ) {
+                        foreach ( $sale -> saleItems as $item ) {
                             if ( $sale -> contact_id == $contact -> id ) {
                                 $total_products += $item -> quantity;
                             }

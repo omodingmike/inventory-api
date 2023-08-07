@@ -18,4 +18,9 @@
         {
             return $this -> hasMany( Sale::class , 'contact_id' , 'id' );
         }
+
+        public function scopeOfUserID ( $query , $user_id )
+        {
+            return $query -> where( 'user_id' , $user_id );
+        }
     }

@@ -2,7 +2,6 @@
 
     namespace Database\Seeders;
 
-    use App\Models\inventory\CartItem;
     use Illuminate\Database\Seeder;
 
     class DatabaseSeeder extends Seeder
@@ -55,8 +54,6 @@
 //            SubCategory ::factory() -> count( 10 ) -> create();
 //            Supplier ::factory() -> count( 10 ) -> create();
 //            Unit ::factory() -> count( 10 ) -> create();
-            CartItem ::factory() -> count( 1000 ) -> create();
-
-
+//            CartItem ::factory() -> count( 1000 ) -> create();
         }
     }
