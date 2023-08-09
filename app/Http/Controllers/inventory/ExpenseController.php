@@ -70,6 +70,29 @@
             }
         }
 
+        public function expenseCategories ( Request $request )
+        {
+            try {
+                $user_id = $request -> user_id;
+                return [
+                    'status'  => 1 ,
+                    'message' => 'success' ,
+                    'data'    => Expense ::ofUserID( $user_id )
+                                         -> groupBy( 'name' )
+                                         -> get( 'name' )
+
+                ];
+            }
+            catch ( Exception $exception ) {
+                return [
+                    'status'  => 0 ,
+                    'message' => $exception -> getMessage() ,
+                    'data'    => []
+                ];
+            }
+
+        }
+
         /**
          * Store a newly created resource in storage.
          *
