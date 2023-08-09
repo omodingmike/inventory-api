@@ -36,14 +36,19 @@
             }
         }
 
-        public function getCategoryProducts ()
+        public function getCategoryProducts ( Request $request )
         {
+            $user_id = $request -> user_id;
             try {
                 return [
                     'status'  => 1 ,
                     'message' => 'success' ,
-                    'data'    => Category ::has( 'products' ) -> with( 'products.supplier' , 'products.units' ) -> get()
-
+//                    'data'    => Category ::has( 'products' ) -> with( 'products.supplier' , 'products.units' ) -> get()
+                    'data'    => Category ::has( 'products' )
+                                          -> with( [ 'products' => function ( $query ) use ( $user_id ) {
+                                              $query -> where( 'user_id' , $user_id );
+                                          } , 'products.supplier' , 'products.units' ] )
+                                          -> get()
                 ];
             }
             catch ( Exception $exception ) {

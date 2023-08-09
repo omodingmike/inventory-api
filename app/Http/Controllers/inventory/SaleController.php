@@ -25,7 +25,7 @@
         {
             try {
                 $user_id        = $request -> user_id;
-                $startDate      = Carbon ::parse( $request -> query( 'from' ) ) -> startOfDay();
+                $startDate      = Carbon :: parse( $request -> query( 'from' ) ) -> startOfDay();
                 $endDate        = Carbon ::parse( $request -> query( 'to' ) ) -> endOfDay();
                 $sales          = Sale :: ofUserID( $user_id )
                                        -> without( 'saleItems' )
@@ -65,17 +65,12 @@
             return [
                 'status'  => 1 ,
                 'message' => 'success' ,
-                'data'    =>
-                    Sale ::where(
-                        [
-                            'user_id' => $request -> user_id ,
-                            'sale_id' => $request -> sale_id
-                        ] )
-                         -> with( 'customer' )
-                         -> with( 'saleItems.product' ) -> first()
+                'data'    => Sale ::where( [
+                    'user_id' => $request -> user_id ,
+                    'sale_id' => $request -> sale_id
+                ] ) -> with( 'customer' )
+                                  -> with( 'saleItems.product' ) -> first()
             ];
-
-
         }
 
         /**
