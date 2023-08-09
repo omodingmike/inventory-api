@@ -25,6 +25,23 @@
                 return [
                     'status'  => 1 ,
                     'message' => 'success' ,
+                    'data'    => Category ::all() ];
+            }
+            catch ( Exception $exception ) {
+                return [
+                    'status'  => 0 ,
+                    'message' => $exception -> getMessage() ,
+                    'data'    => []
+                ];
+            }
+        }
+
+        public function categoryProducts ()
+        {
+            try {
+                return [
+                    'status'  => 1 ,
+                    'message' => 'success' ,
                     'data'    => Category ::with( 'products.supplier' , 'products.units' , 'products.productSubCategory' ) -> get() ];
             }
             catch ( Exception $exception ) {
