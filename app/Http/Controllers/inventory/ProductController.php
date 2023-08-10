@@ -21,20 +21,23 @@
          */
         public function index ( Request $request )
         {
-            $products = Product ::with( 'supplier' , 'units' , 'productCategory' , 'productSubCategory' )
-                                -> where( 'user_id' , $request -> user_id )
-                                -> get();
-            if ( $products ) {
+            try {
                 return [
                     'status'  => 1 ,
                     'message' => 'success' ,
-                    'data'    => $products
+                    'data'    => Product ::with( 'supplier' , 'units' , 'productCategory' , 'productSubCategory' )
+                                         -> where( 'user_id' , $request -> user_id )
+                                         -> get()
                 ];
-            } else {
+            }
+            catch ( Exception $exception ) {
                 return [
                     'status'  => 0 ,
-                    'message' => 'No products found for this user' ,
-                    'data'    => []
+                    'message' => $exception -> getMessage() ,
+                    'data'    => [
+                        'file' => $exception -> getTrace()[ 0 ] [ 'file' ] ,
+                        'line' => $exception -> getTrace()[ 0 ] [ 'line' ] ,
+                    ]
                 ];
             }
         }
@@ -75,10 +78,10 @@
         {
             try {
                 $user_id        = $request -> user_id;
-                $startDate      = Carbon ::parse( $request -> query( 'from' ) ) -> copy() -> startOfDay();
-                $endDate        = Carbon ::parse( $request -> query( 'to' ) ) -> copy() -> endOfDay();
+                $start_date     = Carbon ::parse( $request -> query( 'from' ) ) -> copy() -> startOfDay();
+                $end_date       = Carbon ::parse( $request -> query( 'to' ) ) -> copy() -> endOfDay();
                 $products       = Product ::ofUserID( $user_id )
-                                          -> duration( $startDate , $endDate )
+                                          -> duration( $start_date , $end_date )
                                           -> with( 'supplier' , 'units' , 'productCategory' , 'productSubCategory' )
                                           -> where( 'productCategory' , $request -> query( 'productCategory' ) )
                                           -> get();
@@ -102,8 +105,11 @@
             catch ( Exception $exception ) {
                 return [
                     'status'  => 0 ,
-                    'message' => 'failed' ,
-                    'data'    => []
+                    'message' => $exception -> getMessage() ,
+                    'data'    => [
+                        'file' => $exception -> getTrace()[ 0 ] [ 'file' ] ,
+                        'line' => $exception -> getTrace()[ 0 ] [ 'line' ] ,
+                    ]
                 ];
             }
 
@@ -145,8 +151,11 @@
                 DB ::rollBack();
                 return [
                     'status'  => 0 ,
-                    'message' => 'Update failed' ,
-                    'data'    => []
+                    'message' => $exception -> getMessage() ,
+                    'data'    => [
+                        'file' => $exception -> getTrace()[ 0 ] [ 'file' ] ,
+                        'line' => $exception -> getTrace()[ 0 ] [ 'line' ] ,
+                    ]
                 ];
             }
         }

@@ -21,7 +21,8 @@
                 $table -> integer( 'productSubCategory' );
                 $table -> string( 'productCode' );
                 $table -> string( 'photo' );
-                $table -> integer( 'quantity' );
+                $table -> integer( 'quantity' ) -> default( 0 );
+                $table -> integer( 'sold' ) -> default( 0 );
                 $table -> integer( 'units' );
                 $table -> integer( 'supplier' );
                 $table -> integer( 'retailPrice' );

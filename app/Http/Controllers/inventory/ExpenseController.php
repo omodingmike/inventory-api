@@ -23,23 +23,23 @@
         {
             try {
                 $user_id                   = $request -> user_id;
-                $startDate                 = Carbon ::parse( $request -> query( 'from' ) ) -> startOfDay();
-                $endDate                   = Carbon ::parse( $request -> query( 'to' ) ) -> endOfDay();
-                $previous_month_start_date = $startDate -> copy() -> subMonth();
+                $start_date                = Carbon ::parse( $request -> query( 'from' ) ) -> startOfDay();
+                $end_date                  = Carbon ::parse( $request -> query( 'to' ) ) -> endOfDay();
+                $previous_month_start_date = $start_date -> copy() -> subMonth();
                 $previous_month_end_date   = $previous_month_start_date -> copy() -> endOfMonth();
 
-                $previous_month_expenses = (int) Expense :: ofUserID( $user_id )
-                                                         -> duration( $previous_month_start_date , $previous_month_end_date )
-                                                         -> sum( 'amount' );
-                $previous_month_sales    = (int) Sale :: ofUserID( $user_id )
-                                                      -> duration( $previous_month_start_date , $previous_month_end_date )
-                                                      -> sum( 'grand_total' );
-                $this_month_sales        = (int) Sale :: ofUserID( $user_id )
-                                                      -> duration( $startDate -> copy() -> startOfDay() , $endDate -> copy() -> endOfDay() )
-                                                      -> sum( 'grand_total' );
+                $previous_month_total_expenses = (int) Expense :: ofUserID( $user_id )
+                                                               -> duration( $previous_month_start_date , $previous_month_end_date )
+                                                               -> sum( 'amount' );
+                $previous_month_total_sales    = (int) Sale :: ofUserID( $user_id )
+                                                            -> duration( $previous_month_start_date , $previous_month_end_date )
+                                                            -> sum( 'grand_total' );
+                $this_month_total_sales        = (int) Sale :: ofUserID( $user_id )
+                                                            -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
+                                                            -> sum( 'grand_total' );
 
                 $expenses = Expense :: ofUserID( $user_id )
-                                    -> duration( $startDate -> copy() -> startOfDay() , $endDate -> copy() -> endOfDay() )
+                                    -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
                                     -> selectRaw( 'DAYNAME(date) AS day,DATE(date) AS cdate, SUM(amount) AS amount' )
                                     -> groupBy( 'day' , 'cdate' )
                                     -> orderBy( 'cdate' )
@@ -54,8 +54,8 @@
                     'status'  => 1 ,
                     'message' => 'success' ,
                     'data'    => [
-                        'expense_percentage' => $previous_month_expenses == 0 ? 0 : number_format( ( ( $this_month_total_expenditure - $previous_month_expenses ) / $previous_month_expenses ) * 100 , 1 ) ,
-                        'income_percentage'  => $previous_month_sales == 0 ? 0 : number_format( ( ( $this_month_sales - $previous_month_sales ) / $previous_month_sales ) * 100 , 1 ) ,
+                        'expense_percentage' => $previous_month_total_expenses == 0 ? 0 : number_format( ( ( $this_month_total_expenditure - $previous_month_total_expenses ) / $previous_month_total_expenses ) * 100 , 1 ) ,
+                        'income_percentage'  => $previous_month_total_sales == 0 ? 0 : number_format( ( ( $this_month_total_sales - $previous_month_total_sales ) / $previous_month_total_sales ) * 100 , 1 ) ,
                         'expenses'           => $expenses
                     ]
 
@@ -65,7 +65,10 @@
                 return [
                     'status'  => 0 ,
                     'message' => $exception -> getMessage() ,
-                    'data'    => []
+                    'data'    => [
+                        'file' => $exception -> getTrace()[ 0 ] [ 'file' ] ,
+                        'line' => $exception -> getTrace()[ 0 ] [ 'line' ] ,
+                    ]
                 ];
             }
         }
@@ -73,11 +76,10 @@
         public function expenseCategories ( Request $request )
         {
             try {
-                $user_id = $request -> user_id;
                 return [
                     'status'  => 1 ,
                     'message' => 'success' ,
-                    'data'    => Expense ::ofUserID( $user_id )
+                    'data'    => Expense ::ofUserID( $request -> user_id )
                                          -> groupBy( 'name' )
                                          -> get( 'name' )
 
@@ -87,7 +89,10 @@
                 return [
                     'status'  => 0 ,
                     'message' => $exception -> getMessage() ,
-                    'data'    => []
+                    'data'    => [
+                        'file' => $exception -> getTrace()[ 0 ] [ 'file' ] ,
+                        'line' => $exception -> getTrace()[ 0 ] [ 'line' ] ,
+                    ]
                 ];
             }
 
@@ -101,26 +106,29 @@
          */
         public function store ( Request $request )
         {
-            $validated           = $request -> validate(
-                [ 'name'    => 'required' ,
-                  'amount'  => 'required' ,
-                  'date'    => 'required' ,
-                  'user_id' => 'required'
-                ] );
-            $validated[ 'date' ] = date( 'Y-m-d' , strtotime( $request -> date ) );
-            $expense             = Expense ::create( $validated );
+            try {
+                $validated           = $request -> validate(
+                    [ 'name'    => 'required' ,
+                      'amount'  => 'required' ,
+                      'date'    => 'required' ,
+                      'user_id' => 'required'
+                    ] );
+                $validated[ 'date' ] = date( 'Y-m-d' , strtotime( $request -> date ) );
 
-            if ( $expense ) {
                 return [
                     'status'  => 1 ,
                     'message' => 'success' ,
-                    'data'    => $expense
+                    'data'    => Expense ::create( $validated )
                 ];
-            } else {
+            }
+            catch ( Exception $exception ) {
                 return [
                     'status'  => 0 ,
-                    'message' => 'Operation failed' ,
-                    'data'    => []
+                    'message' => $exception -> getMessage() ,
+                    'data'    => [
+                        'file' => $exception -> getTrace()[ 0 ] [ 'file' ] ,
+                        'line' => $exception -> getTrace()[ 0 ] [ 'line' ] ,
+                    ]
                 ];
             }
         }
@@ -129,28 +137,15 @@
         {
             $user_id = $request -> user_id;
             try {
-                $start_date                 = Carbon ::parse( $request -> query( 'from' ) ) -> copy() -> startOfDay();
-                $end_date                   = Carbon ::parse( $request -> query( 'to' ) ) -> copy() -> endOfDay();
-                $expenses                   = new Collection();
-                $top_out_flow               = new Collection();
-                $top_in_flow                = new Collection();
-                $expenses_statistics        = new Collection();
-                $difference_in_days         = $start_date -> diffInDays( $end_date );
-                $difference_in_months       = $start_date -> diffInMonths( $end_date );
-                $include_expense_statistics = false;
-
-//                $temp  = Expense :: ofUserID( $user_id )
-//                                 -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
-//                                 -> selectRaw( 'MONTHNAME(date) AS month, COUNT(*) AS count, SUM(amount) AS amount' )
-//                                 -> groupBy( 'month' )
-//                                 -> orderBy( 'count' , 'desc' )
-//                                 -> get();
-//                $temp2 = Sale :: ofUserID( $user_id )
-//                              -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
-//                              -> selectRaw( 'MONTHNAME(created_at) AS month, COUNT(*) AS count, SUM(grand_total) AS amount' )
-//                              -> groupBy( 'month' )
-//                              -> orderBy( 'count' , 'desc' )
-//                              -> get();
+                $start_date = Carbon ::parse( $request -> query( 'from' ) ) -> copy() -> startOfDay();
+                $end_date   = Carbon ::parse( $request -> query( 'to' ) ) -> copy() -> endOfDay();
+//                $expenses                   = new Collection();
+//                $top_out_flow               = new Collection();
+                $top_in_flow         = new Collection();
+                $expenses_statistics = new Collection();
+                $difference_in_days  = $start_date -> diffInDays( $end_date );
+//                $difference_in_months       = $start_date -> diffInMonths( $end_date );
+//                $include_expense_statistics = false;
 
                 if ( $difference_in_days <= 7 ) {
                     $expenses = Expense :: ofUserID( $user_id )
@@ -161,14 +156,13 @@
                                         -> get();
 
                 } elseif ( $difference_in_days >= 28 && $difference_in_days <= 31 ) {
-                    $expenses            = Expense :: ofUserID( $user_id )
-                                                   -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
-//                                        -> selectRaw( 'DATE(date) AS week_day, SUM(amount) AS amount' )
-//                                        -> groupBy( 'week_day' )
-                                                   -> selectRaw( 'DAYNAME(date) AS day,DATE(date) AS cdate, SUM(amount) AS amount' )
-                                                   -> groupBy( 'day' , 'cdate' )
-                                                   -> orderBy( 'cdate' )
-                                                   -> get();
+                    $expenses = Expense :: ofUserID( $user_id )
+                                        -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
+                                        -> selectRaw( 'DAYNAME(date) AS day,DATE(date) AS cdate, SUM(amount) AS amount' )
+                                        -> groupBy( 'day' , 'cdate' )
+                                        -> orderBy( 'cdate' )
+                                        -> get();
+
                     $expenses_statistics = Expense :: ofUserID( $user_id )
                                                    -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
                                                    -> selectRaw( 'name, SUM(amount) AS amount' )
@@ -182,7 +176,6 @@
                                         -> orderBy( 'year' )
                                         -> get();
                 }
-
 
                 $top_out_flow = Expense ::ofUserID( $user_id )
                                         -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
@@ -233,8 +226,11 @@
             ( Exception $exception ) {
                 return [
                     'status'  => 0 ,
-                    'message' => $exception -> getTrace() ,
-                    'data'    => []
+                    'message' => $exception -> getMessage() ,
+                    'data'    => [
+                        'file' => $exception -> getTrace()[ 0 ] [ 'file' ] ,
+                        'line' => $exception -> getTrace()[ 0 ] [ 'line' ] ,
+                    ]
                 ];
             }
         }

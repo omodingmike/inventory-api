@@ -21,6 +21,11 @@
             return null;
         }
 
+        /**
+         * @param $query
+         * @param $user_id
+         * @return mixed
+         */
         public function scopeOfUserID ( $query , $user_id )
         {
             return $query -> where( 'user_id' , $user_id );

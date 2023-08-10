@@ -54,8 +54,11 @@
             catch ( Exception $exception ) {
                 return [
                     'status'  => 0 ,
-                    'message' => 'User not found' ,
-                    'data'    => []
+                    'message' => $exception -> getMessage() ,
+                    'data'    => [
+                        'file' => $exception -> getTrace()[ 0 ] [ 'file' ] ,
+                        'line' => $exception -> getTrace()[ 0 ] [ 'line' ] ,
+                    ]
                 ];
             }
         }
@@ -94,7 +97,8 @@
                 foreach ( Arr ::get( $request , 'items' ) as $item ) {
                     $item[ 'sale_id' ] = $sale -> id;
                     CartItem ::create( $item );
-                    Product ::find( $item [ 'productID' ] ) -> decrement( 'quantity' , $item [ 'quantity' ] );
+//                    Product ::find( $item [ 'productID' ] ) -> decrement( 'quantity' , $item [ 'quantity' ] );
+                    Product ::find( $item [ 'productID' ] ) -> increment( 'sold' , $item [ 'quantity' ] );
                 }
                 DB ::commit();
                 return [
@@ -109,7 +113,10 @@
                 return [
                     'status'  => 0 ,
                     'message' => $exception -> getMessage() ,
-                    'data'    => []
+                    'data'    => [
+                        'file' => $exception -> getTrace()[ 0 ] [ 'file' ] ,
+                        'line' => $exception -> getTrace()[ 0 ] [ 'line' ] ,
+                    ]
                 ];
             }
         }

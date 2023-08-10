@@ -19,19 +19,56 @@
          *
          * @return array
          */
-        public function index ()
+        public function index ( Request $request )
         {
             try {
+                $user_id    = $request -> user_id;
+                $categories = Category ::ofUserID( $user_id )
+                                       -> has( 'products' )
+                                       -> with( [ 'products' => function ( $query ) use ( $user_id ) {
+                                           $query -> where( 'user_id' , $user_id );
+                                       } , 'products.supplier' , 'products.units' ] )
+                                       -> get();
+                $data       = [];
+                foreach ( $categories as $category ) {
+                    $test                = [
+                        'name'        => $category -> name ,
+                        'description' => $category -> description ,
+                        'photo'       => $category -> photo ,
+                    ];
+                    $category_collection = collect( $test );
+                    $stock_value         = 0;
+                    $stock_quantity      = 0;
+                    $sold_quantity       = 0;
+                    $status              = '';
+                    foreach ( $category -> products as $product ) {
+                        $stock_value    += $product -> balance;
+                        $stock_quantity += $product -> quantity;
+                        $sold_quantity  += $product -> sold;
+                        $category_collection -> put( 'stock_value' , $stock_value );
+                    }
+                    $percentage_stock = (int) ( ( ( $stock_quantity - $sold_quantity ) / $stock_quantity ) * 100 );
+                    if ( $percentage_stock <= 30 )
+                        $category_collection -> put( 'status' , 'Low' );
+                    else if ( $percentage_stock <= 50 )
+                        $category_collection -> put( 'status' , 'Medium' );
+                    else  $category_collection -> put( 'status' , 'Good' );
+
+                    $data[] = $category_collection;
+                }
                 return [
                     'status'  => 1 ,
                     'message' => 'success' ,
-                    'data'    => Category ::all() ];
+                    'data'    => $data ];
             }
             catch ( Exception $exception ) {
                 return [
                     'status'  => 0 ,
                     'message' => $exception -> getMessage() ,
-                    'data'    => []
+                    'data'    => [
+                        'file' => $exception -> getTrace()[ 0 ] [ 'file' ] ,
+                        'line' => $exception -> getTrace()[ 0 ] [ 'line' ] ,
+                    ]
                 ];
             }
         }
@@ -42,13 +79,17 @@
                 return [
                     'status'  => 1 ,
                     'message' => 'success' ,
-                    'data'    => Category ::with( 'products.supplier' , 'products.units' , 'products.productSubCategory' ) -> get() ];
+                    'data'    => Category ::with( 'products.supplier' , 'products.units' , 'products.productSubCategory' )
+                                          -> get() ];
             }
             catch ( Exception $exception ) {
                 return [
                     'status'  => 0 ,
                     'message' => $exception -> getMessage() ,
-                    'data'    => []
+                    'data'    => [
+                        'file' => $exception -> getTrace()[ 0 ] [ 'file' ] ,
+                        'line' => $exception -> getTrace()[ 0 ] [ 'line' ] ,
+                    ]
                 ];
             }
         }
@@ -60,7 +101,6 @@
                 return [
                     'status'  => 1 ,
                     'message' => 'success' ,
-//                    'data'    => Category ::has( 'products' ) -> with( 'products.supplier' , 'products.units' ) -> get()
                     'data'    => Category ::has( 'products' )
                                           -> with( [ 'products' => function ( $query ) use ( $user_id ) {
                                               $query -> where( 'user_id' , $user_id );
@@ -72,7 +112,10 @@
                 return [
                     'status'  => 0 ,
                     'message' => $exception -> getMessage() ,
-                    'data'    => []
+                    'data'    => [
+                        'file' => $exception -> getTrace()[ 0 ] [ 'file' ] ,
+                        'line' => $exception -> getTrace()[ 0 ] [ 'line' ] ,
+                    ]
                 ];
             }
         }
@@ -107,7 +150,10 @@
                 return [
                     'status'  => 0 ,
                     'message' => $exception -> getMessage() ,
-                    'data'    => []
+                    'data'    => [
+                        'file' => $exception -> getTrace()[ 0 ] [ 'file' ] ,
+                        'line' => $exception -> getTrace()[ 0 ] [ 'line' ] ,
+                    ]
                 ];
             }
         }

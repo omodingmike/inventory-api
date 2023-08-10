@@ -19,35 +19,38 @@
         {
             $user_id = $request -> user_id;
             try {
-                $sales    = Sale ::ofUserID( $user_id )
-                                 -> with( 'saleItems' )
-                                 -> get();
-                $data     = [];
-                $contacts = Contact ::ofUserID( $user_id ) -> get();
+                $sales         = Sale ::ofUserID( $user_id )
+                                      -> with( 'saleItems' )
+                                      -> get();
+                $contacts_data = [];
+                $contacts      = Contact ::ofUserID( $user_id ) -> get();
                 foreach ( $contacts as $contact ) {
                     $total_products = 0;
                     foreach ( $sales as $sale ) {
-                        foreach ( $sale -> saleItems as $item ) {
+                        foreach ( $sale -> saleItems as $sale_item ) {
                             if ( $sale -> contact_id == $contact -> id ) {
-                                $total_products += $item -> quantity;
+                                $total_products += $sale_item -> quantity;
                             }
                         }
                     }
-                    $collection = collect( $contact );
-                    $collection -> put( 'products' , $total_products );
-                    $data[] = $collection;
+                    $contact_collection = collect( $contact );
+                    $contact_collection -> put( 'products' , $total_products );
+                    $contacts_data[] = $contact_collection;
                 }
                 return [
                     'status'  => 1 ,
                     'message' => 'success' ,
-                    'data'    => $data
+                    'data'    => $contacts_data
                 ];
             }
             catch ( Exception $exception ) {
                 return [
-                    'status'  => 0 ,
-                    'message' => $exception -> getMessage() ,
-                    'data'    => []
+                    'status'        => 0 ,
+                    'message'       => $exception -> getMessage() ,
+                    'contacts_data' => [
+                        'file' => $exception -> getTrace()[ 0 ] [ 'file' ] ,
+                        'line' => $exception -> getTrace()[ 0 ] [ 'line' ] ,
+                    ]
                 ];
             }
         }
@@ -60,18 +63,22 @@
          */
         public function store ( Request $request )
         {
-            $contact = Contact ::create( $request -> all() );
-            if ( $contact ) {
+            try {
                 return [
                     'status'  => 1 ,
                     'message' => 'success' ,
-                    'data'    => $contact
+                    'data'    => Contact ::create( $request -> all() )
                 ];
-            } else {
+
+            }
+            catch ( Exception $exception ) {
                 return [
                     'status'  => 0 ,
-                    'message' => 'Contact could not be created' ,
-                    'data'    => []
+                    'message' => $exception -> getMessage() ,
+                    'data'    => [
+                        'file' => $exception -> getTrace()[ 0 ] [ 'file' ] ,
+                        'line' => $exception -> getTrace()[ 0 ] [ 'line' ] ,
+                    ]
                 ];
             }
         }

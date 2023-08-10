@@ -134,9 +134,10 @@
                 $revenue_at_start_date = Sale ::ofUserID( $user_id )
                                               -> duration( $start_date -> copy() -> startOfDay() , $start_date -> copy() -> endOfDay() )
                                               -> sum( 'grand_total' );
-                $revenue_at_end_date   = Sale ::ofUserID( $user_id )
-                                              -> duration( $end_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
-                                              -> sum( 'grand_total' );
+
+                $revenue_at_end_date = Sale ::ofUserID( $user_id )
+                                            -> duration( $end_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
+                                            -> sum( 'grand_total' );
 
                 $percentage_change = $revenue_at_start_date == 0 ? 0 : number_format( ( ( $revenue_at_end_date - $revenue_at_start_date ) / $revenue_at_start_date ) * 100 , 1 );
 
@@ -159,32 +160,27 @@
                        }
                    } );
 
-                if ( $user ) {
-                    return [
-                        'status'  => 1 ,
-                        'message' => 'success' ,
-                        'data'    => [
-                            'products_in'   => (int) $products_in ,
-                            'products_out'  => $products_out ,
-                            'total_sales'   => count( $revenues ) ,
-                            'percentage'    => $percentage_change ,
-                            'total_revenue' => $total_revenue ,
-                            'chart_data'    => $highest_revenues
-                        ]
-                    ];
-                } else {
-                    return [
-                        'status'  => 0 ,
-                        'message' => 'User not found' ,
-                        'data'    => []
-                    ];
-                }
+                return [
+                    'status'  => 1 ,
+                    'message' => 'success' ,
+                    'data'    => [
+                        'products_in'   => (int) $products_in ,
+                        'products_out'  => $products_out ,
+                        'total_sales'   => count( $revenues ) ,
+                        'percentage'    => $percentage_change ,
+                        'total_revenue' => $total_revenue ,
+                        'chart_data'    => $highest_revenues
+                    ]
+                ];
             }
             catch ( Exception $exception ) {
                 return [
                     'status'  => 0 ,
                     'message' => $exception -> getMessage() ,
-                    'data'    => []
+                    'data'    => [
+                        'file' => $exception -> getTrace()[ 0 ] [ 'file' ] ,
+                        'line' => $exception -> getTrace()[ 0 ] [ 'line' ] ,
+                    ]
                 ];
             }
         }

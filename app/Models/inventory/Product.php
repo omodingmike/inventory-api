@@ -13,7 +13,7 @@
 //    protected $dateFormat = 'd-m-Y';
 
         protected $fillable = [
-            'productName' , 'productCode' , 'productCategory' , 'productSubCategory' , 'discount' , 'retailPrice' , 'purchasePrice' , 'wholeSalePrice' , 'photo' , 'quantity' , 'units' , 'supplier' ,
+            'productName' , 'productCode' , 'productCategory' , 'productSubCategory' , 'discount' , 'retailPrice' , 'purchasePrice' , 'wholeSalePrice' , 'photo' , 'quantity' , 'units' , 'supplier' , 'sold'
         ];
         protected $hidden   = [ 'updated_at' ];
         protected $table    = 'inv_products';
@@ -38,7 +38,7 @@
         public function getBalanceAttribute ( $value )
         {
             if ( $value ) {
-                return $this -> attributes[ 'balance' ] = $this -> attributes[ 'quantity' ] * $this -> attributes[ 'purchasePrice' ];
+                return $this -> attributes[ 'balance' ] = $this -> attributes[ 'quantity' ] * $this -> attributes[ 'retailPrice' ];
             }
             return null;
         }

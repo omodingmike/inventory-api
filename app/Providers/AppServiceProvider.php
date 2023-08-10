@@ -23,7 +23,7 @@
          */
         public function boot ()
         {
-//            Artisan ::call( 'migrate:fresh' );
+//            Artisan ::call( 'route:clear' );
 //            Artisan ::call( 'db:seed' );
 //            info( Hash ::make( 'omodingmike@gmail.com' ) );
         }
