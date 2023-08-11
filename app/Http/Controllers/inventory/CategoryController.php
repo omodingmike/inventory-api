@@ -22,14 +22,15 @@
         public function index ( Request $request )
         {
             try {
-                $user_id    = $request -> user_id;
-                $categories = Category ::ofUserID( $user_id )
-                                       -> has( 'products' )
-                                       -> with( [ 'products' => function ( $query ) use ( $user_id ) {
-                                           $query -> where( 'user_id' , $user_id );
-                                       } , 'products.supplier' , 'products.units' ] )
-                                       -> get();
-                $data       = [];
+                $user_id      = $request -> user_id;
+                $categories   = Category ::ofUserID( $user_id )
+                                         -> has( 'products' )
+                                         -> with( [ 'products' => function ( $query ) use ( $user_id ) {
+                                             $query -> where( 'user_id' , $user_id );
+                                         } , 'products.supplier' , 'products.units' ] )
+                                         -> get();
+                $data         = [];
+                $out_of_stock = 0;
                 foreach ( $categories as $category ) {
                     $test                = [
                         'name'        => $category -> name ,
@@ -40,11 +41,12 @@
                     $stock_value         = 0;
                     $stock_quantity      = 0;
                     $sold_quantity       = 0;
-                    $status              = '';
                     foreach ( $category -> products as $product ) {
                         $stock_value    += $product -> balance;
                         $stock_quantity += $product -> quantity;
                         $sold_quantity  += $product -> sold;
+                        if ( $product -> quantity < 1 )
+                            $out_of_stock++;
                         $category_collection -> put( 'stock_value' , $stock_value );
                     }
                     $percentage_stock = (int) ( ( ( $stock_quantity - $sold_quantity ) / $stock_quantity ) * 100 );
@@ -59,7 +61,11 @@
                 return [
                     'status'  => 1 ,
                     'message' => 'success' ,
-                    'data'    => $data ];
+                    'data'    => [
+                        'out_of_stock' => $out_of_stock ,
+                        'categories'   => $data ,
+                    ]
+                ];
             }
             catch ( Exception $exception ) {
                 return [

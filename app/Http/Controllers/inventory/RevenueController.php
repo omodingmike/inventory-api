@@ -32,6 +32,7 @@
                 $difference_in_days   = $start_date -> diffInDays( $end_date );
                 $difference_in_months = $start_date -> diffInMonths( $end_date );
                 $difference_in_weeks  = $start_date -> diffInWeeks( $end_date );
+                info( $difference_in_months );
 
                 if ( $difference_in_days <= 1 ) {
                     $highest_revenues = Sale ::ofUserID( $user_id )
@@ -48,7 +49,7 @@
 //                                             -> groupBy( 'day' )
                                              -> orderBy( 'cdate' )
                                              -> get();
-                } elseif ( $difference_in_months == 1 ) {
+                } elseif ( $difference_in_days > 27 && $difference_in_days < 32 ) {
                     $month_revenues = Sale ::ofUserID( $user_id )
                                            -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
                                            -> selectRaw( 'WEEK(created_at) AS week,  SUM(grand_total) AS amount' )
@@ -62,12 +63,14 @@
 //                    $start_date       = $end_date -> copy() -> subQuarter();
                     $highest_revenues = Sale ::ofUserID( $user_id )
                                              -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
-                                             -> selectRaw( 'YEAR(created_at) AS year, MONTHNAME(created_at) AS month, MAX(grand_total) AS amount' )
-                                             -> groupBy( 'year' , 'month' )
+                                             -> selectRaw( 'YEAR(created_at) AS year, MONTHNAME(created_at) AS month ,MONTH(created_at) AS month_number, MAX(grand_total) AS amount' )
+                                             -> groupBy( 'year' , 'month' , 'month_number' )
                                              -> orderBy( 'year' )
+                                             -> orderBy( 'month_number' )
                                              -> get();
-                }
 
+
+                }
 
 //            switch ( $request -> duration ) {
 //                case '1d':
