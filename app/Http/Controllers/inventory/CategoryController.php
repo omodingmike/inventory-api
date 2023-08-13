@@ -28,6 +28,9 @@
                                          -> with( [ 'products' => function ( $query ) use ( $user_id ) {
                                              $query -> where( 'user_id' , $user_id );
                                          } , 'products.supplier' , 'products.units' ] )
+//                                         -> groupBy( 'name' )
+//                                         -> groupBy()
+//                                         -> select( [ 'name' , 'photo' , 'description' ] )
                                          -> get();
                 $data         = [];
                 $out_of_stock = 0;

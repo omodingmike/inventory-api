@@ -42,6 +42,32 @@
             }
         }
 
+        public function details ( Request $request )
+        {
+            try {
+                return [
+                    'status'  => 1 ,
+                    'message' => 'success' ,
+                    'data'    => Product ::ofUserID( $request -> user_id )
+                                         -> withID( $request -> id )
+                                         -> with( 'supplier' , 'units' , 'productCategory' , 'productSubCategory' )
+                                         -> where( 'user_id' , $request -> user_id )
+                                         -> get()
+                ];
+            }
+            catch ( Exception $exception ) {
+                return [
+                    'status'  => 0 ,
+                    'message' => $exception -> getMessage() ,
+                    'data'    => [
+                        'file' => $exception -> getTrace()[ 0 ] [ 'file' ] ,
+                        'line' => $exception -> getTrace()[ 0 ] [ 'line' ] ,
+                    ]
+                ];
+            }
+
+        }
+
         /**
          * Store a newly created resource in storage.
          *
@@ -159,4 +185,5 @@
                 ];
             }
         }
+
     }

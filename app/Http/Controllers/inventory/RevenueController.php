@@ -24,7 +24,6 @@
             try {
                 $user_id = $request -> user_id;
                 $user    = User ::find( $user_id );
-
                 $start_date = Carbon ::parse( $request -> query( 'from' ) );
                 $end_date   = Carbon ::parse( $request -> query( 'to' ) );
 
@@ -32,21 +31,19 @@
                 $difference_in_days   = $start_date -> diffInDays( $end_date );
                 $difference_in_months = $start_date -> diffInMonths( $end_date );
                 $difference_in_weeks  = $start_date -> diffInWeeks( $end_date );
-                info( $difference_in_months );
 
                 if ( $difference_in_days <= 1 ) {
                     $highest_revenues = Sale ::ofUserID( $user_id )
                                              -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
-//                                             -> selectRaw( 'DATE(created_at) AS date, HOUR(created_at) AS hour, MAX(grand_total) AS amount' )
                                              -> selectRaw( 'HOUR(created_at) AS hour, SUM(grand_total) AS amount' )
                                              -> groupBy( 'hour' )
                                              -> get();
+                    
                 } elseif ( $difference_in_weeks <= 1 ) {
                     $highest_revenues = Sale ::ofUserID( $user_id )
                                              -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
                                              -> selectRaw( 'DAYNAME(created_at) AS day,DATE(created_at) AS cdate, SUM(grand_total) AS amount' )
                                              -> groupBy( 'cdate' , 'day' )
-//                                             -> groupBy( 'day' )
                                              -> orderBy( 'cdate' )
                                              -> get();
                 } elseif ( $difference_in_days > 27 && $difference_in_days < 32 ) {

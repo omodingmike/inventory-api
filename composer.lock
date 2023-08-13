@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2e5fa24da213a74657b984af884955b8",
+    "content-hash": "9624fab27e0afaa4eceaac6fb157081f",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -1744,6 +1744,52 @@
             "time": "2022-04-17T13:12:02+00:00"
         },
         {
+            "name": "letsdrink/ouzo-goodies",
+            "version": "1.8.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/letsdrink/ouzo-goodies.git",
+                "reference": "cb7367f172643c91476fbb4e61f09ec013aa2a20"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/letsdrink/ouzo-goodies/zipball/cb7367f172643c91476fbb4e61f09ec013aa2a20",
+                "reference": "cb7367f172643c91476fbb4e61f09ec013aa2a20",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Ouzo\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ouzo developers",
+                    "email": "ouzo-framework@googlegroups.com"
+                }
+            ],
+            "description": "Utility classes, test assertions and mocking framework extracted from Ouzo framework.",
+            "homepage": "http://ouzoframework.org/",
+            "keywords": [
+                "TDD",
+                "asserts",
+                "mock",
+                "php",
+                "test",
+                "utilities",
+                "utils"
+            ],
+            "support": {
+                "source": "https://github.com/letsdrink/ouzo-goodies/tree/1.8.0"
+            },
+            "time": "2021-03-08T13:23:48+00:00"
+        },
+        {
             "name": "monolog/monolog",
             "version": "2.9.1",
             "source": {
@@ -2951,6 +2997,56 @@
                 }
             ],
             "time": "2023-04-15T23:01:58+00:00"
+        },
+        {
+            "name": "smile-identity/smile-identity-core",
+            "version": "v4.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/smileidentity/smile-identity-core-php.git",
+                "reference": "348916c1c0d58a12d639f908186246af761de269"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/smileidentity/smile-identity-core-php/zipball/348916c1c0d58a12d639f908186246af761de269",
+                "reference": "348916c1c0d58a12d639f908186246af761de269",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "ext-openssl": "*",
+                "ext-zip": "*",
+                "guzzlehttp/guzzle": "^7.0",
+                "letsdrink/ouzo-goodies": "~1.0",
+                "php": ">=7.4"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~9.5.8"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Smile Identity",
+                    "email": "support@smileidentity.com"
+                }
+            ],
+            "description": "The Official Smile Identity PHP library",
+            "homepage": "https://github.com/smileidentity/smile-identity-core-php",
+            "support": {
+                "issues": "https://github.com/smileidentity/smile-identity-core-php/issues",
+                "source": "https://github.com/smileidentity/smile-identity-core-php/tree/v4.0.0"
+            },
+            "time": "2022-12-06T13:37:06+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",

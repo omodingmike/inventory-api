@@ -70,6 +70,11 @@
             return $query -> where( 'user_id' , $user_id );
         }
 
+        public function scopeWithID ( $query , $id )
+        {
+            return $query -> where( 'id' , $id );
+        }
+
         public function scopeDuration ( $query , $start_date , $end_date )
         {
             return $query -> whereBetween( 'created_at' , [ $start_date , $end_date ] );

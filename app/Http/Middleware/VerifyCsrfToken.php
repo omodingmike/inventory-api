@@ -12,6 +12,6 @@
          * @var array<int, string>
          */
         protected $except = [
-            'ussd'
+            'ussd' , 'smile'
         ];
     }

@@ -49,7 +49,6 @@
                 foreach ( $expenses as $expense ) {
                     $this_month_total_expenditure += $expense -> amount;
                 }
-
                 return [
                     'status'  => 1 ,
                     'message' => 'success' ,
@@ -58,7 +57,6 @@
                         'income_percentage'  => $previous_month_total_sales == 0 ? 0 : number_format( ( ( $this_month_total_sales - $previous_month_total_sales ) / $previous_month_total_sales ) * 100 , 1 ) ,
                         'expenses'           => $expenses
                     ]
-
                 ];
             }
             catch ( Exception $exception ) {

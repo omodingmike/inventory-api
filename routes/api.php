@@ -7,21 +7,12 @@
     use App\Http\Controllers\inventory\ProductController;
     use App\Http\Controllers\inventory\RevenueController;
     use App\Http\Controllers\inventory\SaleController;
+    use App\Http\Controllers\inventory\SmileIDController;
     use App\Http\Controllers\inventory\SubCategoryController;
     use App\Http\Controllers\inventory\SupplierController;
     use App\Http\Controllers\inventory\UnitController;
     use Illuminate\Support\Facades\Route;
 
-    /*
-    |--------------------------------------------------------------------------
-    | API Routes
-    |--------------------------------------------------------------------------
-    |
-    | Here is where you can register API routes for your application. These
-    | routes are loaded by the RouteServiceProvider within a group which
-    | is assigned the "api" middleware group. Enjoy building your API!
-    |
-    */
 
     Route ::resource( 'products' , ProductController::class );
     Route ::resource( 'categories' , CategoryController::class );
@@ -33,13 +24,61 @@
     Route ::resource( 'subcategories' , SubCategoryController::class );
 
     Route ::resource( 'units' , UnitController::class );
-    Route ::get( 'filter-category-products' , [ ProductController::class , 'filterProducts' ] );                                                                                                                                      //category-products?category_id=1&from=01-07-2023&to=01-07-2023
-    Route ::get( 'category-products' , [ CategoryController::class , 'categoryProducts' ] );                                                                                                                                          //category-products?category_id=1&from=01-07-2023&to=01-07-2023
-    Route ::get( 'expense-categories' , [ ExpenseController::class , 'expenseCategories' ] );                                                                                                                                         //category-products?category_id=1&from=01-07-2023&to=01-07-2023
-    Route ::get( 'seed' , [ DBSeederController::class , 'seed' ] );                                                                                                                                                                   //category-products?category_id=1&from=01-07-2023&to=01-07-2023
-    Route ::get( 'sale' , [ SaleController::class , 'show' ] );                                                                                                                                                                       //category-products?category_id=1&from=01-07-2023&to=01-07-2023
-    Route ::post( 'update-product' , [ ProductController::class , 'update' ] );                                                                                                                                                       //category-products?category_id=1&from=01-07-2023&to=01-07-2023
-    Route ::get( 'expenses-incomes' , [ ExpenseController::class , 'expensesAndIncomes' ] );                                                                                                                                          //category-products?category_id=1&from=01-07-2023&to=01-07-2023
-    Route ::get( 'getProductCategories' , [ CategoryController::class , 'getCategoryProducts' ] );                        //
-    //category-products?category_id=1&from=01-07-2023&to=01-07-2023
+    Route ::get( 'filter-category-products' , [ ProductController::class , 'filterProducts' ] );
+    Route ::get( 'category-products' , [ CategoryController::class , 'categoryProducts' ] );
+    Route ::get( 'product-details' , [ ProductController::class , 'details' ] );
+    Route ::get( 'expense-categories' , [ ExpenseController::class , 'expenseCategories' ] );
+    Route ::get( 'seed' , [ DBSeederController::class , 'seed' ] );
+    Route ::get( 'sale' , [ SaleController::class , 'show' ] );
+    Route ::post( 'update-product' , [ ProductController::class , 'update' ] );
+    Route ::get( 'expenses-incomes' , [ ExpenseController::class , 'expensesAndIncomes' ] );
+    Route ::get( 'getProductCategories' , [ CategoryController::class , 'getCategoryProducts' ] );
+    Route ::post( 'smile' , [ SmileIDController::class , 'callback' ] );
+    Route ::get( 'smile' , [ SmileIDController::class , 'generateSignature' ] );
+
+    //    Route ::prefix( 'inv' ) -> namespace( 'inventory' ) -> group( function () {
+    //        //  Products Routes
+    //        Route ::get( 'filter-category-products' , 'ProductController@filterProducts ' );
+    //        Route ::post( 'products' , 'ProductController@store' );
+    //        Route ::post( 'update-product' , 'ProductController@update' );
+    //
+    //        // Categories Routes
+    //        Route ::get( 'categories' , 'CategoryController@index ' );
+    //        Route ::get( 'category-products' , 'CategoryController@index ' );
+    //        Route ::get( 'category-products' , 'CategoryController@getCategoryProducts ' );
+    //        Route ::post( 'categories' , 'CategoryController@store ' );
+    //        Route ::post( 'categories' , 'CategoryController@update ' );
+    //
+    //        // Sale Routes
+    //        Route ::get( 'sales' , 'SaleController@index ' );
+    //        Route ::get( 'sale' , 'SaleController@show ' );
+    //
+    //        // Expense Routes
+    //        Route ::get( 'expenses' , 'ExpenseController@index ' );
+    //        Route ::get( 'expense-categories' , 'ExpenseController@expenseCategories ' );
+    //        Route ::get( 'expenses-incomes' , 'ExpenseController@expensesAndIncomes ' );
+    //
+    //        // Revenue Routes
+    //        Route ::get( 'revenues' , 'RevenueController@index ' );
+    //
+    //        // Contacts Routes
+    //        Route ::get( 'contacts' , 'ContactController@index ' );
+    //        Route ::post( 'contacts' , 'ContactController@store ' );
+    //
+    //        // Supplier Routes
+    //        Route ::get( 'suppliers' , 'SupplierController@index ' );
+    //        Route ::post( 'suppliers' , 'SupplierController@store ' );
+    //
+    //        // Subcategories Routes
+    //        Route ::get( 'subcategories' , 'SubCategoryController@index ' );
+    //        Route ::post( 'subcategories' , 'SubCategoryController@store ' );
+    //
+    //        // Units Routes
+    //        Route ::get( 'units' , 'UnitController@index ' );
+    //        Route ::post( 'units' , 'UnitController@store ' );
+    //
+    //        Route ::post( 'smile' , [ SmileIDController::class , 'callback' ] );
+    //        Route ::get( 'smile' , [ SmileIDController::class , 'generateSignature' ] );
+    //    } );
+
 
