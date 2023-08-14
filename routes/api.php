@@ -2,7 +2,6 @@
 
     use App\Http\Controllers\inventory\CategoryController;
     use App\Http\Controllers\inventory\ContactController;
-    use App\Http\Controllers\inventory\DBSeederController;
     use App\Http\Controllers\inventory\ExpenseController;
     use App\Http\Controllers\inventory\ProductController;
     use App\Http\Controllers\inventory\RevenueController;
@@ -24,15 +23,21 @@
     Route ::resource( 'subcategories' , SubCategoryController::class );
 
     Route ::resource( 'units' , UnitController::class );
+
+    Route ::post( 'contact-update' , [ ContactController::class , 'update' ] );
+
     Route ::get( 'filter-category-products' , [ ProductController::class , 'filterProducts' ] );
-    Route ::get( 'category-products' , [ CategoryController::class , 'categoryProducts' ] );
-    Route ::get( 'product-details' , [ ProductController::class , 'details' ] );
-    Route ::get( 'expense-categories' , [ ExpenseController::class , 'expenseCategories' ] );
-    Route ::get( 'seed' , [ DBSeederController::class , 'seed' ] );
-    Route ::get( 'sale' , [ SaleController::class , 'show' ] );
     Route ::post( 'update-product' , [ ProductController::class , 'update' ] );
-    Route ::get( 'expenses-incomes' , [ ExpenseController::class , 'expensesAndIncomes' ] );
+    Route ::get( 'product-details' , [ ProductController::class , 'details' ] );
+
+    Route ::get( 'category-products' , [ CategoryController::class , 'categoryProducts' ] );
     Route ::get( 'getProductCategories' , [ CategoryController::class , 'getCategoryProducts' ] );
+
+    Route ::get( 'expenses-incomes' , [ ExpenseController::class , 'expensesAndIncomes' ] );
+    Route ::get( 'expense-categories' , [ ExpenseController::class , 'expenseCategories' ] );
+
+    Route ::get( 'sale' , [ SaleController::class , 'show' ] );
+
     Route ::post( 'smile' , [ SmileIDController::class , 'callback' ] );
     Route ::get( 'smile' , [ SmileIDController::class , 'generateSignature' ] );
 

@@ -14,7 +14,7 @@
         public function definition () : array
         {
             return [
-                'productName'        => $this -> faker -> name() ,
+                'productName'        => $this -> faker -> word() ,
                 'user_id'            => $this -> faker -> numberBetween( 1 , 10 ) ,
                 'productCategory'    => $this -> faker -> numberBetween( 1 , 10 ) ,
                 'productSubCategory' => $this -> faker -> numberBetween( 1 , 10 ) ,

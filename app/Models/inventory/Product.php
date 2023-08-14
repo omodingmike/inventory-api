@@ -70,7 +70,7 @@
             return $query -> where( 'user_id' , $user_id );
         }
 
-        public function scopeWithID ( $query , $id )
+        public function scopeOfID ( $query , $id )
         {
             return $query -> where( 'id' , $id );
         }

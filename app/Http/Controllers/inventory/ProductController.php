@@ -49,7 +49,7 @@
                     'status'  => 1 ,
                     'message' => 'success' ,
                     'data'    => Product ::ofUserID( $request -> user_id )
-                                         -> withID( $request -> id )
+                                         -> ofID( $request -> id )
                                          -> with( 'supplier' , 'units' , 'productCategory' , 'productSubCategory' )
                                          -> where( 'user_id' , $request -> user_id )
                                          -> get()

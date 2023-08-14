@@ -5,6 +5,7 @@
     use App\Http\Controllers\Controller;
     use App\Models\inventory\Contact;
     use App\Models\inventory\Sale;
+    use Error;
     use Exception;
     use Illuminate\Http\Request;
 
@@ -81,5 +82,39 @@
                     ]
                 ];
             }
+        }
+
+        public function update ( Request $request )
+        {
+            try {
+                return [
+                    'status'  => 1 ,
+                    'message' => 'success' ,
+                    'data'    => [ 'updated' => ( Contact ::find( $request -> id ) )
+                        -> update( $request -> except( 'id' ) ) ]
+                ];
+            }
+            catch ( Exception $exception ) {
+                return [
+                    'status'  => 0 ,
+                    'message' => $exception -> getMessage() ,
+                    'data'    => [
+                        'Error' => $exception -> getTrace()[ 0 ] [ 'file' ] ,
+                        'file'  => $exception -> getTrace()[ 0 ] [ 'file' ] ,
+                        'line'  => $exception -> getTrace()[ 0 ] [ 'line' ] ,
+                    ]
+                ];
+            }
+            catch ( Error $error ) {
+                return [
+                    'status'  => 0 ,
+                    'message' => $error -> getMessage() ,
+                    'data'    => [
+                        'file' => $error -> getTrace()[ 0 ] [ 'file' ] ,
+                        'line' => $error -> getTrace()[ 0 ] [ 'line' ] ,
+                    ]
+                ];
+            }
+
         }
     }
