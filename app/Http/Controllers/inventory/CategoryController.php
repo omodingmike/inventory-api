@@ -36,6 +36,7 @@
                 $out_of_stock = 0;
                 foreach ( $categories as $category ) {
                     $test                = [
+                        'id'          => $category -> id ,
                         'name'        => $category -> name ,
                         'description' => $category -> description ,
                         'photo'       => $category -> photo ,
