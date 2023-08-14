@@ -52,7 +52,7 @@
                                          -> ofID( $request -> id )
                                          -> with( 'supplier' , 'units' , 'productCategory' , 'productSubCategory' )
                                          -> where( 'user_id' , $request -> user_id )
-                                         -> get()
+                                         -> first()
                 ];
             }
             catch ( Exception $exception ) {
