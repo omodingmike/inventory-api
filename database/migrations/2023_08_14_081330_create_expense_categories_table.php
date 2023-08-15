@@ -4,7 +4,7 @@
     use Illuminate\Database\Schema\Blueprint;
     use Illuminate\Support\Facades\Schema;
 
-    class CreateExpensesTable extends Migration
+    class CreateExpenseCategoriesTable extends Migration
     {
         /**
          * Run the migrations.
@@ -13,12 +13,10 @@
          */
         public function up ()
         {
-            Schema ::create( 'inv_expenses' , function ( Blueprint $table ) {
+            Schema ::create( 'expense_categories' , function ( Blueprint $table ) {
                 $table -> id();
-                $table -> string( 'expense_id' );
-                $table -> integer( 'amount' );
                 $table -> integer( 'user_id' );
-                $table -> dateTime( 'date' );
+                $table -> string( 'name' );
                 $table -> timestamps();
             } );
         }
@@ -30,6 +28,6 @@
          */
         public function down ()
         {
-            Schema ::dropIfExists( 'expenses' );
+            Schema ::dropIfExists( 'expense_categories' );
         }
     }

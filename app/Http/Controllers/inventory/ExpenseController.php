@@ -3,6 +3,7 @@
     namespace App\Http\Controllers\inventory;
 
     use App\Http\Controllers\Controller;
+    use App\Models\ExpenseCategory;
     use App\Models\inventory\Expense;
     use App\Models\inventory\Sale;
     use Exception;
@@ -40,14 +41,21 @@
 
                 $expenses = Expense :: ofUserID( $user_id )
                                     -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
-                                    -> selectRaw( 'DAYNAME(date) AS day,DATE(date) AS cdate, SUM(amount) AS amount' )
-                                    -> groupBy( 'day' , 'cdate' )
-                                    -> orderBy( 'cdate' )
+                                    -> with( 'expenseCategory' )
+//                                    -> selectRaw( 'DAYNAME(date) AS day,DATE(date) AS cdate, SUM(amount) AS amount' )
+//                                    -> groupBy( 'day' , 'cdate' )
+                                    -> orderBy( 'date' )
                                     -> get();
 
                 $this_month_total_expenditure = 0;
+                $expense_data                 = [];
                 foreach ( $expenses as $expense ) {
+                    $item[ 'id' ]                 = $expense -> id;
+                    $item[ 'name' ]               = $expense -> expenseCategory -> name;
+                    $item[ 'amount' ]             = $expense -> amount;
+                    $item[ 'date' ]               = $expense -> date;
                     $this_month_total_expenditure += $expense -> amount;
+                    $expense_data[]               = $item;
                 }
                 return [
                     'status'  => 1 ,
@@ -55,7 +63,7 @@
                     'data'    => [
                         'expense_percentage' => $previous_month_total_expenses == 0 ? 0 : number_format( ( ( $this_month_total_expenditure - $previous_month_total_expenses ) / $previous_month_total_expenses ) * 100 , 1 ) ,
                         'income_percentage'  => $previous_month_total_sales == 0 ? 0 : number_format( ( ( $this_month_total_sales - $previous_month_total_sales ) / $previous_month_total_sales ) * 100 , 1 ) ,
-                        'expenses'           => $expenses
+                        'expenses'           => $expense_data
                     ]
                 ];
             }
@@ -78,8 +86,7 @@
                     'status'  => 1 ,
                     'message' => 'success' ,
                     'data'    => Expense ::ofUserID( $request -> user_id )
-                                         -> groupBy( 'name' )
-                                         -> get( 'name' )
+                                         -> get( [ 'id' , 'name' ] )
 
                 ];
             }
@@ -105,13 +112,20 @@
         public function store ( Request $request )
         {
             try {
-                $validated           = $request -> validate(
+                $validated        = $request -> validate(
                     [ 'name'    => 'required' ,
                       'amount'  => 'required' ,
                       'date'    => 'required' ,
                       'user_id' => 'required'
                     ] );
+                $expense_category = ExpenseCategory ::where( 'name' , $validated[ 'name' ] ) -> first();
+                if ( $expense_category ) {
+                    $validated[ 'expense_id' ] = $expense_category -> id;
+                } else {
+                    $validated[ 'expense_id' ] = ( ExpenseCategory ::create( $validated ) ) -> id;
+                }
                 $validated[ 'date' ] = date( 'Y-m-d' , strtotime( $request -> date ) );
+                unset( $validated[ 'name' ] );
 
                 return [
                     'status'  => 1 ,
@@ -163,8 +177,8 @@
 
                     $expenses_statistics = Expense :: ofUserID( $user_id )
                                                    -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
-                                                   -> selectRaw( 'name, SUM(amount) AS amount' )
-                                                   -> groupBy( 'name' )
+                                                   -> selectRaw( 'id, SUM(amount) AS amount' )
+                                                   -> groupBy( 'id' )
                                                    -> get();
                 } else {
                     $expenses = Expense :: ofUserID( $user_id )
@@ -179,7 +193,7 @@
                                         -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
                                         -> orderBy( 'amount' , 'desc' )
                                         -> limit( 2 )
-                                        -> get( [ 'name' , 'amount' , 'date' ] );
+                                        -> get( [ 'id' , 'amount' , 'date' ] );
 
                 $sales = Sale ::ofUserID( $user_id )
                               -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )

@@ -2,23 +2,31 @@
 
     namespace App\Models\inventory;
 
+    use App\Models\ExpenseCategory;
     use Illuminate\Database\Eloquent\Factories\HasFactory;
     use Illuminate\Database\Eloquent\Model;
+    use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
     class Expense extends Model
     {
         use HasFactory;
 
-        protected $fillable = [ 'amount' , 'name' , 'date' , 'user_id' ];
+        protected $fillable = [ 'amount' , 'name' , 'date' , 'user_id' , 'expense_id' ];
         protected $hidden   = [ 'created_at' , 'updated_at' ];
         protected $table    = 'inv_expenses';
 
         public function getDateAttribute ( $value )
         {
             if ( $value ) {
-                return date( 'd-m-Y' , strtotime( $value ) );
+                return date( 'jS M Y' , strtotime( $value ) );
             }
             return null;
+        }
+
+        public function expenseCategory () : BelongsTo
+        {
+            return $this -> belongsTo( ExpenseCategory::class , 'expense_id' , 'id' );
+//            return $this -> belongsTo( ExpenseCategory::class , 'id' , 'expense_id' );
         }
 
         /**

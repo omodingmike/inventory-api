@@ -65,7 +65,6 @@
                     ]
                 ];
             }
-
         }
 
         /**
@@ -76,7 +75,6 @@
          */
         public function store ( Request $request )
         {
-
             $store_data            = $request -> all();
             $store_data[ 'photo' ] = Uploads ::upload_image( $request );
 
@@ -98,7 +96,6 @@
 
             return Product ::create( $store_data );
         }
-
 
         public function filterProducts ( Request $request )
         {

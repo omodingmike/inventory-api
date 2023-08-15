@@ -2,6 +2,7 @@
 
     namespace App\Providers;
 
+    use Illuminate\Support\Facades\Artisan;
     use Illuminate\Support\ServiceProvider;
 
     class AppServiceProvider extends ServiceProvider
@@ -23,7 +24,7 @@
          */
         public function boot ()
         {
-//            Artisan ::call( 'route:clear' );
+            Artisan ::call( 'route:clear' );
 //            Artisan ::call( 'db:seed' );
 //            info( Hash ::make( 'omodingmike@gmail.com' ) );
         }

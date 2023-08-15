@@ -1,5 +1,6 @@
 <?php
 
+    use App\Http\Controllers\ExpenseCategoryController;
     use App\Http\Controllers\inventory\CategoryController;
     use App\Http\Controllers\inventory\ContactController;
     use App\Http\Controllers\inventory\ExpenseController;
@@ -14,6 +15,7 @@
 
 
     Route ::resource( 'products' , ProductController::class );
+    Route ::resource( 'expense-categories' , ExpenseCategoryController::class );
     Route ::resource( 'categories' , CategoryController::class );
     Route ::resource( 'sales' , SaleController::class );
     Route ::resource( 'revenues' , RevenueController::class );
@@ -34,11 +36,15 @@
     Route ::get( 'getProductCategories' , [ CategoryController::class , 'getCategoryProducts' ] );
 
     Route ::get( 'expenses-incomes' , [ ExpenseController::class , 'expensesAndIncomes' ] );
-    Route ::get( 'expense-categories' , [ ExpenseController::class , 'expenseCategories' ] );
+//    Route ::get( 'expense-categories' , [ ExpenseController::class , 'expenseCategories' ] );
 
     Route ::get( 'sale' , [ SaleController::class , 'show' ] );
+    Route ::get( 'generate' , [ SmileIDController::class , 'generateSignature' ] );
+    Route ::post( 'test' , [ SmileIDController::class , 'pathExists' ] );
+    Route ::post( 'files' , [ SmileIDController::class , 'files' ] );
+    Route ::post( 'submit' , [ SmileIDController::class , 'submitJob' ] );
 
-    Route ::post( 'smile' , [ SmileIDController::class , 'callback' ] );
+    Route ::post( 'smile' , [ SmileIDController::class , 'callback' ] ) -> name( 'callback' );
     Route ::get( 'smile' , [ SmileIDController::class , 'generateSignature' ] );
 
     //    Route ::prefix( 'inv' ) -> namespace( 'inventory' ) -> group( function () {

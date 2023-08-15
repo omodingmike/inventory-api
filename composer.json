@@ -9,13 +9,15 @@
     "license": "MIT",
     "require": {
         "php": "^7.4|^8.0",
+        "ext-json": "*",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
         "intervention/image": "^2.7",
         "laravel/framework": "^8.75",
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
-        "smile-identity/smile-identity-core": "^4.0"
+        "letsdrink/ouzo-goodies": "^1.8",
+        "ext-zip": "*"
     },
     "require-dev": {
         "facade/ignition": "^2.5",
