@@ -3,6 +3,7 @@
     namespace App\Http\Controllers\inventory;
 
     use App\helpers\Constants;
+    use App\helpers\Uploads;
     use App\Http\Controllers\Controller;
     use App\smileID\SmileIdentityCore;
     use DateTimeInterface;
@@ -10,8 +11,6 @@
     use GuzzleHttp\Exception\GuzzleException;
     use Illuminate\Http\Request;
     use Illuminate\Support\Arr;
-    use Illuminate\Support\Facades\Storage;
-    use Intervention\Image\Facades\Image;
     use Ouzo\Utilities\Clock;
 
     class SmileIDController extends Controller
@@ -23,17 +22,21 @@
 
         public function files ( Request $request )
         {
-            info( $request );
-            foreach ( $request -> files as $file ) {
-//                $uploaded_image = $request -> file( 'photo' );
-                info( $file-> );
-                $filename = 'public/images/' . time() . $file->get . '.' . $file -> getClientOriginalExtension();
-                // Create an instance of the Intervention Image
-                $image = Image ::make( $file );
-                // Resize the image if needed
-                $image -> resize( 100 , 100 );
-                Storage ::put( $filename , $image -> encode() );
+            if ( $request -> hasFile( 'selfie' ) ) {
+                info( $request -> file( 'selfie' ) -> getClientOriginalName() );
+            } else {
+                info( 'file does not exist' );
             }
+//            foreach ( $request -> files as $file ) {
+////                $uploaded_image = $request -> file( 'photo' );
+//                info( $request );
+//                $filename = 'public/images/' . time() . $file -> get . '.' . $file -> getClientOriginalExtension();
+//                // Create an instance of the Intervention Image
+//                $image = Image ::make( $file );
+//                // Resize the image if needed
+//                $image -> resize( 100 , 100 );
+//                Storage ::put( $filename , $image -> encode() );
+//            }
         }
 
         public function pathExists ( Request $request )
@@ -60,6 +63,9 @@
          */
         public function submitJob ( Request $request )
         {
+            $selfie = Uploads ::upload_image( $request , 'selfie' );
+            $id     = Uploads ::upload_image( $request , 'id' );
+
             // Docs
             // https://docs.usesmileid.com/integration-options/server-to-server/php/products/document-verification
             $partner_id       = Constants::PARTNER_ID;                  // login to the Smile ID portal to view your partner id
@@ -83,13 +89,13 @@
             $image_details  = [
                 [
                     'image_type_id' => 0 ,
-                    'image'         => storage_path( 'app/images/Selfie.jpg' )
-//                    'image'         => $request -> file( 'selfie' )
+                    'image'         => storage_path( 'app/' . $selfie )
+//                    'image'         => storage_path( 'app/images/Selfie.jpg' )
                 ] ,
                 [
                     'image_type_id' => 1 ,
-                    'image'         => storage_path( 'app/images/ID.jpg' )
-//                    'image'         => $request -> file( 'id' )
+                    'image'         => storage_path( 'app/' . $id )
+//                    'image'         => storage_path( 'app/images/ID.jpg' )
                 ]
             ];
 
