@@ -8,7 +8,6 @@
     use Exception;
     use Illuminate\Database\QueryException;
     use Illuminate\Http\Request;
-    use Illuminate\Http\Response;
     use Illuminate\Support\Carbon;
     use Illuminate\Support\Facades\DB;
 
@@ -71,30 +70,54 @@
          * Store a newly created resource in storage.
          *
          * @param Request $request
-         * @return Response
+         * @return array
          */
         public function store ( Request $request )
         {
-            $store_data            = $request -> all();
-            $store_data[ 'photo' ] = Uploads ::upload_image( $request );
+            try {
+                DB ::beginTransaction();
+                $store_data            = $request -> all();
+                $store_data[ 'photo' ] = Uploads ::upload_image( $request , 'photo' );
 
-            $store_data[ 'supplier' ] = DB ::table( 'inv_suppliers' )
-                                           -> where( 'name' , $request -> supplier )
-                                           -> first() -> id;
+                $store_data[ 'supplier' ] = DB ::table( 'inv_suppliers' )
+                                               -> where( 'name' , $request -> supplier )
+                                               -> first() -> id;
 
-            $store_data[ 'productCategory' ] = DB ::table( 'inv_categories' )
-                                                  -> where( 'name' , $request -> productCategory )
-                                                  -> first() -> id;
+                $store_data[ 'productCategory' ] = DB ::table( 'inv_categories' )
+                                                      -> where( 'name' , $request -> productCategory )
+                                                      -> first() -> id;
 
-            $store_data[ 'productSubCategory' ] = DB ::table( 'inv_sub_categories' )
-                                                     -> where( 'name' , $request -> productSubCategory )
-                                                     -> first() -> id;
+                $store_data[ 'productSubCategory' ] = DB ::table( 'inv_sub_categories' )
+                                                         -> where( 'name' , $request -> productSubCategory )
+                                                         -> first() -> id;
 
-            $store_data[ 'units' ] = DB ::table( 'inv_units' )
-                                        -> where( 'name' , $request -> units )
-                                        -> first() -> id;
+                $store_data[ 'units' ]   = DB ::table( 'inv_units' )
+                                              -> where( 'name' , $request -> units )
+                                              -> first() -> id;
+                $store_data[ 'balance' ] = $request -> quantity * $request -> retailPrice;
 
-            return Product ::create( $store_data );
+                Product ::create( $store_data );
+                DB ::commit();
+                return [
+                    'status'  => 1 ,
+                    'message' => 'success' ,
+                    'data'    => [
+                        'message' => 'Product created successfully' ,
+                    ]
+                ];
+            }
+            catch ( Exception $exception ) {
+                DB ::rollBack();
+                return [
+                    'status'  => 0 ,
+                    'message' => 'failed' ,
+                    'data'    => [
+                        'message' => $exception -> getMessage() ,
+                        'file'    => $exception -> getTrace()[ 0 ] [ 'file' ] ,
+                        'line'    => $exception -> getTrace()[ 0 ] [ 'line' ] ,
+                    ]
+                ];
+            }
         }
 
         public function filterProducts ( Request $request )

@@ -4,7 +4,6 @@
 
     use App\Http\Controllers\Controller;
     use App\Models\inventory\Unit;
-    use Illuminate\Database\Eloquent\Collection;
     use Illuminate\Http\Request;
     use Illuminate\Http\Response;
 
@@ -13,11 +12,15 @@
         /**
          * Display a listing of the resource.
          *
-         * @return Collection|Unit[]
+         * @return Unit[]
          */
         public function index ()
         {
-            return Unit ::all();
+            return [
+                'status'  => 1 ,
+                'message' => 'success' ,
+                'data'    => Unit ::all()
+            ];
         }
 
         /**

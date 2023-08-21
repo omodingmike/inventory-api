@@ -140,7 +140,8 @@
         {
             try {
                 DB ::beginTransaction();
-                $validated      = $request -> validate( [ 'name' => 'required|string' , 'photo' => 'required|image' ] );
+                $validated      = $request -> validate( [ 'name'    => 'required|string' , 'photo' => 'required|image' ,
+                                                          'user_id' => 'required|string' , 'description' => 'required|string' ] );
                 $uploaded_image = $request -> file( 'photo' );
                 $filename       = 'public/images/' . time() . '.' . $uploaded_image -> getClientOriginalExtension();
                 $image          = Image ::make( $uploaded_image );

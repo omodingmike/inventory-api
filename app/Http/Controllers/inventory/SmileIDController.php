@@ -63,15 +63,14 @@
          */
         public function submitJob ( Request $request )
         {
-            $selfie = Uploads ::upload_image( $request , 'selfie' );
-            $id     = Uploads ::upload_image( $request , 'id' );
-
-            // Docs
+            $selfie   = Uploads ::upload_image( $request , 'selfie' );
+            $id_front = Uploads ::upload_image( $request , 'id_front' );
+            $id_back  = Uploads ::upload_image( $request , 'id_back' );
             // https://docs.usesmileid.com/integration-options/server-to-server/php/products/document-verification
-            $partner_id       = Constants::PARTNER_ID;                  // login to the Smile ID portal to view your partner id
-            $default_callback = route( 'callback' );                    //callback is only required if you are running an asynchronous job
-            $api_key          = Constants::PRODUCTION_API_KEY;          // copy your API key from the Smile ID portal
-            $sid_server       = 1;                                      // Use '0' for the sandbox server, use '1' for production server
+            $partner_id       = Constants::PARTNER_ID;
+            $default_callback = route( 'callback' );
+            $api_key          = Constants::PRODUCTION_API_KEY;
+            $sid_server       = 1;
 
             $connection = new SmileIdentityCore(
                 $partner_id ,
@@ -80,7 +79,6 @@
                 $sid_server
             );
 
-// Create required tracking parameters
             $partner_params = [
                 'job_id'   => 'J' . time() ,
                 'user_id'  => 'U427' . time() ,
@@ -94,9 +92,12 @@
                 ] ,
                 [
                     'image_type_id' => 1 ,
-                    'image'         => storage_path( 'app/' . $id )
+                    'image'         => storage_path( 'app/' . $id_front )
 //                    'image'         => storage_path( 'app/images/ID.jpg' )
-                ]
+                ] ,
+                [
+                    'image_type_id' => 5 ,
+                    'image'         => storage_path( 'app/' . $id_back ) ]
             ];
 
             // The ID Document Information

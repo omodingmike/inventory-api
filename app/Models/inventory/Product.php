@@ -13,7 +13,7 @@
 //    protected $dateFormat = 'd-m-Y';
 
         protected $fillable = [
-            'productName' , 'productCode' , 'productCategory' , 'productSubCategory' , 'discount' , 'retailPrice' , 'purchasePrice' , 'wholeSalePrice' , 'photo' , 'quantity' , 'units' , 'supplier' , 'sold'
+            'productName' , 'productCode' , 'productCategory' , 'productSubCategory' , 'discount' , 'retailPrice' , 'purchasePrice' , 'wholeSalePrice' , 'photo' , 'quantity' , 'units' , 'supplier' , 'sold' , 'user_id' , 'balance'
         ];
         protected $hidden   = [ 'updated_at' ];
         protected $table    = 'inv_products';

@@ -12,7 +12,7 @@
 
         protected string $update_query = 'ALTER TABLE `inv_categories` ADD `user_id` INT NOT NULL AFTER `id`;';
 
-        protected $fillable = [ 'name' , 'photo' ];
+        protected $fillable = [ 'name' , 'photo' , 'user_id' , 'description' ];
         protected $hidden   = [ 'created_at' , 'updated_at' ];
         protected $table    = 'inv_categories';
 
