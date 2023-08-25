@@ -13,7 +13,7 @@
          */
         public function up ()
         {
-            Schema ::create( 'expense_categories' , function ( Blueprint $table ) {
+            Schema ::create( 'inv_expense_categories' , function ( Blueprint $table ) {
                 $table -> id();
                 $table -> integer( 'user_id' );
                 $table -> string( 'name' );

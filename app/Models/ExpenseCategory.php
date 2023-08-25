@@ -13,6 +13,7 @@
 
         protected $hidden   = [ 'created_at' , 'updated_at' , 'user_id' ];
         protected $fillable = [ 'name' , 'user_id' ];
+        protected $table    = 'inv_expense_categories';
 
         public function scopeOfUserID ( $query , $user_id )
         {
