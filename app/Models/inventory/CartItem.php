@@ -10,7 +10,7 @@
     {
         use HasFactory;
 
-        protected $fillable = [ 'sale_id' , 'quantity' , 'productID' , 'total' ];
+        protected $fillable = [ 'sale_id' , 'quantity' , 'product_id' , 'total' ];
         protected $hidden   = [ 'updated_at' , 'created_at' ];
         protected $table    = 'inv_cart_items';
 
@@ -21,6 +21,6 @@
 
         public function product () : BelongsTo
         {
-            return $this -> belongsTo( Product::class , 'productID' , 'id' );
+            return $this -> belongsTo( Product::class , 'product_id' , 'id' );
         }
     }

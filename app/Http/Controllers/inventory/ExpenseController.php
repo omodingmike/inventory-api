@@ -199,7 +199,7 @@
 
                 $sales = Sale ::ofUserID( $user_id )
                               -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
-                              -> with( 'saleItems.product.productCategory' )
+                              -> with( 'saleItems.product.category' )
                               -> orderBy( 'grand_total' , 'desc' )
                               -> limit( 2 )
                               -> get();
@@ -212,7 +212,7 @@
                     if ( count( $sale -> saleItems ) > 0 ) {
                         $top_in_flow -> push(
                             [
-                                'name'       => ( $sale -> saleItems )[ 0 ] -> product -> productCategory() -> first() -> name ,
+                                'name'       => ( $sale -> saleItems )[ 0 ] -> product -> category() -> first() -> name ,
                                 'amount'     => $sale -> grand_total ,
                                 'created_at' => $sale -> created_at
                             ] );

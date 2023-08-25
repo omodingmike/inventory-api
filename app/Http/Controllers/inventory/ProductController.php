@@ -24,7 +24,7 @@
                 return [
                     'status'  => 1 ,
                     'message' => 'success' ,
-                    'data'    => Product ::with( 'supplier' , 'units' , 'productCategory' , 'productSubCategory' )
+                    'data'    => Product ::with( 'supplier' , 'units' , 'category' , 'subCategory' )
                                          -> where( 'user_id' , $request -> user_id )
                                          -> get()
                 ];
@@ -49,7 +49,7 @@
                     'message' => 'success' ,
                     'data'    => Product ::ofUserID( $request -> user_id )
                                          -> ofID( $request -> id )
-                                         -> with( 'supplier' , 'units' , 'productCategory' , 'productSubCategory' )
+                                         -> with( 'supplier' , 'units' , 'category' , 'subCategory' )
                                          -> where( 'user_id' , $request -> user_id )
                                          -> first()
                 ];
@@ -83,18 +83,18 @@
                                                -> where( 'name' , $request -> supplier )
                                                -> first() -> id;
 
-                $store_data[ 'productCategory' ] = DB ::table( 'inv_categories' )
-                                                      -> where( 'name' , $request -> productCategory )
-                                                      -> first() -> id;
+                $store_data[ 'category' ] = DB ::table( 'inv_categories' )
+                                               -> where( 'name' , $request -> category )
+                                               -> first() -> id;
 
-                $store_data[ 'productSubCategory' ] = DB ::table( 'inv_sub_categories' )
-                                                         -> where( 'name' , $request -> productSubCategory )
-                                                         -> first() -> id;
+                $store_data[ 'sub_category' ] = DB ::table( 'inv_sub_categories' )
+                                                   -> where( 'name' , $request -> sub_category )
+                                                   -> first() -> id;
 
                 $store_data[ 'units' ]   = DB ::table( 'inv_units' )
                                               -> where( 'name' , $request -> units )
                                               -> first() -> id;
-                $store_data[ 'balance' ] = $request -> quantity * $request -> retailPrice;
+                $store_data[ 'balance' ] = $request -> quantity * $request -> retail_price;
 
                 Product ::create( $store_data );
                 DB ::commit();
@@ -128,8 +128,8 @@
                 $end_date       = Carbon ::parse( $request -> query( 'to' ) ) -> copy() -> endOfDay();
                 $products       = Product ::ofUserID( $user_id )
                                           -> duration( $start_date , $end_date )
-                                          -> with( 'supplier' , 'units' , 'productCategory' , 'productSubCategory' )
-                                          -> where( 'productCategory' , $request -> query( 'productCategory' ) )
+                                          -> with( 'supplier' , 'units' , 'category' , 'subCategory' )
+                                          -> where( 'category' , $request -> query( 'productCategory' ) )
                                           -> get();
                 $total_quantity = 0;
                 $total_balance  = 0;
@@ -171,26 +171,26 @@
         {
             try {
                 DB ::beginTransaction();
-                $product                             = Product ::find( $request -> id );
-                $update_data                         = $request -> except( 'id' );
-                $update_data[ 'supplier' ]           = DB ::table( 'inv_suppliers' )
-                                                          -> where( 'name' , $request -> supplier )
-                                                          -> first() -> id;
-                $update_data[ 'productCategory' ]    = DB ::table( 'inv_categories' )
-                                                          -> where( 'name' , $request -> productCategory )
-                                                          -> first() -> id;
-                $update_data[ 'productSubCategory' ] = DB ::table( 'inv_sub_categories' )
-                                                          -> where( 'name' , $request -> productSubCategory )
-                                                          -> first() -> id;
-                $update_data[ 'units' ]              = DB ::table( 'inv_units' )
-                                                          -> where( 'name' , $request -> units )
-                                                          -> first() -> id;
+                $product                       = Product ::find( $request -> id );
+                $update_data                   = $request -> except( 'id' );
+                $update_data[ 'supplier' ]     = DB ::table( 'inv_suppliers' )
+                                                    -> where( 'name' , $request -> supplier )
+                                                    -> first() -> id;
+                $update_data[ 'category' ]     = DB ::table( 'inv_categories' )
+                                                    -> where( 'name' , $request -> category )
+                                                    -> first() -> id;
+                $update_data[ 'sub_category' ] = DB ::table( 'inv_sub_categories' )
+                                                    -> where( 'name' , $request -> sub_category )
+                                                    -> first() -> id;
+                $update_data[ 'units' ]        = DB ::table( 'inv_units' )
+                                                    -> where( 'name' , $request -> units )
+                                                    -> first() -> id;
                 $product -> update( $update_data );
                 DB ::commit();
                 return [
                     'status'  => 1 ,
                     'message' => 'success' ,
-                    'data'    => []
+                    'data'    => [ $product ]
                 ];
             }
             catch ( QueryException $exception ) {

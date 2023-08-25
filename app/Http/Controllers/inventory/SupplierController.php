@@ -31,7 +31,7 @@
         public function store ( Request $request )
         {
             $validated            = $request -> validate( [ 'name' => 'required|string' , 'photo' => 'required|image' , ] );
-            $validated[ 'photo' ] = Uploads ::upload_image( $request );
+            $validated[ 'photo' ] = Uploads ::upload_image( $request , 'photo' );
             return [
                 'status'  => 1 ,
                 'message' => 'success' ,

@@ -89,7 +89,7 @@
                 return [
                     'status'  => 1 ,
                     'message' => 'success' ,
-                    'data'    => Category ::with( 'products.supplier' , 'products.units' , 'products.productSubCategory' )
+                    'data'    => Category ::with( 'products.supplier' , 'products.units' , 'products.sub_category' )
                                           -> get() ];
             }
             catch ( Exception $exception ) {

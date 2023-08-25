@@ -95,11 +95,11 @@
                 ] );
 
                 foreach ( Arr ::get( $request , 'items' ) as $item ) {
-                    $item[ 'sale_id' ]   = $sale -> id;
-                    $product             = Product ::ofUserID( $user_id )
-                                                   -> where( 'productName' , $item [ 'productName' ] )
-                                                   -> first();
-                    $item[ 'productID' ] = $product -> id;
+                    $item[ 'sale_id' ]    = $sale -> id;
+                    $product              = Product ::ofUserID( $user_id )
+                                                    -> where( 'name' , $item [ 'name' ] )
+                                                    -> first();
+                    $item[ 'product_id' ] = $product -> id;
                     $product -> increment( 'sold' , $item [ 'quantity' ] );
                     CartItem ::create( $item );
                 }

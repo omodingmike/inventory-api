@@ -14,10 +14,10 @@
         public function definition () : array
         {
             return [
-                'sale_id'   => $this -> faker -> numberBetween( 1 , 1000 ) ,
-                'productID' => $this -> faker -> numberBetween( 1 , 1000 ) ,
-                'quantity'  => $this -> faker -> numberBetween( 1 , 100 ) ,
-                'total'     => $this -> faker -> numberBetween( 10000 , 100000 ) ,
+                'sale_id'    => $this -> faker -> numberBetween( 1 , 1000 ) ,
+                'product_id' => $this -> faker -> numberBetween( 1 , 1000 ) ,
+                'quantity'   => $this -> faker -> numberBetween( 1 , 100 ) ,
+                'total'      => $this -> faker -> numberBetween( 10000 , 100000 ) ,
             ];
         }
     }

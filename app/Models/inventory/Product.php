@@ -13,7 +13,7 @@
 //    protected $dateFormat = 'd-m-Y';
 
         protected $fillable = [
-            'productName' , 'productCode' , 'productCategory' , 'productSubCategory' , 'discount' , 'retailPrice' , 'purchasePrice' , 'wholeSalePrice' , 'photo' , 'quantity' , 'units' , 'supplier' , 'sold' , 'user_id' , 'balance'
+            'name' , 'code' , 'category' , 'sub_category' , 'discount' , 'retail_price' , 'purchase_price' , 'whole_sale_price' , 'photo' , 'quantity' , 'units' , 'supplier' , 'sold' , 'user_id' , 'balance'
         ];
         protected $hidden   = [ 'updated_at' ];
         protected $table    = 'inv_products';
@@ -38,20 +38,20 @@
         public function getBalanceAttribute ( $value )
         {
             if ( $value ) {
-                return $this -> attributes[ 'balance' ] = $this -> attributes[ 'quantity' ] * $this -> attributes[ 'retailPrice' ];
+                return $this -> attributes[ 'balance' ] = $this -> attributes[ 'quantity' ] * $this -> attributes[ 'retail_price' ];
             }
             return null;
         }
 
-        public function productCategory () : BelongsTo
+        public function category () : BelongsTo
         {
-            return $this -> belongsTo( Category::class , 'productCategory' , 'id' );
+            return $this -> belongsTo( Category::class , 'category' , 'id' );
         }
 
 
-        public function productSubCategory () : BelongsTo
+        public function subCategory () : BelongsTo
         {
-            return $this -> belongsTo( SubCategory::class , 'productSubCategory' , 'id' );
+            return $this -> belongsTo( SubCategory::class , 'sub_category' , 'id' );
         }
 
 

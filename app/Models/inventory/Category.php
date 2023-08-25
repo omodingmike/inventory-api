@@ -18,7 +18,7 @@
 
         public function products () : HasMany
         {
-            return $this -> hasMany( Product::class , 'productCategory' , 'id' );
+            return $this -> hasMany( Product::class , 'category' , 'id' );
         }
 
         public function scopeOfUserID ( $query , $user_id )
