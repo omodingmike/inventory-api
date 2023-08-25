@@ -1,8 +1,8 @@
 <?php
 
-    use App\Http\Controllers\ExpenseCategoryController;
     use App\Http\Controllers\inventory\CategoryController;
     use App\Http\Controllers\inventory\ContactController;
+    use App\Http\Controllers\inventory\ExpenseCategoryController;
     use App\Http\Controllers\inventory\ExpenseController;
     use App\Http\Controllers\inventory\ProductController;
     use App\Http\Controllers\inventory\RevenueController;

@@ -63,76 +63,87 @@
          */
         public function submitJob ( Request $request )
         {
-            $selfie   = Uploads ::upload_image( $request , 'selfie' );
-            $id_front = Uploads ::upload_image( $request , 'id_front' );
-            $id_back  = Uploads ::upload_image( $request , 'id_back' );
-            // https://docs.usesmileid.com/integration-options/server-to-server/php/products/document-verification
-            $partner_id       = Constants::PARTNER_ID;
-            $default_callback = route( 'callback' );
-            $api_key          = Constants::PRODUCTION_API_KEY;
-            $sid_server       = 1;
+            try {
+                $selfie   = Uploads ::upload_image( $request , 'selfie' );
+                $id_front = Uploads ::upload_image( $request , 'id_front' );
+                $id_back  = Uploads ::upload_image( $request , 'id_back' );
 
-            $connection = new SmileIdentityCore(
-                $partner_id ,
-                $default_callback ,
-                $api_key ,
-                $sid_server
-            );
+                // https://docs.usesmileid.com/integration-options/server-to-server/php/products/document-verification
+                $partner_id       = Constants::PARTNER_ID;
+                $default_callback = route( 'callback' );
+                $api_key          = Constants::PRODUCTION_API_KEY;
+                $sid_server       = 1;
 
-            $partner_params = [
-                'job_id'   => 'J' . time() ,
-                'user_id'  => 'U427' . time() ,
-                'job_type' => 6
-            ];
-            $image_details  = [
-                [
-                    'image_type_id' => 0 ,
-                    'image'         => storage_path( 'app/' . $selfie )
+                $connection = new SmileIdentityCore(
+                    $partner_id ,
+                    $default_callback ,
+                    $api_key ,
+                    $sid_server
+                );
+
+                $partner_params = [
+                    'job_id'   => 'J' . time() ,
+                    'user_id'  => 'U427' . time() ,
+                    'job_type' => 6
+                ];
+                $image_details  = [
+                    [
+                        'image_type_id' => 0 ,
+                        'image'         => storage_path( 'app/' . $selfie )
 //                    'image'         => storage_path( 'app/images/Selfie.jpg' )
-                ] ,
-                [
-                    'image_type_id' => 1 ,
-                    'image'         => storage_path( 'app/' . $id_front )
+
+                    ] ,
+                    [
+                        'image_type_id' => 1 ,
+                        'image'         => storage_path( 'app/' . $id_front )
 //                    'image'         => storage_path( 'app/images/ID.jpg' )
-                ] ,
-                [
-                    'image_type_id' => 5 ,
-                    'image'         => storage_path( 'app/' . $id_back ) ]
-            ];
 
-            // The ID Document Information
-            $id_info = [
-                'country' => 'UG' ,                        // The country where ID document was issued
-                'id_type' => 'NATIONAL_ID'                 // The ID document type
-            ];
+                    ] ,
+                    [
+                        'image_type_id' => 5 ,
+                        'image'         => storage_path( 'app/' . $id_back ) ]
+                ];
 
-            // Set the options for the job
-            $options = [
-                'return_job_status'  => true ,  // Set to true if you want to get the job result in sync (in addition to the result been sent to your callback). If set to false, result is sent to callback url only.
-                'return_history'     => false , // Set to true to return results of all jobs you have ran for the user in addition to current job result. You must set return_job_status to true to use this flag.
-                'return_image_links' => true ,  // Set to true to receive selfie and liveness images you uploaded. You must set return_job_status to true to use this flag.
-                'signature'          => true
-            ];
+                // The ID Document Information
+                $id_info = [
+                    'country' => 'UG' ,                        // The country where ID document was issued
+                    'id_type' => 'NATIONAL_ID'                 // The ID document type
+                ];
 
-            // results page
-            // https://docs.usesmileid.com/products/for-individuals-kyc/document-verification#result-codes-and-result-texts
-            $response = $connection -> submit_job( $partner_params , $image_details , $id_info , $options );
-            // 0810 verified, 0811 failed
-            $result_code = Arr ::get( $response , 'result.ResultCode' );
-            $data        = [
-                'register_selfie' => Arr ::get( $response , 'result.Actions.Register_Selfie' ) ,
-                'verify_Document' => Arr ::get( $response , 'result.Actions.Verify_Document' ) ,
-                'result_code'     => $result_code ,
-                'result_text'     => Arr ::get( $response , 'result.ResultText' )
-            ];
-            if ( $result_code == '0810' ) {
-                $data[ 'bio' ] = [
-                    'FullName'       => Arr ::get( $response , 'result.FullName' ) ,
-                    'DOB'            => Arr ::get( $response , 'result.DOB' ) ,
-                    'IDNumber'       => Arr ::get( $response , 'result.IDNumber' ) ,
-                    'ExpirationDate' => Arr ::get( $response , 'result.ExpirationDate' ) ,
+                // Set the options for the job
+                $options = [
+                    'return_job_status'  => true ,  // Set to true if you want to get the job result in sync (in addition to the result been sent to your callback). If set to false, result is sent to callback url only.
+                    'return_history'     => false , // Set to true to return results of all jobs you have ran for the user in addition to current job result. You must set return_job_status to true to use this flag.
+                    'return_image_links' => true ,  // Set to true to receive selfie and liveness images you uploaded. You must set return_job_status to true to use this flag.
+                    'signature'          => true
+                ];
+
+                // results page
+                // https://docs.usesmileid.com/products/for-individuals-kyc/document-verification#result-codes-and-result-texts
+                $response = $connection -> submit_job( $partner_params , $image_details , $id_info , $options );
+                // 0810 verified, 0811 failed
+                $result_code = Arr ::get( $response , 'result.ResultCode' );
+                $data        = [
+                    'register_selfie' => Arr ::get( $response , 'result.Actions.Register_Selfie' ) ,
+                    'verify_Document' => Arr ::get( $response , 'result.Actions.Verify_Document' ) ,
+                    'result_code'     => $result_code ,
+                    'result_text'     => Arr ::get( $response , 'result.ResultText' )
+                ];
+                if ( $result_code == '0810' ) {
+                    $data[ 'bio' ] = [
+                        'FullName'       => Arr ::get( $response , 'result.FullName' ) ,
+                        'DOB'            => Arr ::get( $response , 'result.DOB' ) ,
+                        'IDNumber'       => Arr ::get( $response , 'result.IDNumber' ) ,
+                        'ExpirationDate' => Arr ::get( $response , 'result.ExpirationDate' ) ,
+                    ];
+                }
+                return $data;
+            }
+            catch ( Exception $exception ) {
+                return [
+                    'status'  => 0 ,
+                    'message' => $exception -> getMessage() ,
                 ];
             }
-            return $data;
         }
     }

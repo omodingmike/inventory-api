@@ -1,7 +1,8 @@
 <?php
 
-    namespace App\Http\Controllers;
+    namespace App\Http\Controllers\inventory;
 
+    use App\Http\Controllers\Controller;
     use App\Http\Requests\StoreExpenseCategoryRequest;
     use App\Http\Requests\UpdateExpenseCategoryRequest;
     use App\Models\ExpenseCategory;
