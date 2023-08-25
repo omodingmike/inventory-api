@@ -5,7 +5,6 @@
     use App\Http\Controllers\Controller;
     use App\Models\inventory\Unit;
     use Illuminate\Http\Request;
-    use Illuminate\Http\Response;
 
     class UnitController extends Controller
     {
@@ -27,10 +26,14 @@
          * Store a newly created resource in storage.
          *
          * @param Request $request
-         * @return Response
+         * @return array
          */
         public function store ( Request $request )
         {
-            return Unit ::create( $request -> validate( [ 'name' => 'required|string' , 'symbol' => 'required|string' ] ) );
+            return [
+                'status'  => 1 ,
+                'message' => 'success' ,
+                'data'    => Unit ::create( $request -> validate( [ 'name' => 'required|string' , 'symbol' => 'required|string' ] ) )
+            ];
         }
     }
