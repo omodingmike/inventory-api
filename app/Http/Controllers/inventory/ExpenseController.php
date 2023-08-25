@@ -3,8 +3,8 @@
     namespace App\Http\Controllers\inventory;
 
     use App\Http\Controllers\Controller;
-    use App\Models\ExpenseCategory;
     use App\Models\inventory\Expense;
+    use App\Models\inventory\ExpenseCategory;
     use App\Models\inventory\Sale;
     use Exception;
     use Illuminate\Http\Request;

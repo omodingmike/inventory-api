@@ -1,8 +1,7 @@
 <?php
 
-    namespace App\Models;
+    namespace App\Models\inventory;
 
-    use App\Models\inventory\Expense;
     use Illuminate\Database\Eloquent\Factories\HasFactory;
     use Illuminate\Database\Eloquent\Model;
     use Illuminate\Database\Eloquent\Relations\HasMany;

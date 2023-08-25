@@ -5,7 +5,7 @@
     use App\Http\Controllers\Controller;
     use App\Http\Requests\StoreExpenseCategoryRequest;
     use App\Http\Requests\UpdateExpenseCategoryRequest;
-    use App\Models\ExpenseCategory;
+    use App\Models\inventory\ExpenseCategory;
     use Exception;
     use Illuminate\Http\Request;
     use Illuminate\Http\Response;
