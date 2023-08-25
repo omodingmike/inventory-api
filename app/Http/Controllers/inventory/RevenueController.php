@@ -5,7 +5,6 @@
     use App\Http\Controllers\Controller;
     use App\Models\inventory\Product;
     use App\Models\inventory\Sale;
-    use App\Models\User;
     use Exception;
     use Illuminate\Http\Request;
     use Illuminate\Support\Carbon;
@@ -22,8 +21,7 @@
         public function index ( Request $request )
         {
             try {
-                $user_id = $request -> user_id;
-                $user    = User ::find( $user_id );
+                $user_id    = $request -> user_id;
                 $start_date = Carbon ::parse( $request -> query( 'from' ) );
                 $end_date   = Carbon ::parse( $request -> query( 'to' ) );
 
@@ -38,7 +36,7 @@
                                              -> selectRaw( 'HOUR(created_at) AS hour, SUM(grand_total) AS amount' )
                                              -> groupBy( 'hour' )
                                              -> get();
-                    
+
                 } elseif ( $difference_in_weeks <= 1 ) {
                     $highest_revenues = Sale ::ofUserID( $user_id )
                                              -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
@@ -68,65 +66,6 @@
 
 
                 }
-
-//            switch ( $request -> duration ) {
-//                case '1d':
-//                    $start_date       = $end_date -> copy() -> subDay();
-//                    $highest_revenues = Sale :: duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
-////                                             -> selectRaw( 'DATE(created_at) AS date, HOUR(created_at) AS hour, MAX(grand_total) AS amount' )
-//                                             -> selectRaw( 'HOUR(created_at) AS hour, MAX(grand_total) AS amount' )
-//                                             -> groupBy( 'hour' )
-//                                             -> get();
-//                    break;
-//                case '1w':
-//                    $start_date       = $end_date -> copy() -> subWeek();
-//                    $highest_revenues = Sale :: duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
-//                                             -> selectRaw( 'DAYNAME(created_at) AS day, MAX(grand_total) AS amount' )
-//                                             -> groupBy( 'day' )
-//                                             -> get();
-//                    break;
-//                case '1m':
-//                    $start_date     = $end_date -> copy() -> subMonth();
-//                    $month_revenues = Sale :: duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
-//                                           -> selectRaw( 'WEEK(created_at) AS week, MAX(grand_total) AS amount' )
-//                                           -> groupBy( 'week' )
-//                                           -> get();
-//                    foreach ( $month_revenues as $index => $weekly_revenue ) {
-//                        $highest_revenues -> push( [ 'week' => $index + 1 , 'amount' => $weekly_revenue -> amount ] );
-//                    }
-//                    break;
-//                case '3m':
-//                    $start_date       = $end_date -> copy() -> subQuarter();
-//                    $highest_revenues = Sale :: duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
-//                                             -> selectRaw( 'YEAR(created_at) AS year, MONTHNAME(created_at) AS month, MAX(grand_total) AS amount' )
-//                                             -> groupBy( 'year' , 'month' )
-////                                             -> orderBy( 'year' , 'desc' )
-////                                             -> orderBy( 'month' , 'desc' )
-//                                             -> get();
-//
-//                    break;
-//                case '6m':
-//                    $start_date       = $end_date -> copy() -> subMonths( 6 );
-//                    $highest_revenues = Sale :: duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
-//                                             -> selectRaw( 'YEAR(created_at) AS year, MONTHNAME(created_at) AS month, MAX(grand_total) AS amount' )
-//                                             -> groupBy( 'year' , 'month' )
-//                                             -> get();
-////                    foreach ( $six_month_revenue as $index => $month_revenue ) {
-////                        $highest_revenues -> push( [ 'month' => $index + 1 , 'amount' => $month_revenue -> amount ] );
-////                    }
-//                    break;
-//                case '1y':
-//                    $start_date       = $end_date -> copy() -> subYear();
-//                    $highest_revenues = Sale :: duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
-//                                             -> selectRaw( 'YEAR(created_at) AS year, MONTHNAME(created_at) AS month, MAX(grand_total) AS amount' )
-//                                             -> groupBy( 'year' , 'month' )
-//                                             -> get();
-////                    foreach ( $yearly_revenue as $index => $month_revenue ) {
-////                        $highest_revenues -> push( [ 'month' => $index + 1 , 'amount' => $month_revenue -> amount ] );
-////                    }
-//                    break;
-//            }
-
                 $products_in = Product ::ofUserID( $user_id )
                                        -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
                                        -> sum( 'quantity' );

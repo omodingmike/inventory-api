@@ -21,12 +21,13 @@
         public function index ( Request $request )
         {
             try {
+                $products = Product ::ofUserID( $request -> user_id )
+                                    -> with( 'supplier' , 'units' , 'category' , 'subCategory' )
+                                    -> get();
                 return [
                     'status'  => 1 ,
                     'message' => 'success' ,
-                    'data'    => Product ::with( 'supplier' , 'units' , 'category' , 'subCategory' )
-                                         -> where( 'user_id' , $request -> user_id )
-                                         -> get()
+                    'data'    => $products
                 ];
             }
             catch ( Exception $exception ) {
@@ -44,14 +45,14 @@
         public function details ( Request $request )
         {
             try {
+                $product = Product ::ofUserID( $request -> user_id )
+                                   -> ofID( $request -> id )
+                                   -> with( 'supplier' , 'units' , 'category' , 'subCategory' )
+                                   -> first();
                 return [
                     'status'  => 1 ,
                     'message' => 'success' ,
-                    'data'    => Product ::ofUserID( $request -> user_id )
-                                         -> ofID( $request -> id )
-                                         -> with( 'supplier' , 'units' , 'category' , 'subCategory' )
-                                         -> where( 'user_id' , $request -> user_id )
-                                         -> first()
+                    'data'    => $product
                 ];
             }
             catch ( Exception $exception ) {
@@ -96,13 +97,13 @@
                                               -> first() -> id;
                 $store_data[ 'balance' ] = $request -> quantity * $request -> retail_price;
 
-                Product ::create( $store_data );
+                $product = Product ::create( $store_data );
                 DB ::commit();
                 return [
                     'status'  => 1 ,
                     'message' => 'success' ,
                     'data'    => [
-                        'message' => 'Product created successfully' ,
+                        $product
                     ]
                 ];
             }

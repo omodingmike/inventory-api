@@ -46,9 +46,7 @@
                         'products_sold' => $total_products ,
                         'sales'         => $sales -> each( function ( $sale ) { $sale -> makeHidden( 'saleItems' ); } )
                     ]
-
                 ];
-
             }
             catch ( Exception $exception ) {
                 return [
@@ -64,14 +62,13 @@
 
         public function show ( Request $request )
         {
+            $sale_details = Sale ::where( [ 'user_id' => $request -> user_id , 'sale_id' => $request -> sale_id ] )
+                                 -> with( 'customer' )
+                                 -> with( 'saleItems.product' ) -> first();
             return [
                 'status'  => 1 ,
                 'message' => 'success' ,
-                'data'    => Sale ::where( [
-                    'user_id' => $request -> user_id ,
-                    'sale_id' => $request -> sale_id
-                ] ) -> with( 'customer' )
-                                  -> with( 'saleItems.product' ) -> first()
+                'data'    => $sale_details
             ];
         }
 

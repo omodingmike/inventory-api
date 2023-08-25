@@ -15,10 +15,11 @@
          */
         public function index ()
         {
+            $sub_categories = SubCategory ::all();
             return [
                 'status'  => 1 ,
                 'message' => 'success' ,
-                'data'    => SubCategory ::all()
+                'data'    => $sub_categories
             ];
 
         }
@@ -31,9 +32,10 @@
          */
         public function store ( Request $request )
         {
+            $sub_category = SubCategory ::create( $request -> validate( [ 'name' => 'required|string' ] ) );
             return [
                 'status'  => 1 ,
                 'message' => 'success' ,
-                'data'    => SubCategory ::create( $request -> validate( [ 'name' => 'required|string' ] ) ) ];
+                'data'    => $sub_category ];
         }
     }

@@ -64,11 +64,12 @@
          */
         public function store ( Request $request )
         {
+            $contacts = Contact ::create( $request -> all() );
             try {
                 return [
                     'status'  => 1 ,
                     'message' => 'success' ,
-                    'data'    => Contact ::create( $request -> all() )
+                    'data'    => $contacts
                 ];
 
             }

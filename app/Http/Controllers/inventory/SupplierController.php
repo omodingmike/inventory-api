@@ -32,9 +32,10 @@
         {
             $validated            = $request -> validate( [ 'name' => 'required|string' , 'photo' => 'required|image' , ] );
             $validated[ 'photo' ] = Uploads ::upload_image( $request , 'photo' );
+            $supplier             = Supplier ::create( $validated );
             return [
                 'status'  => 1 ,
                 'message' => 'success' ,
-                'data'    => Supplier ::create( $validated ) ];
+                'data'    => $supplier ];
         }
     }

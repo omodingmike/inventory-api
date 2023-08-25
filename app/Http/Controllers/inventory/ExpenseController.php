@@ -42,8 +42,6 @@
                 $expenses = Expense :: ofUserID( $user_id )
                                     -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
                                     -> with( 'expenseCategory' )
-//                                    -> selectRaw( 'DAYNAME(date) AS day,DATE(date) AS cdate, SUM(amount) AS amount' )
-//                                    -> groupBy( 'day' , 'cdate' )
                                     -> orderBy( 'date' )
                                     -> get();
 
@@ -79,30 +77,6 @@
             }
         }
 
-        public function expenseCategories ( Request $request )
-        {
-            try {
-                return [
-                    'status'  => 1 ,
-                    'message' => 'success' ,
-                    'data'    => Expense ::ofUserID( $request -> user_id )
-                                         -> get( [ 'id' , 'name' ] )
-
-                ];
-            }
-            catch ( Exception $exception ) {
-                return [
-                    'status'  => 0 ,
-                    'message' => $exception -> getMessage() ,
-                    'data'    => [
-                        'file' => $exception -> getTrace()[ 0 ] [ 'file' ] ,
-                        'line' => $exception -> getTrace()[ 0 ] [ 'line' ] ,
-                    ]
-                ];
-            }
-
-        }
-
         /**
          * Store a newly created resource in storage.
          *
@@ -121,18 +95,17 @@
                     ] );
 //                $expense_category = ExpenseCategory ::where( 'name' , $validated[ 'name' ] ) -> first();
                 $expense_category = ExpenseCategory ::find( $validated[ 'category_id' ] );
-                if ( $expense_category ) {
-                    $validated[ 'expense_id' ] = $expense_category -> id;
-                } else {
-                    $validated[ 'expense_id' ] = ( ExpenseCategory ::create( $validated ) ) -> id;
-                }
+                if ( $expense_category ) $validated[ 'expense_id' ] = $expense_category -> id;
+                else $validated[ 'expense_id' ] = ( ExpenseCategory ::create( $validated ) ) -> id;
                 $validated[ 'date' ] = date( 'Y-m-d' , strtotime( $request -> date ) );
                 unset( $validated[ 'name' ] );
+
+                $expenses = Expense ::create( $validated );
 
                 return [
                     'status'  => 1 ,
                     'message' => 'success' ,
-                    'data'    => Expense ::create( $validated )
+                    'data'    => $expenses
                 ];
             }
             catch ( Exception $exception ) {
@@ -151,15 +124,11 @@
         {
             $user_id = $request -> user_id;
             try {
-                $start_date = Carbon ::parse( $request -> query( 'from' ) ) -> copy() -> startOfDay();
-                $end_date   = Carbon ::parse( $request -> query( 'to' ) ) -> copy() -> endOfDay();
-//                $expenses                   = new Collection();
-//                $top_out_flow               = new Collection();
+                $start_date          = Carbon ::parse( $request -> query( 'from' ) ) -> copy() -> startOfDay();
+                $end_date            = Carbon ::parse( $request -> query( 'to' ) ) -> copy() -> endOfDay();
                 $top_in_flow         = new Collection();
                 $expenses_statistics = new Collection();
                 $difference_in_days  = $start_date -> diffInDays( $end_date );
-//                $difference_in_months       = $start_date -> diffInMonths( $end_date );
-//                $include_expense_statistics = false;
 
                 if ( $difference_in_days <= 7 ) {
                     $expenses = Expense :: ofUserID( $user_id )
