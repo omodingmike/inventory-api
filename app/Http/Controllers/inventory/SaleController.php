@@ -7,7 +7,6 @@
     use App\Models\inventory\Product;
     use App\Models\inventory\Sale;
     use Exception;
-    use Illuminate\Database\QueryException;
     use Illuminate\Http\Request;
     use Illuminate\Support\Arr;
     use Illuminate\Support\Carbon;
@@ -86,19 +85,23 @@
         {
             try {
                 DB ::beginTransaction();
-                $sale = Sale ::create( [
+                $user_id = Arr ::get( $request , 'user_id' );
+                $sale    = Sale ::create( [
                     'sale_id'     => 'S' . time() ,
-                    'user_id'     => Arr ::get( $request , 'user_id' ) ,
+                    'user_id'     => $user_id ,
                     'grand_total' => Arr ::get( $request , 'grandTotal' ) ,
                     'contact_id'  => Arr ::get( $request , 'customerID' ) ,
                     'mode'        => Arr ::get( $request , 'payment_mode' )
                 ] );
 
                 foreach ( Arr ::get( $request , 'items' ) as $item ) {
-                    $item[ 'sale_id' ] = $sale -> id;
+                    $item[ 'sale_id' ]   = $sale -> id;
+                    $product             = Product ::ofUserID( $user_id )
+                                                   -> where( 'productName' , $item [ 'productName' ] )
+                                                   -> first();
+                    $item[ 'productID' ] = $product -> id;
+                    $product -> increment( 'sold' , $item [ 'quantity' ] );
                     CartItem ::create( $item );
-//                    Product ::find( $item [ 'productID' ] ) -> decrement( 'quantity' , $item [ 'quantity' ] );
-                    Product ::find( $item [ 'productID' ] ) -> increment( 'sold' , $item [ 'quantity' ] );
                 }
                 DB ::commit();
                 return [
@@ -108,7 +111,7 @@
                 ];
 
             }
-            catch ( QueryException $exception ) {
+            catch ( Exception $exception ) {
                 DB ::rollBack();
                 return [
                     'status'  => 0 ,
