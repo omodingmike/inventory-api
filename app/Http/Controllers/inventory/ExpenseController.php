@@ -112,13 +112,15 @@
         public function store ( Request $request )
         {
             try {
-                $validated        = $request -> validate(
-                    [ 'name'    => 'required' ,
-                      'amount'  => 'required' ,
-                      'date'    => 'required' ,
-                      'user_id' => 'required'
+                $validated = $request -> validate(
+                    [
+                        'category_id' => 'required' ,
+                        'amount'      => 'required' ,
+                        'date'        => 'required' ,
+                        'user_id'     => 'required'
                     ] );
-                $expense_category = ExpenseCategory ::where( 'name' , $validated[ 'name' ] ) -> first();
+//                $expense_category = ExpenseCategory ::where( 'name' , $validated[ 'name' ] ) -> first();
+                $expense_category = ExpenseCategory ::find( $validated[ 'category_id' ] );
                 if ( $expense_category ) {
                     $validated[ 'expense_id' ] = $expense_category -> id;
                 } else {
