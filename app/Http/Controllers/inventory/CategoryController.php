@@ -56,9 +56,9 @@
                     $categories_data[] = $category_collection;
                 }
                 return [
-                    'status'          => 1 ,
-                    'message'         => 'success' ,
-                    'categories_data' => [
+                    'status'  => 1 ,
+                    'message' => 'success' ,
+                    'data'    => [
                         'out_of_stock' => $out_of_stock ,
                         'categories'   => $categories_data ,
                     ]
@@ -66,9 +66,9 @@
             }
             catch ( Exception $exception ) {
                 return [
-                    'status'          => 0 ,
-                    'message'         => $exception -> getMessage() ,
-                    'categories_data' => [
+                    'status'  => 0 ,
+                    'message' => $exception -> getMessage() ,
+                    'data'    => [
                         'file' => $exception -> getTrace()[ 0 ] [ 'file' ] ,
                         'line' => $exception -> getTrace()[ 0 ] [ 'line' ] ,
                     ]

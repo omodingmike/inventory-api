@@ -46,9 +46,9 @@
             }
             catch ( Exception $exception ) {
                 return [
-                    'status'        => 0 ,
-                    'message'       => $exception -> getMessage() ,
-                    'contacts_data' => [
+                    'status'  => 0 ,
+                    'message' => $exception -> getMessage() ,
+                    'data'    => [
                         'file' => $exception -> getTrace()[ 0 ] [ 'file' ] ,
                         'line' => $exception -> getTrace()[ 0 ] [ 'line' ] ,
                     ]
