@@ -2,9 +2,10 @@
 
     namespace App\Http\Controllers\inventory;
 
+    use App\helpers\Response;
     use App\Http\Controllers\Controller;
+    use App\Http\Requests\StoreSubCategoryRequest;
     use App\Models\inventory\SubCategory;
-    use Illuminate\Http\Request;
 
     class SubCategoryController extends Controller
     {
@@ -16,26 +17,25 @@
         public function index ()
         {
             $sub_categories = SubCategory ::all();
-            return [
-                'status'  => 1 ,
-                'message' => 'success' ,
-                'data'    => $sub_categories
-            ];
-
+            if ( $sub_categories -> count() > 0 ) return Response ::success( $sub_categories );
+            else return Response ::error( "No subcategories found" );
         }
 
         /**
          * Store a newly created resource in storage.
          *
-         * @param Request $request
+         * @param StoreSubCategoryRequest $request
          * @return array
          */
-        public function store ( Request $request )
+        public function store ( StoreSubCategoryRequest $request )
         {
-            $sub_category = SubCategory ::create( $request -> validate( [ 'name' => 'required|string' ] ) );
-            return [
-                'status'  => 1 ,
-                'message' => 'success' ,
-                'data'    => $sub_category ];
+            $validator = $request -> validator;
+            if ( $validator -> fails() ) {
+                return Response ::error( $validator -> errors() -> first() );
+            }
+            $validated    = $request -> validated();
+            $sub_category = SubCategory ::create( $validated );
+            if ( $sub_category ) return Response ::success( $sub_category );
+            else return Response ::error( 'Sub category not created' );
         }
     }

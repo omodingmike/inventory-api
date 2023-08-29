@@ -6,6 +6,8 @@
     use Illuminate\Database\Eloquent\Model;
     use Illuminate\Database\Eloquent\Relations\BelongsTo;
     use Illuminate\Database\Eloquent\Relations\HasMany;
+    use Illuminate\Http\Request;
+    use Illuminate\Support\Facades\Validator;
 
     class Sale extends Model
     {
@@ -14,6 +16,20 @@
         protected $fillable = [ 'sale_id' , 'mode' , 'grand_total' , 'contact_id' , 'user_id' ];
         protected $hidden   = [ 'updated_at' , 'contact_id' , 'user_id' ];
         protected $table    = 'inv_sales';
+
+        public static function validateSaleId ( Request $request ) : ?string
+        {
+            $validator = Validator ::make( $request -> all() ,
+                [
+                    'sale_id' => 'bail|required|int|exists:inv_sales,id'
+                ]
+            );
+            $errors    = null;
+            if ( $validator -> stopOnFirstFailure() -> fails() ) {
+                $errors = $validator -> messages() -> first();
+            }
+            return $errors;
+        }
 
         public function getCreatedAtAttribute ( $value )
         {

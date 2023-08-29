@@ -2,9 +2,10 @@
 
     namespace App\Http\Controllers\inventory;
 
+    use App\helpers\Response;
     use App\Http\Controllers\Controller;
     use App\Models\inventory\ExpenseCategory;
-    use Exception;
+    use App\Models\User;
     use Illuminate\Http\Request;
 
     class ExpenseCategoryController extends Controller
@@ -16,23 +17,11 @@
          */
         public function index ( Request $request )
         {
-            $expense_categories = ExpenseCategory ::ofUserID( $request -> user_id ) -> get();
-            try {
-                return [
-                    'status'  => 1 ,
-                    'message' => 'success' ,
-                    'data'    => $expense_categories
-                ];
-            }
-            catch ( Exception $exception ) {
-                return [
-                    'status'  => 0 ,
-                    'message' => $exception -> getMessage() ,
-                    'data'    => [
-                        'file' => $exception -> getTrace()[ 0 ] [ 'file' ] ,
-                        'line' => $exception -> getTrace()[ 0 ] [ 'line' ] ,
-                    ]
-                ];
-            }
+            $errors = User ::validateUserId( $request );
+            if ( $errors ) return Response ::error( $errors );
+            $user_id            = $request -> user_id;
+            $expense_categories = ExpenseCategory ::ofUserID( $user_id ) -> get();
+            if ( $expense_categories -> count() > 1 ) return Response ::success( $expense_categories );
+            else return Response ::error( 'No Expense categories found' );
         }
     }

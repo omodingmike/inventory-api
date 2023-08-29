@@ -2,6 +2,7 @@
 
     namespace App\Models;
 
+    use App\helpers\CustomValidator;
     use App\Models\inventory\Contact;
     use App\Models\inventory\Expense;
     use App\Models\inventory\Product;
@@ -9,6 +10,7 @@
     use Illuminate\Database\Eloquent\Factories\HasFactory;
     use Illuminate\Database\Eloquent\Relations\HasMany;
     use Illuminate\Foundation\Auth\User as Authenticatable;
+    use Illuminate\Http\Request;
     use Illuminate\Notifications\Notifiable;
     use Laravel\Sanctum\HasApiTokens;
 
@@ -47,6 +49,22 @@
         protected $casts = [
             'email_verified_at' => 'datetime' ,
         ];
+
+        public static function UserExists ( int $user_id ) : bool
+        {
+            return User ::where( 'id' , $user_id ) -> exists();
+
+        }
+
+        public static function validateUserId ( Request $request ) : ?string
+        {
+            $validator = CustomValidator ::validateUserId( $request );
+            $errors    = null;
+            if ( $validator -> stopOnFirstFailure() -> fails() ) {
+                $errors = $validator -> messages() -> first();
+            }
+            return $errors;
+        }
 
         public function expenses () : HasMany
         {

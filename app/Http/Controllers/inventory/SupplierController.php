@@ -2,10 +2,11 @@
 
     namespace App\Http\Controllers\inventory;
 
+    use App\helpers\Response;
     use App\helpers\Uploads;
     use App\Http\Controllers\Controller;
+    use App\Http\Requests\StoreSupplierRequest;
     use App\Models\inventory\Supplier;
-    use Illuminate\Http\Request;
 
     class SupplierController extends Controller
     {
@@ -16,26 +17,27 @@
          */
         public function index ()
         {
-            return [
-                'status'  => 1 ,
-                'message' => 'success' ,
-                'data'    => Supplier ::all() ];
+            $supplier = Supplier ::all();
+            if ( $supplier -> count() > 0 ) return Response ::success( $supplier );
+            else return Response ::error( 'No Suppliers found' );
         }
 
         /**
          * Store a newly created resource in storage.
          *
-         * @param Request $request
+         * @param StoreSupplierRequest $request
          * @return array
          */
-        public function store ( Request $request )
+        public function store ( StoreSupplierRequest $request )
         {
-            $validated            = $request -> validate( [ 'name' => 'required|string' , 'photo' => 'required|image' , ] );
+            $validator = $request -> validator;
+            if ( $validator -> fails() ) {
+                return Response ::error( $validator -> errors() -> first() );
+            }
+            $validated            = $request -> validated();
             $validated[ 'photo' ] = Uploads ::upload_image( $request , 'photo' );
             $supplier             = Supplier ::create( $validated );
-            return [
-                'status'  => 1 ,
-                'message' => 'success' ,
-                'data'    => $supplier ];
+            if ( $supplier ) return Response ::success( $supplier );
+            else return Response ::error( 'Supplier could not be created' );
         }
     }
