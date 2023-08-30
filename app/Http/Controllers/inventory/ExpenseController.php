@@ -27,7 +27,15 @@
         {
             $errors = User ::validateUserId( $request );
             if ( $errors ) return Response ::error( $errors );
-            $user_id                   = $request -> user_id;
+            $user_id              = $request -> user_id;
+            $date_range_validator = Validator ::make( $request -> all() ,
+                [
+                    'from' => 'bail|required|date' ,
+                    'to'   => 'bail|required|date' ,
+                ]
+            );
+            if ( $date_range_validator -> fails() ) return Response ::error( $date_range_validator -> errors() -> first() );
+
             $start_date                = Carbon ::parse( $request -> query( 'from' ) ) -> startOfDay();
             $end_date                  = Carbon ::parse( $request -> query( 'to' ) ) -> endOfDay();
             $previous_month_start_date = $start_date -> copy() -> subMonth();

@@ -131,7 +131,6 @@
          */
         public function update ( UpdateProductRequest $request )
         {
-            DB ::beginTransaction();
             $validator = $request -> validator;
             if ( $validator -> fails() ) {
                 return Response ::error( $validator -> errors() -> first() );
@@ -140,7 +139,6 @@
             $update_data = $request -> validated();
             $update_data = $this -> getIDsFromNames( $request , $update_data );
             $updated     = $product -> update( $update_data );
-            DB ::commit();
             if ( $updated ) return Response ::success( $updated );
             else return Response ::error( 'Product update failed' );
         }

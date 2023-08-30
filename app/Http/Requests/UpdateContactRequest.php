@@ -2,6 +2,7 @@
 
     namespace App\Http\Requests;
 
+    use App\Rules\Phone;
     use Illuminate\Contracts\Validation\Validator;
     use Illuminate\Foundation\Http\FormRequest;
 
@@ -29,7 +30,7 @@
         {
             return [
                 'name'  => 'required|string' ,
-                'phone' => 'required' ,
+                'phone' => [ 'required' , new Phone , 'unique:inv_contacts,phone' ] ,
                 'id'    => 'required|string|exists:inv_contacts,id' ,
                 'email' => 'sometimes|email|unique:inv_contacts,email' ,
             ];

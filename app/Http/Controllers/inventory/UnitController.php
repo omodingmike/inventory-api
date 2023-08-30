@@ -2,9 +2,10 @@
 
     namespace App\Http\Controllers\inventory;
 
+    use App\helpers\Response;
     use App\Http\Controllers\Controller;
+    use App\Http\Requests\StoreUnitRequest;
     use App\Models\inventory\Unit;
-    use Illuminate\Http\Request;
 
     class UnitController extends Controller
     {
@@ -25,15 +26,14 @@
         /**
          * Store a newly created resource in storage.
          *
-         * @param Request $request
+         * @param StoreUnitRequest $request
          * @return array
          */
-        public function store ( Request $request )
+        public function store ( StoreUnitRequest $request )
         {
-            return [
-                'status'  => 1 ,
-                'message' => 'success' ,
-                'data'    => Unit ::create( $request -> validate( [ 'name' => 'required|string' , 'symbol' => 'required|string' ] ) )
-            ];
+            $validator = $request -> validator;
+            if ( $validator -> fails() ) return Response ::error( $validator -> errors() -> first() );
+            $unit = Unit ::create( $request -> validated() );
+            return Response ::success( $unit );
         }
     }

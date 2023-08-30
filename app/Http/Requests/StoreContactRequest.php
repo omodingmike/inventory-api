@@ -2,6 +2,7 @@
 
     namespace App\Http\Requests;
 
+    use App\Rules\Phone;
     use Illuminate\Contracts\Validation\Validator;
     use Illuminate\Foundation\Http\FormRequest;
 
@@ -15,7 +16,7 @@
          *
          * @return bool
          */
-        public function authorize ()
+        public function authorize () : bool
         {
             return true;
         }
@@ -29,7 +30,7 @@
         {
             return [
                 'name'    => 'required|string' ,
-                'phone'   => 'required' ,
+                'phone'   => [ 'required' , new Phone , 'unique:inv_contacts,phone' ] ,
                 'user_id' => 'required|string|exists:users,id' ,
                 'email'   => 'sometimes|email|unique:inv_contacts,email' ,
             ];

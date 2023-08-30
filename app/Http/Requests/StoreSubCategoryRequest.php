@@ -28,7 +28,7 @@
         public function rules ()
         {
             return [
-                'name' => 'required|string'
+                'name' => 'required|string|unique:inv_sub_categories'
             ];
         }
 

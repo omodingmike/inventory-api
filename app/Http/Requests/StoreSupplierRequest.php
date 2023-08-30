@@ -25,10 +25,10 @@
          *
          * @return array
          */
-        public function rules ()
+        public function rules () : array
         {
             return [
-                'name'  => 'required|string' ,
+                'name'  => 'required|string|unique:inv_suppliers,name' ,
                 'photo' => 'required|image'
             ];
         }

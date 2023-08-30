@@ -22,7 +22,8 @@
          */
         public function index ( Request $request )
         {
-            User ::validateUserId( $request );
+            $errors = User ::validateUserId( $request );
+            if ( $errors ) return Response ::error( $errors );
             $user_id              = $request -> user_id;
             $date_range_validator = Validator ::make( $request -> all() ,
                 [

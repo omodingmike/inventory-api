@@ -2,13 +2,13 @@
 
     namespace App\Http\Controllers\inventory;
 
-    use App\helpers\CustomValidator;
     use App\helpers\Response;
     use App\Http\Controllers\Controller;
     use App\Http\Requests\StoreSaleRequest;
     use App\Models\inventory\CartItem;
     use App\Models\inventory\Product;
     use App\Models\inventory\Sale;
+    use App\Models\User;
     use Illuminate\Http\Request;
     use Illuminate\Support\Carbon;
     use Illuminate\Support\Facades\DB;
@@ -24,10 +24,8 @@
          */
         public function index ( Request $request )
         {
-            $validator = CustomValidator ::validateUserId( $request );
-            if ( $validator -> stopOnFirstFailure() -> fails() ) {
-                return Response ::error( $validator -> messages() -> first() );
-            }
+            $errors = User ::validateUserId( $request );
+            if ( $errors ) return Response ::error( $errors );
             $user_id              = $request -> user_id;
             $date_range_validator = Validator ::make( $request -> all() ,
                 [
@@ -61,10 +59,8 @@
 
         public function show ( Request $request )
         {
-            $validator = CustomValidator ::validateUserId( $request );
-            if ( $validator -> stopOnFirstFailure() -> fails() ) {
-                return Response ::error( $validator -> messages() -> first() );
-            }
+            $errors = User ::validateUserId( $request );
+            if ( $errors ) return Response ::error( $errors );
             $user_id         = $request -> user_id;
             $validate_saleID = Validator ::make( $request -> all() , [ 'sale_id' => 'bail|required|string|exists:inv_sales,sale_id' ] );
             if ( $validate_saleID -> stopOnFirstFailure() -> fails() ) {
