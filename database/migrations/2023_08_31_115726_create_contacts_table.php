@@ -30,6 +30,6 @@
          */
         public function down ()
         {
-            Schema ::dropIfExists( 'contacts' );
+            Schema ::dropIfExists( 'inv_contacts' );
         }
     }

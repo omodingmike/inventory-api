@@ -29,6 +29,6 @@
          */
         public function down ()
         {
-            Schema ::dropIfExists( 'categories' );
+            Schema ::dropIfExists( 'inv_categories' );
         }
     }

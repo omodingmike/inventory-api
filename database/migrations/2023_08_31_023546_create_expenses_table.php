@@ -30,6 +30,6 @@
          */
         public function down ()
         {
-            Schema ::dropIfExists( 'expenses' );
+            Schema ::dropIfExists( 'inv_expenses' );
         }
     }

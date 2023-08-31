@@ -28,6 +28,6 @@
          */
         public function down ()
         {
-            Schema ::dropIfExists( 'expense_categories' );
+            Schema ::dropIfExists( 'inv_expense_categories' );
         }
     }

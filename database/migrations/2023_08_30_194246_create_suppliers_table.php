@@ -13,7 +13,7 @@
          */
         public function up ()
         {
-            Schema ::create( 'inv_suppliers', function (Blueprint $table) {
+            Schema ::create( 'inv_suppliers' , function ( Blueprint $table ) {
                 $table -> id();
                 $table -> string( 'name' );
                 $table -> string( 'photo' );
@@ -28,6 +28,6 @@
          */
         public function down ()
         {
-            Schema ::dropIfExists( 'suppliers' );
+            Schema ::dropIfExists( 'inv_suppliers' );
         }
     }

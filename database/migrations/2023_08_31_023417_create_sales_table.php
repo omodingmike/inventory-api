@@ -32,6 +32,6 @@
          */
         public function down ()
         {
-            Schema ::dropIfExists( 'sales' );
+            Schema ::dropIfExists( 'inv_sales' );
         }
     }

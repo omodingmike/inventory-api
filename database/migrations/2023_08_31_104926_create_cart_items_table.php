@@ -30,6 +30,6 @@
          */
         public function down ()
         {
-            Schema ::dropIfExists( 'cart_items' );
+            Schema ::dropIfExists( 'inv_cart_items' );
         }
     }

@@ -13,7 +13,7 @@
          */
         public function up ()
         {
-            Schema ::create( 'inv_revenues', function (Blueprint $table) {
+            Schema ::create( 'inv_revenues' , function ( Blueprint $table ) {
                 $table -> id();
                 $table -> timestamps();
             } );
@@ -26,6 +26,6 @@
          */
         public function down ()
         {
-            Schema ::dropIfExists( 'revenues' );
+            Schema ::dropIfExists( 'inv_revenues' );
         }
     }

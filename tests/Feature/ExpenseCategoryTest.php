@@ -32,4 +32,26 @@
                           ]
                       ] );
         }
+
+        public function testNoExpenseCategories ()
+        {
+            $response = $this -> json( 'GET' , '/api/expense-categories?user_id=64' );
+            $response -> assertStatus( 200 )
+                      -> assertJsonStructure( [
+                          'status' ,
+                          'message' ,
+                          'data' ,
+                      ] );
+        }
+
+        public function testUserIdMissingInExpenseCategories ()
+        {
+            $response = $this -> json( 'GET' , '/api/expense-categories' );
+            $response -> assertStatus( 200 )
+                      -> assertJsonStructure( [
+                          'status' ,
+                          'message' ,
+                          'data' ,
+                      ] );
+        }
     }

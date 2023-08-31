@@ -62,6 +62,50 @@
                       ] );
         }
 
+        public function testCategoryMissingInFilterCategoryProducts ()
+        {
+            $response = $this -> json( 'get' , '/api/filter-category-products?from=01-02-2021&to=01-09-2023&user_id=1' );
+            $response -> assertStatus( 200 )
+                      -> assertJsonStructure( [
+                          'status' ,
+                          'message' ,
+                          'data' ,
+                      ] );
+        }
+
+        public function testFromDateMissingInFilterCategoryProducts ()
+        {
+            $response = $this -> json( 'get' , '/api/filter-category-products?category=1&to=01-09-2023&user_id=1' );
+            $response -> assertStatus( 200 )
+                      -> assertJsonStructure( [
+                          'status' ,
+                          'message' ,
+                          'data' ,
+                      ] );
+        }
+
+        public function testToDateMissingInFilterCategoryProducts ()
+        {
+            $response = $this -> json( 'get' , '/api/filter-category-products?category=1&from=01-02-2021&user_id=1' );
+            $response -> assertStatus( 200 )
+                      -> assertJsonStructure( [
+                          'status' ,
+                          'message' ,
+                          'data' ,
+                      ] );
+        }
+
+        public function testUserIdMissingInFilterCategoryProducts ()
+        {
+            $response = $this -> json( 'get' , '/api/filter-category-products?category=1&from=01-02-2021&to=01-09-2023' );
+            $response -> assertStatus( 200 )
+                      -> assertJsonStructure( [
+                          'status' ,
+                          'message' ,
+                          'data' ,
+                      ] );
+        }
+
         public function testProductDetails ()
         {
             $expectedData = [
@@ -104,10 +148,32 @@
                 ] ,
             ];
 
-            $response = $this -> get( '/api/product-details?id=1&user_id=36' ); // Replace with the actual endpoint URL
+            $response = $this -> get( '/api/product-details?id=1&user_id=36' );
 
             $response -> assertStatus( 200 )
                       -> assertJsonStructure( $expectedData );
+        }
+
+        public function testIdMissingInProductDetails ()
+        {
+            $response = $this -> get( '/api/product-details?user_id=36' );
+            $response -> assertStatus( 200 )
+                      -> assertJsonStructure( [
+                          'status' ,
+                          'message' ,
+                          'data' ,
+                      ] );
+        }
+
+        public function testUserIdMissingInProductDetails ()
+        {
+            $response = $this -> get( '/api/product-details?id=1' );
+            $response -> assertStatus( 200 )
+                      -> assertJsonStructure( [
+                          'status' ,
+                          'message' ,
+                          'data' ,
+                      ] );
         }
 
         public function testProductStore ()
@@ -155,11 +221,336 @@
                               'id' ,
                           ]
                       ] );
-
-            // Optionally, you can also assert that the record was inserted into the database
             $this -> assertDatabaseHas( 'inv_products' , [
                 'name' => $product_name
             ] );
+        }
+
+        public function testNameMissingInProductStore ()
+        {
+            $data     = [
+                'user_id'          => 1 ,
+                'category'         => 'Brady' ,
+                'sub_category'     => 'aut' ,
+                'code'             => 'ABC123' ,
+                'photo'            => UploadedFile ::fake() -> image( 'product.jpg' ) ,
+                'quantity'         => 100 ,
+                'units'            => 'et' ,
+                'supplier'         => 'Velda' ,
+                'retail_price'     => 1000 ,
+                'whole_sale_price' => 800 ,
+                'purchase_price'   => 750 ,
+                'balance'          => 75000 ,
+                'discount'         => 10 ,
+            ];
+            $response = $this -> post( '/api/products' , $data );
+            $response -> assertStatus( 200 )
+                      -> assertJsonStructure( [
+                          'status' ,
+                          'message' ,
+                          'data' ,
+                      ] );
+        }
+
+        public function testUserIdMissingInProductStore ()
+        {
+            $data     = [
+                'name'             => 'name' . time() ,
+                'category'         => 'Brady' ,
+                'sub_category'     => 'aut' ,
+                'code'             => 'ABC123' ,
+                'photo'            => UploadedFile ::fake() -> image( 'product.jpg' ) ,
+                'quantity'         => 100 ,
+                'units'            => 'et' ,
+                'supplier'         => 'Velda' ,
+                'retail_price'     => 1000 ,
+                'whole_sale_price' => 800 ,
+                'purchase_price'   => 750 ,
+                'balance'          => 75000 ,
+                'discount'         => 10 ,
+            ];
+            $response = $this -> post( '/api/products' , $data );
+            $response -> assertStatus( 200 )
+                      -> assertJsonStructure( [
+                          'status' ,
+                          'message' ,
+                          'data' ,
+                      ] );
+        }
+
+        public function testCategoryMissingInProductStore ()
+        {
+            $data     = [
+                'name'             => 'name' . time() ,
+                'user_id'          => 1 ,
+                'sub_category'     => 'aut' ,
+                'code'             => 'ABC123' ,
+                'photo'            => UploadedFile ::fake() -> image( 'product.jpg' ) ,
+                'quantity'         => 100 ,
+                'units'            => 'et' ,
+                'supplier'         => 'Velda' ,
+                'retail_price'     => 1000 ,
+                'whole_sale_price' => 800 ,
+                'purchase_price'   => 750 ,
+                'discount'         => 10 ,
+            ];
+            $response = $this -> post( '/api/products' , $data );
+            $response -> assertStatus( 200 )
+                      -> assertJsonStructure( [
+                          'status' ,
+                          'message' ,
+                          'data' ,
+                      ] );
+        }
+
+        public function testSubCategoryMissingInProductStore ()
+        {
+            $data     = [
+                'name'             => 'name' . time() ,
+                'user_id'          => 1 ,
+                'category'         => 'Brady' ,
+                'code'             => 'ABC123' ,
+                'photo'            => UploadedFile ::fake() -> image( 'product.jpg' ) ,
+                'quantity'         => 100 ,
+                'units'            => 'et' ,
+                'supplier'         => 'Velda' ,
+                'retail_price'     => 1000 ,
+                'whole_sale_price' => 800 ,
+                'purchase_price'   => 750 ,
+
+                'discount' => 10 ,
+            ];
+            $response = $this -> post( '/api/products' , $data );
+            $response -> assertStatus( 200 )
+                      -> assertJsonStructure( [
+                          'status' ,
+                          'message' ,
+                          'data' ,
+                      ] );
+        }
+
+        public function testCodeMissingInProductStore ()
+        {
+            $data     = [
+                'name'             => 'name' . time() ,
+                'user_id'          => 1 ,
+                'category'         => 'Brady' ,
+                'sub_category'     => 'aut' ,
+                'photo'            => UploadedFile ::fake() -> image( 'product.jpg' ) ,
+                'quantity'         => 100 ,
+                'units'            => 'et' ,
+                'supplier'         => 'Velda' ,
+                'retail_price'     => 1000 ,
+                'whole_sale_price' => 800 ,
+                'purchase_price'   => 750 ,
+                'discount'         => 10 ,
+            ];
+            $response = $this -> post( '/api/products' , $data );
+            $response -> assertStatus( 200 )
+                      -> assertJsonStructure( [
+                          'status' ,
+                          'message' ,
+                          'data' ,
+                      ] );
+        }
+
+        public function testPhotoMissingInProductStore ()
+        {
+            $data     = [
+                'name'             => 'name' . time() ,
+                'user_id'          => 1 ,
+                'category'         => 'Brady' ,
+                'sub_category'     => 'aut' ,
+                'code'             => 'ABC123' ,
+                'quantity'         => 100 ,
+                'units'            => 'et' ,
+                'supplier'         => 'Velda' ,
+                'retail_price'     => 1000 ,
+                'whole_sale_price' => 800 ,
+                'purchase_price'   => 750 ,
+                'discount'         => 10 ,
+            ];
+            $response = $this -> post( '/api/products' , $data );
+            $response -> assertStatus( 200 )
+                      -> assertJsonStructure( [
+                          'status' ,
+                          'message' ,
+                          'data' ,
+                      ] );
+        }
+
+        public function testQuantityMissingInProductStore ()
+        {
+            $data     = [
+                'name'             => 'name' . time() ,
+                'user_id'          => 1 ,
+                'category'         => 'Brady' ,
+                'sub_category'     => 'aut' ,
+                'code'             => 'ABC123' ,
+                'photo'            => UploadedFile ::fake() -> image( 'product.jpg' ) ,
+                'units'            => 'et' ,
+                'supplier'         => 'Velda' ,
+                'retail_price'     => 1000 ,
+                'whole_sale_price' => 800 ,
+                'purchase_price'   => 750 ,
+                'discount'         => 10 ,
+            ];
+            $response = $this -> post( '/api/products' , $data );
+            $response -> assertStatus( 200 )
+                      -> assertJsonStructure( [
+                          'status' ,
+                          'message' ,
+                          'data' ,
+                      ] );
+        }
+
+        public function testUnitsMissingInProductStore ()
+        {
+            $data     = [
+                'name'             => 'name' . time() ,
+                'user_id'          => 1 ,
+                'category'         => 'Brady' ,
+                'sub_category'     => 'aut' ,
+                'code'             => 'ABC123' ,
+                'photo'            => UploadedFile ::fake() -> image( 'product.jpg' ) ,
+                'quantity'         => 100 ,
+                'supplier'         => 'Velda' ,
+                'retail_price'     => 1000 ,
+                'whole_sale_price' => 800 ,
+                'purchase_price'   => 750 ,
+                'discount'         => 10 ,
+            ];
+            $response = $this -> post( '/api/products' , $data );
+            $response -> assertStatus( 200 )
+                      -> assertJsonStructure( [
+                          'status' ,
+                          'message' ,
+                          'data' ,
+                      ] );
+        }
+
+        public function testSupplierMissingInProductStore ()
+        {
+            $data     = [
+                'name'             => 'name' . time() ,
+                'user_id'          => 1 ,
+                'category'         => 'Brady' ,
+                'sub_category'     => 'aut' ,
+                'code'             => 'ABC123' ,
+                'photo'            => UploadedFile ::fake() -> image( 'product.jpg' ) ,
+                'quantity'         => 100 ,
+                'units'            => 'et' ,
+                'retail_price'     => 1000 ,
+                'whole_sale_price' => 800 ,
+                'purchase_price'   => 750 ,
+                'discount'         => 10 ,
+            ];
+            $response = $this -> post( '/api/products' , $data );
+            $response -> assertStatus( 200 )
+                      -> assertJsonStructure( [
+                          'status' ,
+                          'message' ,
+                          'data' ,
+                      ] );
+        }
+
+        public function testRetailPriceMissingInProductStore ()
+        {
+            $data     = [
+                'name'             => 'name' . time() ,
+                'user_id'          => 1 ,
+                'category'         => 'Brady' ,
+                'sub_category'     => 'aut' ,
+                'code'             => 'ABC123' ,
+                'photo'            => UploadedFile ::fake() -> image( 'product.jpg' ) ,
+                'quantity'         => 100 ,
+                'units'            => 'et' ,
+                'supplier'         => 'Velda' ,
+                'whole_sale_price' => 800 ,
+                'purchase_price'   => 750 ,
+                'discount'         => 10 ,
+            ];
+            $response = $this -> post( '/api/products' , $data );
+            $response -> assertStatus( 200 )
+                      -> assertJsonStructure( [
+                          'status' ,
+                          'message' ,
+                          'data' ,
+                      ] );
+        }
+
+        public function testWholeSalePriceMissingInProductStore ()
+        {
+            $data     = [
+                'name'           => 'name' . time() ,
+                'user_id'        => 1 ,
+                'category'       => 'Brady' ,
+                'sub_category'   => 'aut' ,
+                'code'           => 'ABC123' ,
+                'photo'          => UploadedFile ::fake() -> image( 'product.jpg' ) ,
+                'quantity'       => 100 ,
+                'units'          => 'et' ,
+                'supplier'       => 'Velda' ,
+                'retail_price'   => 1000 ,
+                'purchase_price' => 750 ,
+                'discount'       => 10 ,
+            ];
+            $response = $this -> post( '/api/products' , $data );
+            $response -> assertStatus( 200 )
+                      -> assertJsonStructure( [
+                          'status' ,
+                          'message' ,
+                          'data' ,
+                      ] );
+        }
+
+        public function testPurchasePriceMissingInProductStore ()
+        {
+            $data     = [
+                'name'             => 'name' . time() ,
+                'user_id'          => 1 ,
+                'category'         => 'Brady' ,
+                'sub_category'     => 'aut' ,
+                'code'             => 'ABC123' ,
+                'photo'            => UploadedFile ::fake() -> image( 'product.jpg' ) ,
+                'quantity'         => 100 ,
+                'units'            => 'et' ,
+                'supplier'         => 'Velda' ,
+                'retail_price'     => 1000 ,
+                'whole_sale_price' => 800 ,
+                'discount'         => 10 ,
+            ];
+            $response = $this -> post( '/api/products' , $data );
+            $response -> assertStatus( 200 )
+                      -> assertJsonStructure( [
+                          'status' ,
+                          'message' ,
+                          'data' ,
+                      ] );
+        }
+
+        public function testDiscountMissingInProductStore ()
+        {
+            $data     = [
+                'name'             => 'name' . time() ,
+                'user_id'          => 1 ,
+                'category'         => 'Brady' ,
+                'sub_category'     => 'aut' ,
+                'code'             => 'ABC123' ,
+                'photo'            => UploadedFile ::fake() -> image( 'product.jpg' ) ,
+                'quantity'         => 100 ,
+                'units'            => 'et' ,
+                'supplier'         => 'Velda' ,
+                'retail_price'     => 1000 ,
+                'whole_sale_price' => 800 ,
+            ];
+            $response = $this -> post( '/api/products' , $data );
+            $response -> assertStatus( 200 )
+                      -> assertJsonStructure( [
+                          'status' ,
+                          'message' ,
+                          'data' ,
+                      ] );
         }
 
         public function testProductUpdate ()
