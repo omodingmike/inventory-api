@@ -29,9 +29,9 @@
         public function rules () : array
         {
             return [
-                'name'        => [ 'bail' , 'required' , 'string' , new UniqueNameAndUserID( $this -> input( 'user_id' ) , 'inv_categories' ) ] ,
                 'photo'       => 'bail|required|image' ,
-                'user_id'     => 'bail|required|string|exists:users,id' ,
+                'user_id'     => 'required|int|exists:users,id' ,
+                'name'        => [ 'bail' , 'required' , 'string' , new UniqueNameAndUserID( $this -> input( 'user_id' ) , 'inv_categories' ) ] ,
                 'description' => 'bail|required|string'
             ];
         }

@@ -13,7 +13,7 @@
     {
         use HasFactory;
 
-        protected $fillable = [ 'sale_id' , 'mode' , 'grand_total' , 'contact_id' , 'user_id' ];
+        protected $fillable = [ 'sale_id' , 'payment_mode' , 'grand_total' , 'contact_id' , 'user_id' ];
         protected $hidden   = [ 'updated_at' , 'contact_id' , 'user_id' ];
         protected $table    = 'inv_sales';
 

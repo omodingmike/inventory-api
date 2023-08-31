@@ -14,7 +14,7 @@
         public function definition () : array
         {
             return [
-                'name'  => $this -> faker -> name() ,
+                'name'  => $this -> faker -> firstName() ,
                 'photo' => $this -> faker -> imageUrl() ,
 
             ];

@@ -11,13 +11,13 @@
          *
          * @return array
          */
-        public function definition ()
+        public function definition () : array
         {
             return [
-                'name'    => $this -> faker -> name() ,
+                'name'    => $this -> faker -> firstName() ,
                 'phone'   => $this -> faker -> phoneNumber() ,
                 'email'   => $this -> faker -> safeEmail() ,
-                'user_id' => $this -> faker -> numberBetween( 1 , 10 ) ,
+                'user_id' => $this -> faker -> numberBetween( 1 , 100 ) ,
             ];
         }
     }

@@ -9,6 +9,7 @@
     use App\Models\inventory\Product;
     use App\Models\inventory\Sale;
     use App\Models\User;
+    use Illuminate\Http\JsonResponse;
     use Illuminate\Http\Request;
     use Illuminate\Support\Carbon;
     use Illuminate\Support\Facades\DB;
@@ -20,7 +21,7 @@
          * Display a listing of the resource.
          *
          * @param Request $request
-         * @return array
+         * @return JsonResponse
          */
         public function index ( Request $request )
         {
@@ -77,7 +78,7 @@
          * Store a newly created resource in storage.
          *
          * @param StoreSaleRequest $request
-         * @return string[]
+         * @return JsonResponse
          */
         public function store ( StoreSaleRequest $request )
         {
@@ -90,6 +91,7 @@
             $user_id                 = $validated [ 'user_id' ];
             $validated [ 'sale_id' ] = 'S' . time();
             $sale                    = Sale ::create( $validated );
+            info( $sale );
 
             foreach ( $validated [ 'items' ] as $item ) {
                 $item[ 'sale_id' ] = $sale -> id;
@@ -97,12 +99,15 @@
                                              -> where( 'name' , $item [ 'name' ] )
                                              -> first();
 
-                if ( !$product ) return Response ::error( 'No products found for this user' );
+                if ( !$product ) {
+                    DB ::rollBack();
+                    return Response ::error( 'No products found for this user' );
+                }
                 $item[ 'product_id' ] = $product -> id;
                 $product -> increment( 'sold' , $item [ 'quantity' ] );
                 CartItem ::create( $item );
             }
             DB ::commit();
-            return Response ::success( $sale );
+            return Response ::success( $sale , 201 );
         }
     }

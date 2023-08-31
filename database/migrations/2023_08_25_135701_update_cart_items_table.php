@@ -13,8 +13,8 @@
          */
         public function up ()
         {
-            Schema ::create( 'inv_cart_items' , function ( Blueprint $table ) {
-                $table -> integer( 'product_id' );
+            Schema ::table( 'inv_cart_items' , function ( Blueprint $table ) {
+                $table -> renameColumn( 'productID' , 'product_id' );
             } );
         }
 
@@ -26,7 +26,7 @@
         public function down ()
         {
             Schema ::create( 'inv_cart_items' , function ( Blueprint $table ) {
-                $table -> integer( 'product_id' );
+                $table -> renameColumn( 'product_id' , 'productID' );
             } );
         }
     }

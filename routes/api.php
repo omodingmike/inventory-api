@@ -46,50 +46,6 @@
 
     Route ::post( 'smile' , [ SmileIDController::class , 'callback' ] ) -> name( 'callback' );
     Route ::get( 'smile' , [ SmileIDController::class , 'generateSignature' ] );
-
-    //    Route ::prefix( 'inv' ) -> namespace( 'inventory' ) -> group( function () {
-    //        //  Products Routes
-    //        Route ::get( 'filter-category-products' , 'ProductController@filterProducts ' );
-    //        Route ::post( 'products' , 'ProductController@store' );
-    //        Route ::post( 'update-product' , 'ProductController@update' );
-    //
-    //        // Categories Routes
-    //        Route ::get( 'categories' , 'CategoryController@index ' );
-    //        Route ::get( 'category-products' , 'CategoryController@index ' );
-    //        Route ::get( 'category-products' , 'CategoryController@getCategoryProducts ' );
-    //        Route ::post( 'categories' , 'CategoryController@store ' );
-    //        Route ::post( 'categories' , 'CategoryController@update ' );
-    //
-    //        // Sale Routes
-    //        Route ::get( 'sales' , 'SaleController@index ' );
-    //        Route ::get( 'sale' , 'SaleController@show ' );
-    //
-    //        // Expense Routes
-    //        Route ::get( 'expenses' , 'ExpenseController@index ' );
-    //        Route ::get( 'expense-categories' , 'ExpenseController@expenseCategories ' );
-    //        Route ::get( 'expenses-incomes' , 'ExpenseController@expensesAndIncomes ' );
-    //
-    //        // Revenue Routes
-    //        Route ::get( 'revenues' , 'RevenueController@index ' );
-    //
-    //        // Contacts Routes
-    //        Route ::get( 'contacts' , 'ContactController@index ' );
-    //        Route ::post( 'contacts' , 'ContactController@store ' );
-    //
-    //        // Supplier Routes
-    //        Route ::get( 'suppliers' , 'SupplierController@index ' );
-    //        Route ::post( 'suppliers' , 'SupplierController@store ' );
-    //
-    //        // Subcategories Routes
-    //        Route ::get( 'subcategories' , 'SubCategoryController@index ' );
-    //        Route ::post( 'subcategories' , 'SubCategoryController@store ' );
-    //
-    //        // Units Routes
-    //        Route ::get( 'units' , 'UnitController@index ' );
-    //        Route ::post( 'units' , 'UnitController@store ' );
-    //
-    //        Route ::post( 'smile' , [ SmileIDController::class , 'callback' ] );
-    //        Route ::get( 'smile' , [ SmileIDController::class , 'generateSignature' ] );
-    //    } );
+    
 
 

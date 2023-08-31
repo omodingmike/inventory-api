@@ -4,7 +4,7 @@
 
     use Illuminate\Database\Eloquent\Factories\Factory;
 
-    class CategoryFactory extends Factory
+    class ExpenseCategoryFactory extends Factory
     {
         /**
          * Define the model's default state.
@@ -14,9 +14,8 @@
         public function definition () : array
         {
             return [
-                'name'        => $this -> faker -> firstName() ,
-                'photo'       => $this -> faker -> imageUrl() ,
-                'description' => '10 pcs - 8 types - 3 sizes' ,
+                'user_id' => $this -> faker -> numberBetween( 1 , 1000 ) ,
+                'name'    => $this -> faker -> word() ,
             ];
         }
     }

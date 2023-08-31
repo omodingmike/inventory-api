@@ -4,7 +4,7 @@
     use Illuminate\Database\Schema\Blueprint;
     use Illuminate\Support\Facades\Schema;
 
-    class CreateCartItemsTable extends Migration
+    class UpdateCategoriesTable extends Migration
     {
         /**
          * Run the migrations.
@@ -13,13 +13,8 @@
          */
         public function up ()
         {
-            Schema ::create( 'inv_cart_items' , function ( Blueprint $table ) {
-                $table -> id();
-                $table -> integer( 'sale_id' );
-                $table -> integer( 'productID' );
-                $table -> integer( 'quantity' );
-                $table -> integer( 'total' );
-                $table -> timestamps();
+            Schema ::table( 'inv_categories' , function ( Blueprint $table ) {
+                $table -> addColumn( 'integer' , 'user_id' );
             } );
         }
 
@@ -30,6 +25,8 @@
          */
         public function down ()
         {
-            Schema ::dropIfExists( 'cart_items' );
+            Schema ::table( 'inv_categories' , function ( Blueprint $table ) {
+                $table -> dropColumn( [ 'user_id' ] );
+            } );
         }
     }

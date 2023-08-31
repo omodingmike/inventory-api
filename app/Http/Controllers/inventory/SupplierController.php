@@ -7,13 +7,14 @@
     use App\Http\Controllers\Controller;
     use App\Http\Requests\StoreSupplierRequest;
     use App\Models\inventory\Supplier;
+    use Illuminate\Http\JsonResponse;
 
     class SupplierController extends Controller
     {
         /**
          * Display a listing of the resource.
          *
-         * @return Supplier[]
+         * @return JsonResponse
          */
         public function index ()
         {
@@ -26,7 +27,7 @@
          * Store a newly created resource in storage.
          *
          * @param StoreSupplierRequest $request
-         * @return array
+         * @return JsonResponse
          */
         public function store ( StoreSupplierRequest $request )
         {
@@ -37,7 +38,7 @@
             $validated            = $request -> validated();
             $validated[ 'photo' ] = Uploads ::upload_image( $request , 'photo' );
             $supplier             = Supplier ::create( $validated );
-            if ( $supplier ) return Response ::success( $supplier );
+            if ( $supplier ) return Response ::success( $supplier , 201 );
             else return Response ::error( 'Supplier could not be created' );
         }
     }

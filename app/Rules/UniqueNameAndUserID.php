@@ -7,7 +7,7 @@
 
     class UniqueNameAndUserID implements Rule
     {
-        private int    $user_id;
+        private        $user_id;
         private string $table;
 
         /**
@@ -15,7 +15,7 @@
          *
          * @return void
          */
-        public function __construct ( int $user_id , string $table )
+        public function __construct ( $user_id , string $table )
         {
             $this -> user_id = $user_id;
             $this -> table   = $table;
@@ -30,10 +30,11 @@
          */
         public function passes ( $attribute , $value ) : bool
         {
-            return !DB ::table( $this -> table )
-                       -> where( 'user_id' , $this -> user_id )
-                       -> where( 'name' , $value )
-                       -> exists();
+            if ( $this -> user_id == null ) return false;
+            else return !DB ::table( $this -> table )
+                            -> where( 'user_id' , $this -> user_id )
+                            -> where( 'name' , $value )
+                            -> exists();
         }
 
         /**

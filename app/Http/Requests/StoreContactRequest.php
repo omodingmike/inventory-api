@@ -31,7 +31,7 @@
             return [
                 'name'    => 'required|string' ,
                 'phone'   => [ 'required' , new Phone , 'unique:inv_contacts,phone' ] ,
-                'user_id' => 'required|string|exists:users,id' ,
+                'user_id' => 'required|int|exists:users,id' ,
                 'email'   => 'sometimes|email|unique:inv_contacts,email' ,
             ];
         }

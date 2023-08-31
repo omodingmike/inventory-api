@@ -31,23 +31,11 @@
             return [
                 'name'  => 'required|string' ,
                 'phone' => [ 'required' , new Phone , 'unique:inv_contacts,phone' ] ,
-                'id'    => 'required|string|exists:inv_contacts,id' ,
+                'id'    => 'required|int|exists:inv_contacts,id' ,
                 'email' => 'sometimes|email|unique:inv_contacts,email' ,
             ];
         }
-
-        public function messages () : array
-        {
-            return [
-                'name.required'    => 'Contact name is required' ,
-                'name.string'      => 'Contact name should be a string' ,
-                'phone.required'   => 'Phone is required' ,
-                'user_id.required' => 'user_id not found in request' ,
-                'user_id.int'      => 'user_id should be an integer' ,
-                'user_id.exists'   => 'user with given ID not found'
-            ];
-        }
-
+        
         public function failedValidation ( Validator $validator )
         {
             $this -> validator = $validator;

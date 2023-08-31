@@ -9,6 +9,7 @@
     use App\Models\inventory\ExpenseCategory;
     use App\Models\inventory\Sale;
     use App\Models\User;
+    use Illuminate\Http\JsonResponse;
     use Illuminate\Http\Request;
     use Illuminate\Support\Carbon;
     use Illuminate\Support\Collection;
@@ -21,7 +22,7 @@
          * Display a listing of the resource.
          *
          * @param Request $request
-         * @return array
+         * @return JsonResponse
          */
         public function index ( Request $request )
         {
@@ -80,7 +81,7 @@
          * Store a newly created resource in storage.
          *
          * @param StoreExpenseRequest $request
-         * @return string[]
+         * @return JsonResponse
          */
         public function store ( StoreExpenseRequest $request )
         {
@@ -95,7 +96,7 @@
             $validated[ 'date' ] = date( 'Y-m-d' , strtotime( $request -> date ) );
             unset( $validated[ 'name' ] );
             $expense = Expense ::create( $validated );
-            if ( $expense ) return Response ::success( $expense );
+            if ( $expense ) return Response ::success( $expense , 201 );
             else return Response ::error( 'Expense could not be created' );
         }
 

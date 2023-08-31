@@ -6,6 +6,7 @@
     use App\Http\Controllers\Controller;
     use App\Http\Requests\StoreSubCategoryRequest;
     use App\Models\inventory\SubCategory;
+    use Illuminate\Http\JsonResponse;
 
     class SubCategoryController extends Controller
     {
@@ -25,7 +26,7 @@
          * Store a newly created resource in storage.
          *
          * @param StoreSubCategoryRequest $request
-         * @return array
+         * @return JsonResponse
          */
         public function store ( StoreSubCategoryRequest $request )
         {
@@ -35,7 +36,7 @@
             }
             $validated    = $request -> validated();
             $sub_category = SubCategory ::create( $validated );
-            if ( $sub_category ) return Response ::success( $sub_category );
+            if ( $sub_category ) return Response ::success( $sub_category , 201 );
             else return Response ::error( 'Sub category not created' );
         }
     }

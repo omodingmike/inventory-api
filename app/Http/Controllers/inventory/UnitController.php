@@ -6,6 +6,7 @@
     use App\Http\Controllers\Controller;
     use App\Http\Requests\StoreUnitRequest;
     use App\Models\inventory\Unit;
+    use Illuminate\Http\JsonResponse;
 
     class UnitController extends Controller
     {
@@ -27,13 +28,13 @@
          * Store a newly created resource in storage.
          *
          * @param StoreUnitRequest $request
-         * @return array
+         * @return JsonResponse
          */
         public function store ( StoreUnitRequest $request )
         {
             $validator = $request -> validator;
             if ( $validator -> fails() ) return Response ::error( $validator -> errors() -> first() );
             $unit = Unit ::create( $request -> validated() );
-            return Response ::success( $unit );
+            return Response ::success( $unit , 201 );
         }
     }

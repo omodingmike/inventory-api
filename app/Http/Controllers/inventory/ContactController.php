@@ -9,6 +9,7 @@
     use App\Models\inventory\Contact;
     use App\Models\inventory\Sale;
     use App\Models\User;
+    use Illuminate\Http\JsonResponse;
     use Illuminate\Http\Request;
 
     class ContactController extends Controller
@@ -16,7 +17,7 @@
         /**
          * Display a listing of the resource.
          *
-         * @return Contact[]
+         * @return JsonResponse
          */
         public function index ( Request $request )
         {
@@ -51,7 +52,7 @@
          * Store a newly created resource in storage.
          *
          * @param StoreContactRequest $request
-         * @return string[]
+         * @return JsonResponse
          */
         public function store ( StoreContactRequest $request )
         {
@@ -62,7 +63,7 @@
             $validated = $request -> validated();
             $contact   = Contact ::create( $validated );
             if ( $contact ) {
-                return Response ::success( $contact );
+                return Response ::success( $contact , 201 );
             } else {
                 return Response ::error( 'Contact could not be created' );
             }

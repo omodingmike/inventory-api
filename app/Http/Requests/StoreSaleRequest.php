@@ -28,11 +28,11 @@
         public function rules () : array
         {
             return [
-                'contact_id'  => 'required|int' ,
-                'grand_total' => 'required|int' ,
-                'user_id'     => 'required|int|exists:users,id' ,
-                'mode'        => 'required|string' ,
-                'items'       => 'required|array' ,
+                'contact_id'   => 'required|int' ,
+                'grand_total'  => 'required|int' ,
+                'user_id'      => 'required|int|exists:users,id' ,
+                'payment_mode' => 'required|string' ,
+                'items'        => 'required|array' ,
             ];
         }
 

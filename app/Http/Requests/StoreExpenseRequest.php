@@ -28,7 +28,7 @@
         public function rules () : array
         {
             return [
-                'category_id' => 'required|int|exists:inv_categories,id' ,
+                'category_id' => 'required|int|exists:inv_expense_categories,id' ,
                 'amount'      => 'required|int' ,
                 'date'        => 'required|date' ,
                 'user_id'     => 'required|int|exists:users,id'

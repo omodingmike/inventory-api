@@ -8,6 +8,7 @@
     use App\Models\inventory\Category;
     use App\Models\User;
     use Illuminate\Database\QueryException;
+    use Illuminate\Http\JsonResponse;
     use Illuminate\Http\Request;
     use Illuminate\Support\Facades\DB;
     use Illuminate\Support\Facades\Storage;
@@ -19,7 +20,7 @@
         /**
          * Display a listing of the resource.
          *
-         * @return array
+         * @return JsonResponse
          */
         public function index ( Request $request )
         {
@@ -48,14 +49,19 @@
                 $stock_value         = 0;
                 $stock_quantity      = 0;
                 $sold_quantity       = 0;
-                foreach ( $category -> products as $product ) {
-                    $stock_value    += $product -> balance;
-                    $stock_quantity += $product -> quantity;
-                    $sold_quantity  += $product -> sold;
-                    if ( $product -> quantity < 1 ) $out_of_stock++;
-                    $category_collection -> put( 'stock_value' , $stock_value );
+                if ( $category -> products -> count() > 0 ) {
+                    foreach ( $category -> products as $product ) {
+                        $stock_value    += $product -> balance;
+                        $stock_quantity += $product -> quantity;
+                        $sold_quantity  += $product -> sold;
+                        $category_collection -> put( 'stock_value' , $stock_value );
+                        if ( $product -> quantity < 1 ) $out_of_stock++;
+                    }
+                } else  $category_collection -> put( 'stock_value' , $stock_value );
+                $percentage_stock = 0;
+                if ( $stock_quantity != 0 ) {
+                    $percentage_stock = (int) ( ( ( $stock_quantity - $sold_quantity ) / $stock_quantity ) * 100 );
                 }
-                $percentage_stock = (int) ( ( ( $stock_quantity - $sold_quantity ) / $stock_quantity ) * 100 );
                 if ( $percentage_stock <= 30 ) $category_collection -> put( 'status' , 'Low' );
                 else if ( $percentage_stock <= 50 ) $category_collection -> put( 'status' , 'Medium' );
                 else  $category_collection -> put( 'status' , 'Good' );
@@ -99,7 +105,7 @@
          * Store a newly created resource in storage.
          *
          * @param StoreCategoryRequest $request
-         * @return string[]
+         * @return JsonResponse
          */
         public function store ( StoreCategoryRequest $request )
         {
@@ -118,7 +124,7 @@
                 $category             = Category ::create( $validated );
                 DB ::commit();
                 if ( $category ) {
-                    return Response ::success( $category );
+                    return Response ::success( $category , 201 );
                 } else {
                     return Response ::error( 'Category could not be created' );
                 }

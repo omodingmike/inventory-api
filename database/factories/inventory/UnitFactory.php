@@ -14,8 +14,8 @@
         public function definition () : array
         {
             return [
-                'name'   => $this -> faker -> name() ,
-                'symbol' => $this -> faker -> name() ,
+                'name'   => $this -> faker -> word() ,
+                'symbol' => $this -> faker -> randomElement( [ 'kg' , 'L' , 'pc' ] ) ,
             ];
         }
     }

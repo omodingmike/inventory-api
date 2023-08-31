@@ -21,6 +21,7 @@
                 $table -> integer( 'contact_id' );
                 $table -> integer( 'user_id' );
                 $table -> timestamps();
+
             } );
         }
 

@@ -15,19 +15,19 @@
         {
             Schema ::create( 'inv_products' , function ( Blueprint $table ) {
                 $table -> id();
-                $table -> string( 'name' );
+                $table -> string( 'productName' );
                 $table -> integer( 'user_id' );
-                $table -> integer( 'category' );
-                $table -> integer( 'sub_category' );
-                $table -> string( 'code' );
+                $table -> integer( 'productCategory' );
+                $table -> integer( 'productSubCategory' );
+                $table -> string( 'productCode' );
                 $table -> string( 'photo' );
                 $table -> integer( 'quantity' ) -> default( 0 );
                 $table -> integer( 'sold' ) -> default( 0 );
                 $table -> integer( 'units' );
                 $table -> integer( 'supplier' );
-                $table -> integer( 'retail_price' );
-                $table -> integer( 'whole_sale_price' );
-                $table -> integer( 'purchase_price' );
+                $table -> integer( 'retailPrice' );
+                $table -> integer( 'wholeSalePrice' );
+                $table -> integer( 'purchasePrice' );
                 $table -> integer( 'balance' );
                 $table -> decimal( 'discount' );
                 $table -> timestamps();

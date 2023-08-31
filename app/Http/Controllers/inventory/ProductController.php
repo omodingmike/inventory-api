@@ -13,6 +13,7 @@
     use App\Models\inventory\Supplier;
     use App\Models\inventory\Unit;
     use App\Models\User;
+    use Illuminate\Http\JsonResponse;
     use Illuminate\Http\Request;
     use Illuminate\Support\Carbon;
     use Illuminate\Support\Facades\DB;
@@ -23,7 +24,7 @@
         /**
          * Display a listing of the resource.
          *
-         * @return Product[]
+         * @return JsonResponse
          */
         public function index ( Request $request )
         {
@@ -43,7 +44,7 @@
             if ( $errors ) return Response ::error( $errors );
             $user_id              = $request -> user_id;
             $validated_product_id = Validator ::make( $request -> all() , [ 'id' => 'required|int|exists:inv_products,id' ] );
-            if ( $validated_product_id -> fails() ) return Response ::error( $validated_product_id -> errors() -> first() );
+            if ( $validated_product_id -> stopOnFirstFailure() -> fails() ) return Response ::error( $validated_product_id -> errors() -> first() );
             $product = Product ::ofUserID( $user_id )
                                -> ofID( $request -> id )
                                -> with( 'supplier' , 'units' , 'category' , 'subCategory' )
@@ -56,7 +57,7 @@
          * Store a newly created resource in storage.
          *
          * @param StoreProductRequest $request
-         * @return array
+         * @return JsonResponse
          */
         public function store ( StoreProductRequest $request )
         {
@@ -65,13 +66,29 @@
             if ( $validator -> fails() ) {
                 return Response ::error( $validator -> errors() -> first() );
             }
+            $supplier_validator = Validator ::make( $request -> all() , [ 'supplier' => 'required|exists:inv_suppliers,name' ] );
+            if ( $supplier_validator -> stopOnFirstFailure() -> fails() ) {
+                return Response ::error( 'Supplier name not found in database' );
+            }
+            $category_validator = Validator ::make( $request -> all() , [ 'category' => 'required|exists:inv_categories,name' ] );
+            if ( $category_validator -> stopOnFirstFailure() -> fails() ) {
+                return Response ::error( 'category name not found in database' );
+            }
+            $sub_category_validator = Validator ::make( $request -> all() , [ 'sub_category' => 'required|exists:inv_sub_categories,name' ] );
+            if ( $sub_category_validator -> stopOnFirstFailure() -> fails() ) {
+                return Response ::error( 'Sub category name not found in database' );
+            }
+            $units_validator = Validator ::make( $request -> all() , [ 'units' => 'required|exists:inv_units,name' ] );
+            if ( $units_validator -> stopOnFirstFailure() -> fails() ) {
+                return Response ::error( 'Unit name not found in database' );
+            }
             $store_data              = $request -> validated();
             $store_data[ 'photo' ]   = Uploads ::upload_image( $request , 'photo' );
             $store_data              = $this -> getIDsFromNames( $request , $store_data );
             $store_data[ 'balance' ] = $request -> quantity * $request -> retail_price;
             $product                 = Product ::create( $store_data );
             DB ::commit();
-            if ( $product ) return Response ::success( $product );
+            if ( $product ) return Response ::success( $product , 201 );
             else return Response ::error( 'Product not created' );
         }
 
@@ -106,7 +123,7 @@
             $products   = Product ::ofUserID( $user_id )
                                   -> duration( $start_date , $end_date )
                                   -> with( 'supplier' , 'units' , 'category' , 'subCategory' )
-                                  -> where( 'category' , $request -> query( 'productCategory' ) )
+                                  -> where( 'category' , $request -> query( 'category' ) )
                                   -> get();
             if ( $products -> count() < 1 ) return Response ::error( "No products found" );
             $total_quantity = 0;
@@ -127,13 +144,29 @@
          * Update the specified resource in storage.
          *
          * @param UpdateProductRequest $request
-         * @return string[]
+         * @return JsonResponse
          */
         public function update ( UpdateProductRequest $request )
         {
             $validator = $request -> validator;
             if ( $validator -> fails() ) {
                 return Response ::error( $validator -> errors() -> first() );
+            }
+            $supplier_validator = Validator ::make( $request -> all() , [ 'supplier' => 'required|exists:inv_suppliers,name' ] );
+            if ( $supplier_validator -> stopOnFirstFailure() -> fails() ) {
+                return Response ::error( 'Supplier name not found in database' );
+            }
+            $category_validator = Validator ::make( $request -> all() , [ 'category' => 'required|exists:inv_categories,name' ] );
+            if ( $category_validator -> stopOnFirstFailure() -> fails() ) {
+                return Response ::error( 'category name not found in database' );
+            }
+            $sub_category_validator = Validator ::make( $request -> all() , [ 'sub_category' => 'required|exists:inv_sub_categories,name' ] );
+            if ( $sub_category_validator -> stopOnFirstFailure() -> fails() ) {
+                return Response ::error( 'Sub category name not found in database' );
+            }
+            $units_validator = Validator ::make( $request -> all() , [ 'units' => 'required|exists:inv_units,name' ] );
+            if ( $units_validator -> stopOnFirstFailure() -> fails() ) {
+                return Response ::error( 'Unit name not found in database' );
             }
             $product     = Product ::find( $request -> validated()[ 'id' ] );
             $update_data = $request -> validated();
