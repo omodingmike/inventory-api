@@ -14,8 +14,8 @@
         public function definition () : array
         {
             return [
-                'sale_id'    => $this -> faker -> numberBetween( 1 , 1000 ) ,
-                'product_id' => $this -> faker -> numberBetween( 1 , 1000 ) ,
+                'sale_id'    => 1 ,
+                'product_id' => 1 ,
                 'quantity'   => $this -> faker -> numberBetween( 1 , 100 ) ,
                 'total'      => $this -> faker -> numberBetween( 10000 , 100000 ) ,
             ];

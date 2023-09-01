@@ -2,6 +2,7 @@
 
     namespace Tests\Feature;
 
+    use App\helpers\TestingModels;
     use Illuminate\Http\UploadedFile;
     use Tests\TestCase;
 
@@ -14,7 +15,8 @@
          */
         public function testAllCategories ()
         {
-            $response = $this -> json( 'GET' , '/api/categories?user_id=1' );
+            TestingModels ::createModels();
+            $response = $this -> json( 'GET' , "/api/categories?user_id=1" );
             $response -> assertStatus( 200 )
                       -> assertJsonStructure( [
                           'status' ,

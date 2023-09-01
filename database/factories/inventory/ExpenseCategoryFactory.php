@@ -14,7 +14,7 @@
         public function definition () : array
         {
             return [
-                'user_id' => $this -> faker -> numberBetween( 1 , 1000 ) ,
+                'user_id' => 1 ,
                 'name'    => $this -> faker -> word() ,
             ];
         }

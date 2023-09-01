@@ -15,13 +15,13 @@
         {
             return [
                 'name'             => $this -> faker -> word() ,
-                'user_id'          => $this -> faker -> numberBetween( 1 , 100 ) ,
-                'category'         => $this -> faker -> numberBetween( 1 , 10 ) ,
-                'sub_category'     => $this -> faker -> numberBetween( 1 , 10 ) ,
+                'user_id'          => 1 ,
+                'category'         => 1 ,
+                'sub_category'     => 1 ,
                 'code'             => $this -> faker -> postcode() ,
                 'photo'            => $this -> faker -> imageUrl() ,
-                'units'            => $this -> faker -> numberBetween( 1 , 10 ) ,
-                'supplier'         => $this -> faker -> numberBetween( 1 , 100 ) ,
+                'units'            => 1 ,
+                'supplier'         => 1 ,
                 'retail_price'     => $this -> faker -> numberBetween( 10000 , 1000000 ) ,
                 'whole_sale_price' => $this -> faker -> numberBetween( 10000 , 1000000 ) ,
                 'purchase_price'   => $this -> faker -> numberBetween( 10000 , 1000000 ) ,

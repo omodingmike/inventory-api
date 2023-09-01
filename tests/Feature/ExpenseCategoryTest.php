@@ -19,7 +19,7 @@
 
         public function testAllExpenseCategories ()
         {
-            $response = $this -> json( 'GET' , '/api/expense-categories?user_id=64' );
+            $response = $this -> json( 'GET' , '/api/expense-categories?user_id=1' );
             $response -> assertStatus( 200 )
                       -> assertJsonStructure( [
                           'status' ,
@@ -35,7 +35,7 @@
 
         public function testNoExpenseCategories ()
         {
-            $response = $this -> json( 'GET' , '/api/expense-categories?user_id=64' );
+            $response = $this -> json( 'GET' , '/api/expense-categories?user_id=1' );
             $response -> assertStatus( 200 )
                       -> assertJsonStructure( [
                           'status' ,

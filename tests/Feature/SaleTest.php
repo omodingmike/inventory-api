@@ -2,6 +2,8 @@
 
     namespace Tests\Feature;
 
+    use App\Models\inventory\Product;
+    use App\Models\inventory\Sale;
     use Tests\TestCase;
 
     class SaleTest extends TestCase
@@ -74,7 +76,8 @@
 
         public function testSaleDetails ()
         {
-            $response = $this -> json( 'GET' , '/api/sale?user_id=1&sale_id=S638793' );
+            $sale_id  = ( Sale ::first() ) -> sale_id;
+            $response = $this -> json( 'GET' , "/api/sale?user_id=1&sale_id=$sale_id" );
             $response -> assertStatus( 200 )
                       -> assertJson( [
                           'status'  => 1 ,
@@ -122,7 +125,8 @@
 
         public function testUserIdMissingInSaleDetails ()
         {
-            $response = $this -> json( 'GET' , '/api/sale?sale_id=S638793' );
+            $sale_id  = ( Sale ::first() ) -> sale_id;
+            $response = $this -> json( 'GET' , "/api/sale?sale_id=$sale_id " );
             $response -> assertStatus( 200 )
                       -> assertJsonStructure( [
                           'status' ,
@@ -147,11 +151,11 @@
             $postData = [
                 'contact_id'   => 1 ,
                 'grand_total'  => 34000 ,
-                'user_id'      => 50 ,
+                'user_id'      => 1 ,
                 'payment_mode' => 'cash' ,
                 'items'        => [
                     [
-                        'name'     => 'odit' ,
+                        'name'     => ( Product ::first() ) -> name ,
                         'amount'   => 1000 ,
                         'quantity' => 10 ,
                         'total'    => 2000
@@ -179,7 +183,7 @@
         {
             $postData = [
                 'grand_total'  => 34000 ,
-                'user_id'      => 50 ,
+                'user_id'      => 1 ,
                 'payment_mode' => 'cash' ,
                 'items'        => [
                     [
@@ -203,7 +207,7 @@
         {
             $postData = [
                 'contact_id'   => 1 ,
-                'user_id'      => 50 ,
+                'user_id'      => 1 ,
                 'payment_mode' => 'cash' ,
                 'items'        => [
                     [
@@ -276,7 +280,7 @@
             $postData = [
                 'contact_id'   => 1 ,
                 'grand_total'  => 34000 ,
-                'user_id'      => 50 ,
+                'user_id'      => 1 ,
                 'payment_mode' => 'cash' ,
             ];
             $response = $this -> json( 'POST' , '/api/sales' , $postData );

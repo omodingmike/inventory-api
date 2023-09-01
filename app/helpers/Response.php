@@ -13,7 +13,7 @@
                 'message' => 'success' ,
                 'data'    => $data
             ] , $status );
-            info( $response );
+//            info( $response );
             return $response;
         }
 
@@ -24,7 +24,7 @@
                 'message' => $message ,
                 'data'    => null
             ] );
-            info( $response );
+//            info( $response );
             return $response;
         }
     }

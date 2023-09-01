@@ -17,7 +17,7 @@
                 'name'    => $this -> faker -> firstName() ,
                 'phone'   => $this -> faker -> phoneNumber() ,
                 'email'   => $this -> faker -> safeEmail() ,
-                'user_id' => $this -> faker -> numberBetween( 1 , 100 ) ,
+                'user_id' => 1 ,
             ];
         }
     }

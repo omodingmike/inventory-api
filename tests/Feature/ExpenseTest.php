@@ -20,7 +20,7 @@
 
         public function testAllUserExpenses ()
         {
-            $response = $this -> json( 'GET' , '/api/expenses?user_id=1&from=01-08-2021&to=31-08-2021' );
+            $response = $this -> json( 'GET' , '/api/expenses?user_id=1&from=01-01-2021&to=01-12-2023' );
             $response -> assertStatus( 200 )
                       -> assertJsonStructure( [
                           'status' ,

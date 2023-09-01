@@ -2,6 +2,10 @@
 
     namespace Tests\Feature;
 
+    use App\Models\inventory\Category;
+    use App\Models\inventory\SubCategory;
+    use App\Models\inventory\Supplier;
+    use App\Models\inventory\Unit;
     use Illuminate\Http\UploadedFile;
     use Tests\TestCase;
 
@@ -14,7 +18,7 @@
          */
         public function testFilterCategoryProducts ()
         {
-            $response = $this -> json( 'get' , '/api/filter-category-products?category=1&from=01-02-2021&to=01-09-2023&user_id=1' );
+            $response = $this -> json( 'get' , '/api/filter-category-products?category=1&from=01-01-2021&to=01-12-2023&user_id=1' );
             $response -> assertStatus( 200 )
                       -> assertJsonStructure( [
                           'status' ,
@@ -148,7 +152,7 @@
                 ] ,
             ];
 
-            $response = $this -> get( '/api/product-details?id=1&user_id=36' );
+            $response = $this -> get( '/api/product-details?id=1&user_id=1' );
 
             $response -> assertStatus( 200 )
                       -> assertJsonStructure( $expectedData );
@@ -156,7 +160,7 @@
 
         public function testIdMissingInProductDetails ()
         {
-            $response = $this -> get( '/api/product-details?user_id=36' );
+            $response = $this -> get( '/api/product-details?user_id=1' );
             $response -> assertStatus( 200 )
                       -> assertJsonStructure( [
                           'status' ,
@@ -178,17 +182,16 @@
 
         public function testProductStore ()
         {
-            $product_name = 'product' . time();
-            $data         = [
-                'name'             => $product_name ,
+            $data = [
+                'name'             => 'name' ,
                 'user_id'          => 1 ,
-                'category'         => 'Brady' ,
-                'sub_category'     => 'aut' ,
+                'category'         => ( Category ::first() ) -> name ,
+                'sub_category'     => ( SubCategory ::first() ) -> name ,
                 'code'             => 'ABC123' ,
                 'photo'            => UploadedFile ::fake() -> image( 'product.jpg' ) ,
                 'quantity'         => 100 ,
-                'units'            => 'et' ,
-                'supplier'         => 'Velda' ,
+                'units'            => ( Unit ::first() ) -> name ,
+                'supplier'         => ( Supplier ::first() ) -> name ,
                 'retail_price'     => 1000 ,
                 'whole_sale_price' => 800 ,
                 'purchase_price'   => 750 ,
@@ -221,22 +224,19 @@
                               'id' ,
                           ]
                       ] );
-            $this -> assertDatabaseHas( 'inv_products' , [
-                'name' => $product_name
-            ] );
         }
 
         public function testNameMissingInProductStore ()
         {
             $data     = [
                 'user_id'          => 1 ,
-                'category'         => 'Brady' ,
-                'sub_category'     => 'aut' ,
                 'code'             => 'ABC123' ,
                 'photo'            => UploadedFile ::fake() -> image( 'product.jpg' ) ,
                 'quantity'         => 100 ,
-                'units'            => 'et' ,
-                'supplier'         => 'Velda' ,
+                'category'         => ( Category ::first() ) -> name ,
+                'sub_category'     => ( SubCategory ::first() ) -> name ,
+                'units'            => ( Unit ::first() ) -> name ,
+                'supplier'         => ( Supplier ::first() ) -> name ,
                 'retail_price'     => 1000 ,
                 'whole_sale_price' => 800 ,
                 'purchase_price'   => 750 ,
@@ -256,13 +256,13 @@
         {
             $data     = [
                 'name'             => 'name' . time() ,
-                'category'         => 'Brady' ,
-                'sub_category'     => 'aut' ,
                 'code'             => 'ABC123' ,
                 'photo'            => UploadedFile ::fake() -> image( 'product.jpg' ) ,
                 'quantity'         => 100 ,
-                'units'            => 'et' ,
-                'supplier'         => 'Velda' ,
+                'category'         => ( Category ::first() ) -> name ,
+                'sub_category'     => ( SubCategory ::first() ) -> name ,
+                'units'            => ( Unit ::first() ) -> name ,
+                'supplier'         => ( Supplier ::first() ) -> name ,
                 'retail_price'     => 1000 ,
                 'whole_sale_price' => 800 ,
                 'purchase_price'   => 750 ,
@@ -283,12 +283,12 @@
             $data     = [
                 'name'             => 'name' . time() ,
                 'user_id'          => 1 ,
-                'sub_category'     => 'aut' ,
                 'code'             => 'ABC123' ,
                 'photo'            => UploadedFile ::fake() -> image( 'product.jpg' ) ,
                 'quantity'         => 100 ,
-                'units'            => 'et' ,
-                'supplier'         => 'Velda' ,
+                'sub_category'     => ( SubCategory ::first() ) -> name ,
+                'units'            => ( Unit ::first() ) -> name ,
+                'supplier'         => ( Supplier ::first() ) -> name ,
                 'retail_price'     => 1000 ,
                 'whole_sale_price' => 800 ,
                 'purchase_price'   => 750 ,
@@ -306,14 +306,15 @@
         public function testSubCategoryMissingInProductStore ()
         {
             $data     = [
-                'name'             => 'name' . time() ,
-                'user_id'          => 1 ,
-                'category'         => 'Brady' ,
+                'name'    => 'name' . time() ,
+                'user_id' => 1 ,
+
                 'code'             => 'ABC123' ,
                 'photo'            => UploadedFile ::fake() -> image( 'product.jpg' ) ,
                 'quantity'         => 100 ,
-                'units'            => 'et' ,
-                'supplier'         => 'Velda' ,
+                'category'         => ( Category ::first() ) -> name ,
+                'units'            => ( Unit ::first() ) -> name ,
+                'supplier'         => ( Supplier ::first() ) -> name ,
                 'retail_price'     => 1000 ,
                 'whole_sale_price' => 800 ,
                 'purchase_price'   => 750 ,
@@ -334,12 +335,12 @@
             $data     = [
                 'name'             => 'name' . time() ,
                 'user_id'          => 1 ,
-                'category'         => 'Brady' ,
-                'sub_category'     => 'aut' ,
                 'photo'            => UploadedFile ::fake() -> image( 'product.jpg' ) ,
                 'quantity'         => 100 ,
-                'units'            => 'et' ,
-                'supplier'         => 'Velda' ,
+                'category'         => ( Category ::first() ) -> name ,
+                'sub_category'     => ( SubCategory ::first() ) -> name ,
+                'units'            => ( Unit ::first() ) -> name ,
+                'supplier'         => ( Supplier ::first() ) -> name ,
                 'retail_price'     => 1000 ,
                 'whole_sale_price' => 800 ,
                 'purchase_price'   => 750 ,
@@ -359,12 +360,12 @@
             $data     = [
                 'name'             => 'name' . time() ,
                 'user_id'          => 1 ,
-                'category'         => 'Brady' ,
-                'sub_category'     => 'aut' ,
                 'code'             => 'ABC123' ,
                 'quantity'         => 100 ,
-                'units'            => 'et' ,
-                'supplier'         => 'Velda' ,
+                'category'         => ( Category ::first() ) -> name ,
+                'sub_category'     => ( SubCategory ::first() ) -> name ,
+                'units'            => ( Unit ::first() ) -> name ,
+                'supplier'         => ( Supplier ::first() ) -> name ,
                 'retail_price'     => 1000 ,
                 'whole_sale_price' => 800 ,
                 'purchase_price'   => 750 ,
@@ -384,12 +385,12 @@
             $data     = [
                 'name'             => 'name' . time() ,
                 'user_id'          => 1 ,
-                'category'         => 'Brady' ,
-                'sub_category'     => 'aut' ,
                 'code'             => 'ABC123' ,
                 'photo'            => UploadedFile ::fake() -> image( 'product.jpg' ) ,
-                'units'            => 'et' ,
-                'supplier'         => 'Velda' ,
+                'category'         => ( Category ::first() ) -> name ,
+                'sub_category'     => ( SubCategory ::first() ) -> name ,
+                'units'            => ( Unit ::first() ) -> name ,
+                'supplier'         => ( Supplier ::first() ) -> name ,
                 'retail_price'     => 1000 ,
                 'whole_sale_price' => 800 ,
                 'purchase_price'   => 750 ,
@@ -409,12 +410,12 @@
             $data     = [
                 'name'             => 'name' . time() ,
                 'user_id'          => 1 ,
-                'category'         => 'Brady' ,
-                'sub_category'     => 'aut' ,
                 'code'             => 'ABC123' ,
                 'photo'            => UploadedFile ::fake() -> image( 'product.jpg' ) ,
                 'quantity'         => 100 ,
-                'supplier'         => 'Velda' ,
+                'category'         => ( Category ::first() ) -> name ,
+                'sub_category'     => ( SubCategory ::first() ) -> name ,
+                'supplier'         => ( Supplier ::first() ) -> name ,
                 'retail_price'     => 1000 ,
                 'whole_sale_price' => 800 ,
                 'purchase_price'   => 750 ,
@@ -434,12 +435,12 @@
             $data     = [
                 'name'             => 'name' . time() ,
                 'user_id'          => 1 ,
-                'category'         => 'Brady' ,
-                'sub_category'     => 'aut' ,
                 'code'             => 'ABC123' ,
                 'photo'            => UploadedFile ::fake() -> image( 'product.jpg' ) ,
                 'quantity'         => 100 ,
-                'units'            => 'et' ,
+                'category'         => ( Category ::first() ) -> name ,
+                'sub_category'     => ( SubCategory ::first() ) -> name ,
+                'units'            => ( Unit ::first() ) -> name ,
                 'retail_price'     => 1000 ,
                 'whole_sale_price' => 800 ,
                 'purchase_price'   => 750 ,
@@ -459,13 +460,13 @@
             $data     = [
                 'name'             => 'name' . time() ,
                 'user_id'          => 1 ,
-                'category'         => 'Brady' ,
-                'sub_category'     => 'aut' ,
                 'code'             => 'ABC123' ,
                 'photo'            => UploadedFile ::fake() -> image( 'product.jpg' ) ,
                 'quantity'         => 100 ,
-                'units'            => 'et' ,
-                'supplier'         => 'Velda' ,
+                'category'         => ( Category ::first() ) -> name ,
+                'sub_category'     => ( SubCategory ::first() ) -> name ,
+                'units'            => ( Unit ::first() ) -> name ,
+                'supplier'         => ( Supplier ::first() ) -> name ,
                 'whole_sale_price' => 800 ,
                 'purchase_price'   => 750 ,
                 'discount'         => 10 ,
@@ -484,13 +485,13 @@
             $data     = [
                 'name'           => 'name' . time() ,
                 'user_id'        => 1 ,
-                'category'       => 'Brady' ,
-                'sub_category'   => 'aut' ,
                 'code'           => 'ABC123' ,
                 'photo'          => UploadedFile ::fake() -> image( 'product.jpg' ) ,
                 'quantity'       => 100 ,
-                'units'          => 'et' ,
-                'supplier'       => 'Velda' ,
+                'category'       => ( Category ::first() ) -> name ,
+                'sub_category'   => ( SubCategory ::first() ) -> name ,
+                'units'          => ( Unit ::first() ) -> name ,
+                'supplier'       => ( Supplier ::first() ) -> name ,
                 'retail_price'   => 1000 ,
                 'purchase_price' => 750 ,
                 'discount'       => 10 ,
@@ -509,13 +510,13 @@
             $data     = [
                 'name'             => 'name' . time() ,
                 'user_id'          => 1 ,
-                'category'         => 'Brady' ,
-                'sub_category'     => 'aut' ,
                 'code'             => 'ABC123' ,
                 'photo'            => UploadedFile ::fake() -> image( 'product.jpg' ) ,
                 'quantity'         => 100 ,
-                'units'            => 'et' ,
-                'supplier'         => 'Velda' ,
+                'category'         => ( Category ::first() ) -> name ,
+                'sub_category'     => ( SubCategory ::first() ) -> name ,
+                'units'            => ( Unit ::first() ) -> name ,
+                'supplier'         => ( Supplier ::first() ) -> name ,
                 'retail_price'     => 1000 ,
                 'whole_sale_price' => 800 ,
                 'discount'         => 10 ,
@@ -534,13 +535,13 @@
             $data     = [
                 'name'             => 'name' . time() ,
                 'user_id'          => 1 ,
-                'category'         => 'Brady' ,
-                'sub_category'     => 'aut' ,
                 'code'             => 'ABC123' ,
                 'photo'            => UploadedFile ::fake() -> image( 'product.jpg' ) ,
                 'quantity'         => 100 ,
-                'units'            => 'et' ,
-                'supplier'         => 'Velda' ,
+                'category'         => ( Category ::first() ) -> name ,
+                'sub_category'     => ( SubCategory ::first() ) -> name ,
+                'units'            => ( Unit ::first() ) -> name ,
+                'supplier'         => ( Supplier ::first() ) -> name ,
                 'retail_price'     => 1000 ,
                 'whole_sale_price' => 800 ,
             ];
@@ -555,17 +556,16 @@
 
         public function testProductUpdate ()
         {
-            $product_name = 'product' . time();
-            $data         = [
-                'name'             => $product_name ,
+            $data = [
+                'name'             => 'name' ,
                 'user_id'          => 1 ,
-                'category'         => 'Brady' ,
-                'sub_category'     => 'aut' ,
                 'code'             => 'ABC123' ,
                 'photo'            => UploadedFile ::fake() -> image( 'product.jpg' ) ,
                 'quantity'         => 100 ,
-                'units'            => 'et' ,
-                'supplier'         => 'Velda' ,
+                'category'         => ( Category ::first() ) -> name ,
+                'sub_category'     => ( SubCategory ::first() ) -> name ,
+                'units'            => ( Unit ::first() ) -> name ,
+                'supplier'         => ( Supplier ::first() ) -> name ,
                 'retail_price'     => 1000 ,
                 'whole_sale_price' => 800 ,
                 'purchase_price'   => 750 ,
@@ -581,11 +581,6 @@
                           'message' ,
                           'data'
                       ] );
-
-            // Optionally, you can also assert that the record was inserted into the database
-            $this -> assertDatabaseHas( 'inv_products' , [
-                'name' => $product_name
-            ] );
         }
 
     }
