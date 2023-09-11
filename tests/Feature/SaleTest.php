@@ -164,17 +164,45 @@
             ];
             $response = $this -> json( 'POST' , '/api/sales' , $postData );
             $response -> assertStatus( 201 )
-                      -> assertJson( [
-                          'status'  => 1 ,
-                          'message' => 'success' ,
-                      ] )
                       -> assertJsonStructure( [
+                          'status' ,
+                          'message' ,
                           'data' => [
-                              'grand_total' ,
-                              'payment_mode' ,
-                              'sale_id' ,
-                              'created_at' ,
-                              'id' ,
+                              [
+                                  'id' ,
+                                  'sale_id' ,
+                                  'payment_mode' ,
+                                  'grand_total' ,
+                                  'created_at' ,
+                                  'sale_items' => [
+                                      [
+                                          'id' ,
+                                          'sale_id' ,
+                                          'product_id' ,
+                                          'quantity' ,
+                                          'total' ,
+                                          'product' => [
+                                              'id' ,
+                                              'name' ,
+                                              'user_id' ,
+                                              'category' ,
+                                              'sub_category' ,
+                                              'code' ,
+                                              'photo' ,
+                                              'quantity' ,
+                                              'sold' ,
+                                              'units' ,
+                                              'supplier' ,
+                                              'retail_price' ,
+                                              'whole_sale_price' ,
+                                              'purchase_price' ,
+                                              'balance' ,
+                                              'discount' ,
+                                              'created_at' ,
+                                          ] ,
+                                      ] ,
+                                  ] ,
+                              ] ,
                           ] ,
                       ] );
         }

@@ -109,14 +109,6 @@
             DB ::commit();
             $sales = Sale ::with( 'saleItems.product' ) -> where( 'sale_id' , $sale -> sale_id ) -> get();
 
-//            foreach ( $sales as $sale ) {
-//                $product = Product::find($sale->)
-//                $sale_item = [];
-//                $sale_item['product_name']=Product::find()
-//
-//            }
-
-
             return Response ::success( $sales , 201 );
         }
     }
