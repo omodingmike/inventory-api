@@ -11,5 +11,5 @@
 
         protected $fillable = [ 'name' ];
         protected $table    = 'inv_sub_categories';
-        protected $hidden   = [ 'created_at', 'updated_at' ];
+        protected $hidden   = [ 'created_at' , 'updated_at' , 'pivot' ];
     }

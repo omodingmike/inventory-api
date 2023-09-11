@@ -25,10 +25,11 @@
          *
          * @return array
          */
-        public function rules ()
+        public function rules () : array
         {
             return [
-                'name' => 'required|string|unique:inv_sub_categories'
+                'name'        => 'required|string|unique:inv_sub_categories' ,
+                'category_id' => 'required|int|exists:inv_categories,id'
             ];
         }
 
