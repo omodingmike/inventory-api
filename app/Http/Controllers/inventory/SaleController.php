@@ -107,7 +107,7 @@
                 CartItem ::create( $item );
             }
             DB ::commit();
-            $sales = Sale ::with( 'saleItems.product' ) -> where( 'sale_id' , $sale -> sale_id ) -> get();
+            $sales = Sale ::with( 'saleItems.product' ) -> where( 'sale_id' , $sale -> sale_id ) -> first();
 
             return Response ::success( $sales , 201 );
         }
