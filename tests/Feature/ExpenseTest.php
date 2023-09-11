@@ -76,12 +76,12 @@
         public function testStoreExpense ()
         {
             $payload  = [
-                'category_id' => 1 ,
-                'amount'      => 789 ,
-                'date'        => '24-07-2023' ,
-                'user_id'     => 1
+                'name'    => "name" ,
+                'amount'  => 789 ,
+                'date'    => date( 'Y-m-d' ) ,
+                'user_id' => 1
             ];
-            $response = $this -> json( 'POST' , '/api/expenses' , $payload ); // Replace with your actual endpoint
+            $response = $this -> json( 'POST' , '/api/expenses' , $payload );
             $response -> assertStatus( 201 )
                       -> assertJsonStructure( [
                           'status' ,
@@ -96,11 +96,11 @@
                       ] );
         }
 
-        public function testCategoryIdMissingInStoreExpense ()
+        public function testNameMissingInStoreExpense ()
         {
             $payload  = [
                 'amount'  => 789 ,
-                'date'    => '24-07-2023' ,
+                'date'    => date( 'Y-m-d' ) ,
                 'user_id' => 1
             ];
             $response = $this -> json( 'POST' , '/api/expenses' , $payload ); // Replace with your actual endpoint
@@ -115,9 +115,9 @@
         public function testAmountMissingInStoreExpense ()
         {
             $payload  = [
-                'category_id' => 1 ,
-                'date'        => '24-07-2023' ,
-                'user_id'     => 1
+                'name'    => "name" ,
+                'date'    => date( 'Y-m-d' ) ,
+                'user_id' => 1
             ];
             $response = $this -> json( 'POST' , '/api/expenses' , $payload ); // Replace with your actual endpoint
             $response -> assertStatus( 200 )
@@ -131,9 +131,9 @@
         public function testDateMissingInStoreExpense ()
         {
             $payload  = [
-                'category_id' => 1 ,
-                'amount'      => 789 ,
-                'user_id'     => 1
+                'name'    => 'name' ,
+                'amount'  => 789 ,
+                'user_id' => 1
             ];
             $response = $this -> json( 'POST' , '/api/expenses' , $payload ); // Replace with your actual endpoint
             $response -> assertStatus( 200 )
@@ -147,9 +147,9 @@
         public function testUserIdMissingInStoreExpense ()
         {
             $payload  = [
-                'category_id' => 1 ,
-                'amount'      => 789 ,
-                'date'        => '24-07-2023' ,
+                'name'   => 'name' ,
+                'amount' => 789 ,
+                'date'   => date( 'Y-m-d' ) ,
             ];
             $response = $this -> json( 'POST' , '/api/expenses' , $payload ); // Replace with your actual endpoint
             $response -> assertStatus( 200 )

@@ -28,10 +28,11 @@
         public function rules () : array
         {
             return [
-                'category_id' => 'required|int|exists:inv_expense_categories,id' ,
-                'amount'      => 'required|int' ,
-                'date'        => 'required|date' ,
-                'user_id'     => 'required|int|exists:users,id'
+//                'category_id' => 'required|int|exists:inv_expense_categories,id' ,
+                'name'    => 'required|string' ,
+                'amount'  => 'required|int' ,
+                'date'    => 'required|date' ,
+                'user_id' => 'required|int|exists:users,id'
             ];
         }
 

@@ -90,14 +90,31 @@
                 return Response ::error( $validator -> errors() -> first() );
             }
             $validated        = $request -> validated();
-            $expense_category = ExpenseCategory ::find( $validated[ 'category_id' ] );
-            if ( $expense_category ) $validated[ 'expense_id' ] = $expense_category -> id;
-            else $validated[ 'expense_id' ] = ( ExpenseCategory ::create( $validated ) ) -> id;
+            $expense_category = ExpenseCategory ::create( [
+                'name'    => $validated[ 'name' ] ,
+                'user_id' => $validated[ 'user_id' ] ,
+            ] );
+            if ( !$expense_category ) return Response ::error( $validator -> errors() -> first() );
+
             $validated[ 'date' ] = date( 'Y-m-d' , strtotime( $request -> date ) );
-            unset( $validated[ 'name' ] );
-            $expense = Expense ::create( $validated );
-            if ( $expense ) return Response ::success( $expense , 201 );
-            else return Response ::error( 'Expense could not be created' );
+            $expense             = Expense ::create( [
+                'amount'     => $validated[ 'amount' ] ,
+                'user_id'    => $validated[ 'user_id' ] ,
+                'date'       => $validated[ 'date' ] ,
+                'expense_id' => $expense_category -> id ,
+            ] );
+            if ( !$expense ) return Response ::error( $validator -> errors() -> first() );
+            return Response ::success( $expense , 201 );
+
+
+//            $expense_category = ExpenseCategory ::find( $validated[ 'category_id' ] );
+//            if ( $expense_category ) $validated[ 'expense_id' ] = $expense_category -> id;
+//            else $validated[ 'expense_id' ] = ( ExpenseCategory ::create( $validated ) ) -> id;
+//            $validated[ 'date' ] = date( 'Y-m-d' , strtotime( $request -> date ) );
+//            unset( $validated[ 'name' ] );
+//            $expense = Expense ::create( $validated );
+//            if ( $expense ) return Response ::success( $expense , 201 );
+//            else return Response ::error( 'Expense could not be created' );
         }
 
         public function expensesAndIncomes ( Request $request )

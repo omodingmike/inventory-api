@@ -91,7 +91,6 @@
             $user_id                 = $validated [ 'user_id' ];
             $validated [ 'sale_id' ] = 'S' . time();
             $sale                    = Sale ::create( $validated );
-            info( $sale );
 
             foreach ( $validated [ 'items' ] as $item ) {
                 $item[ 'sale_id' ] = $sale -> id;
@@ -101,13 +100,23 @@
 
                 if ( !$product ) {
                     DB ::rollBack();
-                    return Response ::error( 'No products found for this user' );
+                    return Response ::error( 'Products not for this user' );
                 }
                 $item[ 'product_id' ] = $product -> id;
                 $product -> increment( 'sold' , $item [ 'quantity' ] );
                 CartItem ::create( $item );
             }
             DB ::commit();
-            return Response ::success( $sale , 201 );
+            $sales = Sale ::with( 'saleItems.product' ) -> where( 'sale_id' , $sale -> sale_id ) -> get();
+
+//            foreach ( $sales as $sale ) {
+//                $product = Product::find($sale->)
+//                $sale_item = [];
+//                $sale_item['product_name']=Product::find()
+//
+//            }
+
+
+            return Response ::success( $sales , 201 );
         }
     }
