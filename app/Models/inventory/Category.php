@@ -23,7 +23,7 @@
 
         public function subCategories () : BelongsToMany
         {
-            return $this -> belongsToMany( SubCategory::class , 'category_sub_categories' );
+            return $this -> belongsToMany( SubCategory::class , 'inv_category_sub_categories' );
         }
 
         public function scopeOfUserID ( $query , $user_id )
