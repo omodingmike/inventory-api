@@ -13,7 +13,6 @@
     use App\Models\inventory\Supplier;
     use App\Models\inventory\Unit;
     use App\Models\User;
-    use Illuminate\Http\JsonResponse;
     use Illuminate\Http\Request;
     use Illuminate\Support\Carbon;
     use Illuminate\Support\Facades\DB;
@@ -21,11 +20,6 @@
 
     class ProductController extends Controller
     {
-        /**
-         * Display a listing of the resource.
-         *
-         * @return JsonResponse
-         */
         public function index ( Request $request )
         {
             $errors = User ::validateUserId( $request );
@@ -53,12 +47,6 @@
             else return Response ::success( $product );
         }
 
-        /**
-         * Store a newly created resource in storage.
-         *
-         * @param StoreProductRequest $request
-         * @return JsonResponse
-         */
         public function store ( StoreProductRequest $request )
         {
             DB ::beginTransaction();
@@ -92,11 +80,6 @@
             else return Response ::error( 'Product not created' );
         }
 
-        /**
-         * @param       $request
-         * @param array $data
-         * @return array
-         */
         public function getIDsFromNames ( $request , array $data ) : array
         {
             $data[ 'supplier' ]     = Supplier ::where( 'name' , $request -> supplier ) -> first() -> id;
@@ -112,19 +95,32 @@
             if ( $errors ) return Response ::error( $errors );
             $date_range_validator = Validator ::make( $request -> all() ,
                 [
-                    'from' => 'bail|required|date' ,
-                    'to'   => 'bail|required|date' ,
+                    'from' => 'sometimes|bail|required|date' ,
+                    'to'   => 'sometimes|bail|required|date' ,
                 ]
             );
             if ( $date_range_validator -> fails() ) return Response ::error( $date_range_validator -> errors() -> first() );
-            $user_id    = $request -> user_id;
-            $start_date = Carbon ::parse( $request -> query( 'from' ) ) -> copy() -> startOfDay();
-            $end_date   = Carbon ::parse( $request -> query( 'to' ) ) -> copy() -> endOfDay();
-            $products   = Product ::ofUserID( $user_id )
-                                  -> duration( $start_date , $end_date )
-                                  -> with( 'supplier' , 'units' , 'category' , 'subCategory' )
-                                  -> where( 'category' , $request -> query( 'category' ) )
-                                  -> get();
+            $user_id = $request -> user_id;
+
+            $from = $request -> query( 'from' );
+            $to   = $request -> query( 'to' );
+
+            if ( $from && $to ) {
+                $start_date = Carbon ::parse( $from ) -> copy() -> startOfDay();
+                $end_date   = Carbon ::parse( $to ) -> copy() -> endOfDay();
+                $products   = Product ::ofUserID( $user_id )
+                                      -> duration( $start_date , $end_date )
+//                                  -> with( 'supplier' , 'units' , 'category' , 'subCategory' )
+                                      -> where( 'category' , $request -> query( 'category' ) )
+                                      -> get( [ 'id' , 'name' , 'code' , 'quantity' , 'balance' , 'retail_price' ] )
+                                      -> makeHidden( 'retail_price' );
+            } else {
+                $products = Product ::ofUserID( $user_id )
+                                    -> where( 'category' , $request -> query( 'category' ) )
+                                    -> get( [ 'id' , 'name' , 'code' , 'quantity' , 'balance' , 'retail_price' ] )
+                                    -> makeHidden( 'retail_price' );
+            }
+
             if ( $products -> count() < 1 ) return Response ::error( "No products found" );
             $total_quantity = 0;
             $total_balance  = 0;
@@ -140,12 +136,6 @@
             return Response ::success( $data );
         }
 
-        /**
-         * Update the specified resource in storage.
-         *
-         * @param UpdateProductRequest $request
-         * @return JsonResponse
-         */
         public function update ( UpdateProductRequest $request )
         {
             $validator = $request -> validator;

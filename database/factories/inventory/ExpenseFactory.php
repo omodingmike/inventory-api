@@ -15,9 +15,9 @@
         {
             return [
                 'amount'     => $this -> faker -> numberBetween( 10000 , 500000 ) ,
-                'user_id'    => 1 ,
+                'user_id'    => 427 ,
                 'expense_id' => 1 ,
-                'date'       => $this -> faker -> dateTimeBetween( '-3 years' ) ,
+                'date'       => $this -> faker -> dateTimeBetween( '2020-01-01 00:00:00' , '2023-12-31 23:59:59' ) ,
             ];
         }
     }

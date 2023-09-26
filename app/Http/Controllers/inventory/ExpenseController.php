@@ -8,37 +8,27 @@
     use App\Models\inventory\Expense;
     use App\Models\inventory\ExpenseCategory;
     use App\Models\inventory\Sale;
-    use App\Models\User;
-    use Illuminate\Http\JsonResponse;
+    use App\Traits\DateTrait;
+    use App\Traits\UserTrait;
+    use Carbon\CarbonPeriod;
     use Illuminate\Http\Request;
-    use Illuminate\Support\Carbon;
     use Illuminate\Support\Collection;
-    use Illuminate\Support\Facades\Validator;
+    use Illuminate\Support\Facades\DB;
 
 
     class ExpenseController extends Controller
     {
-        /**
-         * Display a listing of the resource.
-         *
-         * @param Request $request
-         * @return JsonResponse
-         */
+        use UserTrait , DateTrait;
+
         public function index ( Request $request )
         {
-            $errors = User ::validateUserId( $request );
+            $errors = $this -> validateUserID( $request );
             if ( $errors ) return Response ::error( $errors );
-            $user_id              = $request -> user_id;
-            $date_range_validator = Validator ::make( $request -> all() ,
-                [
-                    'from' => 'bail|required|date' ,
-                    'to'   => 'bail|required|date' ,
-                ]
-            );
-            if ( $date_range_validator -> fails() ) return Response ::error( $date_range_validator -> errors() -> first() );
+            $user_id           = $this -> userID( $request );
+            $date_range_errors = $this -> validateDate( $request );
+            if ( $date_range_errors ) return Response ::error( $errors );
+            [ $start_date , $end_date ] = $this -> dateRange( $request );
 
-            $start_date                = Carbon ::parse( $request -> query( 'from' ) ) -> startOfDay();
-            $end_date                  = Carbon ::parse( $request -> query( 'to' ) ) -> endOfDay();
             $previous_month_start_date = $start_date -> copy() -> subMonth();
             $previous_month_end_date   = $previous_month_start_date -> copy() -> endOfMonth();
 
@@ -70,19 +60,13 @@
                 $expense_data[]               = $item;
             }
             $data = [
-                'expense_percentage' => $previous_month_total_expenses == 0 ? 0 : number_format( ( ( $this_month_total_expenditure - $previous_month_total_expenses ) / $previous_month_total_expenses ) * 100 , 1 ) ,
-                'income_percentage'  => $previous_month_total_sales == 0 ? 0 : number_format( ( ( $this_month_total_sales - $previous_month_total_sales ) / $previous_month_total_sales ) * 100 , 1 ) ,
+                'expense_percentage' => $previous_month_total_expenses == 0 ? 0 : number_format( (($this_month_total_expenditure - $previous_month_total_expenses) / $previous_month_total_expenses) * 100 , 1 ) ,
+                'income_percentage'  => $previous_month_total_sales == 0 ? 0 : number_format( (($this_month_total_sales - $previous_month_total_sales) / $previous_month_total_sales) * 100 , 1 ) ,
                 'expenses'           => $expense_data
             ];
             return Response ::success( $data );
         }
 
-        /**
-         * Store a newly created resource in storage.
-         *
-         * @param StoreExpenseRequest $request
-         * @return JsonResponse
-         */
         public function store ( StoreExpenseRequest $request )
         {
             $validator = $request -> validator;
@@ -107,105 +91,153 @@
             return Response ::success( $expense , 201 );
 
 
-//            $expense_category = ExpenseCategory ::find( $validated[ 'category_id' ] );
-//            if ( $expense_category ) $validated[ 'expense_id' ] = $expense_category -> id;
-//            else $validated[ 'expense_id' ] = ( ExpenseCategory ::create( $validated ) ) -> id;
-//            $validated[ 'date' ] = date( 'Y-m-d' , strtotime( $request -> date ) );
-//            unset( $validated[ 'name' ] );
-//            $expense = Expense ::create( $validated );
-//            if ( $expense ) return Response ::success( $expense , 201 );
-//            else return Response ::error( 'Expense could not be created' );
         }
 
         public function expensesAndIncomes ( Request $request )
         {
-            $errors = User ::validateUserId( $request );
+            $errors = $this -> validateUserID( $request );
             if ( $errors ) return Response ::error( $errors );
-            $user_id              = $request -> user_id;
-            $date_range_validator = Validator ::make( $request -> all() ,
-                [
-                    'from' => 'bail|required|date' ,
-                    'to'   => 'bail|required|date' ,
-                ]
-            );
-            if ( $date_range_validator -> fails() ) return Response ::error( $date_range_validator -> errors() -> first() );
-            $start_date          = Carbon ::parse( $request -> query( 'from' ) ) -> copy() -> startOfDay();
-            $end_date            = Carbon ::parse( $request -> query( 'to' ) ) -> copy() -> endOfDay();
-            $top_in_flow         = new Collection();
-            $expenses_statistics = new Collection();
+            $user_id           = $this -> userID( $request );
+            $date_range_errors = $this -> validateDate( $request );
+            if ( $date_range_errors ) return Response ::error( $errors );
+            [ $start_date , $end_date ] = $this -> dateRange( $request );
+
             $difference_in_days  = $start_date -> diffInDays( $end_date );
-
+            $monthly_expenses    = new Collection();
+            $all_weekly_expenses = new Collection();
             if ( $difference_in_days <= 7 ) {
-                $expenses = Expense :: ofUserID( $user_id )
-                                    -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
-                                    -> selectRaw( 'DAYNAME(date) AS day,DATE(date) AS cdate, SUM(amount) AS amount' )
-                                    -> groupBy( 'day' , 'cdate' )
-                                    -> orderBy( 'cdate' )
-                                    -> get();
-
-            } elseif ( $difference_in_days >= 28 && $difference_in_days <= 31 ) {
-                $expenses = Expense :: ofUserID( $user_id )
-                                    -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
-                                    -> selectRaw( 'DAYNAME(date) AS day,DATE(date) AS cdate, SUM(amount) AS amount' )
-                                    -> groupBy( 'day' , 'cdate' )
-                                    -> orderBy( 'cdate' )
-                                    -> get();
-
-                $expenses_statistics = Expense :: ofUserID( $user_id )
-                                               -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
-                                               -> selectRaw( 'id, SUM(amount) AS amount' )
-                                               -> groupBy( 'id' )
-                                               -> get();
-            } else {
-                $expenses = Expense :: ofUserID( $user_id )
-                                    -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
-                                    -> selectRaw( 'YEAR(date) AS year, SUM(amount) AS amount' )
-                                    -> groupBy( 'year' )
-                                    -> orderBy( 'year' )
-                                    -> get();
-                if ( $expenses -> count() < 1 ) return Response ::error( 'No expenses found' );
-            }
-
-            $top_out_flow = Expense ::ofUserID( $user_id )
-                                    -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
-                                    -> orderBy( 'amount' , 'desc' )
-                                    -> limit( 2 )
-                                    -> get( [ 'id' , 'amount' , 'date' ] );
-
-            $sales = Sale ::ofUserID( $user_id )
-                          -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
-                          -> with( 'saleItems.product.category' )
-                          -> orderBy( 'grand_total' , 'desc' )
-                          -> limit( 2 )
-                          -> get();
-            if ( $sales -> count() < 1 ) return Response ::error( 'No sales found' );
-
-            $total_expenses = 0;
-            foreach ( $expenses as $expense ) {
-                $total_expenses += $expense -> amount;
-            }
-            foreach ( $sales as $sale ) {
-                if ( count( $sale -> saleItems ) > 0 ) {
-                    $top_in_flow -> push(
-                        [
-                            'name'       => ( $sale -> saleItems )[ 0 ] -> product -> category() -> first() -> name ,
-                            'amount'     => $sale -> grand_total ,
-                            'created_at' => $sale -> created_at
-                        ] );
+                $weekly_expenses = DB ::table( 'inv_expenses' )
+                                      -> selectRaw( 'DAYNAME(date) AS day,DATE(date) AS cdate, SUM(amount) AS total' )
+                                      -> where( 'inv_expenses.user_id' , $user_id )
+                                      -> whereBetween( 'inv_expenses.date' , [ $start_date , $end_date ] )
+                                      -> groupBy( 'day' , 'cdate' )
+                                      -> orderBy( 'cdate' );
+                $period          = CarbonPeriod ::create( $start_date , $end_date );
+                $dates           = [];
+                foreach ( $weekly_expenses -> get() as $weekly_expense ) {
+                    $dates[] = collect( $weekly_expense ) [ 'cdate' ];
                 }
+                $all_weekly_expenses = $weekly_expenses -> get() -> slice( 0 );
+                foreach ( $period as $date_period ) {
+                    $date = $date_period -> toDate() -> format( 'Y-m-d' );
+                    // Adding records to fill the gaps
+                    if ( !in_array( $date , $dates ) ) {
+                        $gap = [ 'day' => $date_period -> toDate() -> format( 'l' ) , 'cdate' => $date , 'total' => 0 ];
+                        $all_weekly_expenses -> push( $gap );
+                    }
+                }
+                $total_expenses = $weekly_expenses -> get() -> sum( 'total' );
+
+            } else {
+                $monthly_expenses = DB ::table( 'inv_expenses' )
+                                       -> selectRaw( 'YEAR(date) AS year, SUM(amount) AS amount' )
+                                       -> where( 'inv_expenses.user_id' , $user_id )
+                                       -> whereBetween( 'inv_expenses.date' , [ $start_date , $end_date ] )
+                                       -> groupBy( 'year' )
+                                       -> orderBy( 'year' );
+                $total_expenses   = $monthly_expenses -> get() -> sum( 'amount' );
             }
-//                }
+
+            $top_out_flow = DB ::table( 'inv_expenses' )
+                               -> join( 'inv_expense_categories' , 'inv_expenses.expense_id' , '=' , 'inv_expense_categories.id' )
+                               -> selectRaw( 'name,amount,inv_expenses.created_at AS date' )
+                               -> where( 'inv_expenses.user_id' , $user_id )
+                               -> whereBetween( 'inv_expenses.date' , [ $start_date , $end_date ] )
+                               -> orderByRaw( 'date' )
+                               -> take( 2 )
+                               -> get();
+
+            $sales = Sale :: whereHas( 'saleItems' )
+                          -> where( 'user_id' , $user_id )
+                          -> whereBetween( 'created_at' , [ $start_date , $end_date ] )
+                          -> orderBy( 'created_at' , 'desc' )
+                          -> take( 2 )
+                          -> get();
+
+            $sale_item = new Collection();
+            foreach ( $sales as $sale ) {
+                $item = [
+                    'name'   => $sale -> saleItems() -> first() -> product() -> first() -> category() -> first() -> name ,
+                    'date'   => $sale -> created_at ,
+                    'amount' => $sale -> grand_total ,
+                ];
+                $sale_item -> push( $item );
+            }
+
             $data = [
                 'total_expenses' => $total_expenses ,
-                'chart_data'     => $expenses ,
+                'chart_data'     => ($difference_in_days <= 7) ? $all_weekly_expenses -> sortBy( 'cdate' ) -> values() : $monthly_expenses -> get() ,
                 'top_out_flow'   => $top_out_flow ,
-                'top_in_flow'    => $top_in_flow ,
+                'top_in_flow'    => $sale_item ,
             ];
 
-            if ( count( $expenses_statistics ) > 1 ) {
-                $data[ 'expenses_chart' ] = $expenses_statistics;
-            }
             return Response ::success( $data );
+        }
+
+        public function topSection ( Request $request )
+        {
+            $errors = $this -> validateUserID( $request );
+            if ( $errors ) return Response ::error( $errors );
+            $user_id           = $this -> userID( $request );
+            $date_range_errors = $this -> validateDate( $request );
+            if ( $date_range_errors ) return Response ::error( $errors );
+            [ $start_date , $end_date ] = $this -> dateRange( $request );
+
+            $total_expenses = DB ::table( 'inv_expenses' )
+                                 -> join( 'inv_expense_categories' , 'inv_expenses.expense_id' , '=' , 'inv_expense_categories.id' )
+                                 -> where( 'inv_expenses.user_id' , $user_id )
+                                 -> whereBetween( 'date' , [ $start_date , $end_date ] )
+                                 -> sum( 'amount' );
+
+            $total_sales        = DB ::table( 'inv_sales' )
+                                     -> where( 'user_id' , $user_id )
+                                     -> whereBetween( 'created_at' , [ $start_date , $end_date ] )
+                                     -> sum( 'grand_total' );
+            $sales_percentage   = round( ($total_sales / ($total_expenses + $total_sales)) * 100 );
+            $expense_percentage = round( ($total_expenses / ($total_expenses + $total_sales)) * 100 );
+
+            $period = CarbonPeriod ::create( $start_date , $end_date );
+            foreach ( $period as $date ) {
+//                info( $date -> toDateString() );
+            }
+            return Response ::success( [
+                'total_expenses'     => $total_expenses ,
+                'sales_percentage'   => $sales_percentage ,
+                'expense_percentage' => $expense_percentage ,
+            ] );
+        }
+
+        public function bottomSection ( Request $request )
+        {
+            $errors = $this -> validateUserID( $request );
+            if ( $errors ) return Response ::error( $errors );
+            $user_id           = $this -> userID( $request );
+            $date_range_errors = $this -> validateDate( $request );
+            if ( $date_range_errors ) return Response ::error( $errors );
+            [ $start_date , $end_date ] = $this -> dateRange( $request );
+
+            $expenses = DB ::table( 'inv_expenses' )
+                           -> join( 'inv_expense_categories' , 'inv_expenses.expense_id' , '=' , 'inv_expense_categories.id' )
+                           -> selectRaw( 'name,SUM(amount) AS total' )
+                           -> groupBy( 'name' )
+                           -> orderByRaw( 'SUM(amount) DESC' )
+                           -> where( 'inv_expenses.user_id' , $user_id )
+                           -> whereBetween( 'inv_expenses.date' , [ $start_date , $end_date ] );
+
+            $latest_expenditure = DB ::table( 'inv_expenses' )
+                                     -> join( 'inv_expense_categories' , 'inv_expenses.expense_id' , '=' , 'inv_expense_categories.id' )
+                                     -> selectRaw( 'name,amount,date' )
+                                     -> orderByRaw( 'inv_expenses.date DESC' )
+                                     -> where( 'inv_expenses.user_id' , $user_id )
+                                     -> whereBetween( 'inv_expenses.date' , [ $start_date , $end_date ] ) -> take( 1 ) -> get();
+
+            $total_expenses = $expenses -> sum( 'amount' );
+
+            return Response ::success( [
+                'total_expenses'     => $total_expenses ,
+                'expenses'           => $expenses -> take( 4 ) -> get() ,
+                'latest_expenditure' => $latest_expenditure
+            ] );
         }
     }
 

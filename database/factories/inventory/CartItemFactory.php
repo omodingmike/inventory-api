@@ -6,18 +6,13 @@
 
     class CartItemFactory extends Factory
     {
-        /**
-         * Define the model's default state.
-         *
-         * @return array
-         */
         public function definition () : array
         {
             return [
-                'sale_id'    => 1 ,
+                'sale_id'    => $this -> faker -> numberBetween( 1 , 1000 ) ,
                 'product_id' => 1 ,
                 'quantity'   => $this -> faker -> numberBetween( 1 , 100 ) ,
-                'total'      => $this -> faker -> numberBetween( 10000 , 100000 ) ,
+                'total'      => $this -> faker -> numberBetween( 10000 , 10000 ) ,
             ];
         }
     }

@@ -34,8 +34,8 @@
         public function getCreatedAtAttribute ( $value )
         {
             if ( $value ) {
-//                return date( 'd-m-Y h:m a' , strtotime( $value ) );
-                return date( 'jS M Y h:ia' , strtotime( $value ) );
+//                return date( 'jS M Y h:ia' , strtotime( $value ) );
+                return date( 'Y-m-d H:i:s' , strtotime( $value ) );
             }
             return null;
         }

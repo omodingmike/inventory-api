@@ -6,34 +6,25 @@
     use App\Http\Controllers\Controller;
     use App\Models\inventory\Product;
     use App\Models\inventory\Sale;
-    use App\Models\User;
+    use App\Traits\DateTrait;
+    use App\Traits\UserTrait;
+    use Carbon\CarbonPeriod;
     use Illuminate\Http\Request;
-    use Illuminate\Support\Carbon;
     use Illuminate\Support\Collection;
     use Illuminate\Support\Facades\DB;
-    use Illuminate\Support\Facades\Validator;
 
     class RevenueController extends Controller
     {
-        /**
-         * Display a listing of the resource.
-         *
-         * @return array|string[]
-         */
+        use UserTrait , DateTrait;
+
         public function index ( Request $request )
         {
-            $errors = User ::validateUserId( $request );
+            $errors = $this -> validateUserID( $request );
             if ( $errors ) return Response ::error( $errors );
-            $user_id              = $request -> user_id;
-            $date_range_validator = Validator ::make( $request -> all() ,
-                [
-                    'from' => 'bail|required|date' ,
-                    'to'   => 'bail|required|date' ,
-                ]
-            );
-            if ( $date_range_validator -> fails() ) return Response ::error( $date_range_validator -> errors() -> first() );
-            $start_date = Carbon ::parse( $request -> query( 'from' ) );
-            $end_date   = Carbon ::parse( $request -> query( 'to' ) );
+            $user_id           = $this -> userID( $request );
+            $date_range_errors = $this -> validateDate( $request );
+            if ( $date_range_errors ) return Response ::error( $errors );
+            [ $start_date , $end_date ] = $this -> dateRange( $request );
 
             $highest_revenues     = new Collection();
             $difference_in_days   = $start_date -> diffInDays( $end_date );
@@ -46,7 +37,19 @@
                                          -> selectRaw( 'HOUR(created_at) AS hour, SUM(grand_total) AS amount' )
                                          -> groupBy( 'hour' )
                                          -> get();
-
+//
+                $months = [];
+                foreach ( $highest_revenues as $expense ) {
+                    $months[] = collect( $expense ) [ 'hour' ];
+                }
+                $highest_revenues = $highest_revenues -> slice( 0 );
+                for ( $i = 1 ; $i <= 24 ; $i++ ) {
+                    if ( !in_array( $i , $months ) ) {
+                        $gap = [ 'hour' => $i , 'amount' => 0 ];
+                        $highest_revenues -> push( $gap );
+                    }
+                }
+                $highest_revenues = collect( $highest_revenues ) -> sortBy( 'hour' ) -> values();
             } elseif ( $difference_in_weeks <= 1 ) {
                 $highest_revenues = Sale ::ofUserID( $user_id )
                                          -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
@@ -54,6 +57,21 @@
                                          -> groupBy( 'cdate' , 'day' )
                                          -> orderBy( 'cdate' )
                                          -> get();
+                $period           = CarbonPeriod ::create( $start_date , $end_date );
+                $dates            = [];
+                foreach ( $highest_revenues as $highest_revenue ) {
+                    $dates[] = collect( $highest_revenue ) [ 'cdate' ];
+                }
+                $highest_revenues = $highest_revenues -> slice( 0 );
+                foreach ( $period as $date_period ) {
+                    $date = $date_period -> toDate() -> format( 'Y-m-d' );
+                    // Adding records to fill the gaps
+                    if ( !in_array( $date , $dates ) ) {
+                        $gap = [ 'day' => $date_period -> toDate() -> format( 'l' ) , 'cdate' => $date , 'amount' => 0 ];
+                        $highest_revenues -> push( $gap );
+                    }
+                }
+
             } elseif ( $difference_in_days > 27 && $difference_in_days < 32 ) {
                 $month_revenues = Sale ::ofUserID( $user_id )
                                        -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
@@ -64,16 +82,53 @@
                 foreach ( $month_revenues as $index => $weekly_revenue ) {
                     $highest_revenues -> push( [ 'week' => $index + 1 , 'amount' => $weekly_revenue -> amount ] );
                 }
+                $months = [];
+                foreach ( $highest_revenues as $revenue ) {
+                    $months[] = collect( $revenue ) [ 'week' ];
+                }
+                $highest_revenues = $highest_revenues -> slice( 0 );
+                for ( $i = 1 ; $i <= $start_date -> diffInWeeks( $end_date ) ; $i++ ) {
+                    if ( !in_array( $i , $months ) ) {
+                        $gap = [ 'week' => $i , 'amount' => 0 ];
+                        $highest_revenues -> push( $gap );
+                    }
+                }
+                $highest_revenues = collect( $highest_revenues ) -> sortBy( 'week' ) -> values();
             } elseif ( $difference_in_months >= 3 ) {
                 $highest_revenues = Sale ::ofUserID( $user_id )
                                          -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
-                                         -> selectRaw( 'YEAR(created_at) AS year, MONTHNAME(created_at) AS month ,MONTH(created_at) AS month_number, MAX(grand_total) AS amount' )
+                                         -> selectRaw( 'YEAR(created_at) AS year, MONTHNAME(created_at) AS month' )
+                                         -> selectRaw( 'MONTH(created_at) AS month_number' )
+                                         -> selectRaw( 'MAX(grand_total) AS amount' )
                                          -> groupBy( 'year' , 'month' , 'month_number' )
                                          -> orderBy( 'year' )
                                          -> orderBy( 'month_number' )
                                          -> get();
-
-
+//                $months           = [];
+//                foreach ( $highest_revenues as $revenue ) {
+//                    $months[] = collect( $revenue ) [ 'month_number' ];
+//                }
+//                $highest_revenues = $highest_revenues -> slice( 0 );
+//                for ( $i = 1 ; $i <= $start_date -> diffInMonths( $end_date ) ; $i++ ) {
+//                    if ( !in_array( $i , $months ) ) {
+//                        $gap = [ 'year' => $i , 'month_number' => $i , 'month' , 'amount' => 0 ];
+//                        $highest_revenues -> push( $gap );
+//                    }
+//                }
+//                $highest_revenues  = collect( $highest_revenues ) -> sortBy( 'week' ) -> values();
+//                $period            = CarbonPeriod ::create( $start_date , $end_date );
+//                $monthsInDateRange = [];
+//                foreach ( $period as $date ) {
+//                    if ( !in_array( $date -> format( 'F Y' ) , $monthsInDateRange ) ) {
+//                        $monthsInDateRange[] = $date -> format( 'F Y' );
+//                    }
+//                }
+//                for ( $i = 1 ; $i <= count( $monthsInDateRange ) ; $i++ ) {
+//                    if ( !in_array( $i , $months ) ) {
+//                        $gap = [ 'year' => $i , 'month_number' => $i , 'month' , 'amount' => 0 ];
+//                        $highest_revenues -> push( $gap );
+//                    }
+//                }
             }
             $products_in = Product ::ofUserID( $user_id )
                                    -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
@@ -87,7 +142,7 @@
                                         -> duration( $end_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
                                         -> sum( 'grand_total' );
 
-            $percentage_change = $revenue_at_start_date == 0 ? 0 : number_format( ( ( $revenue_at_end_date - $revenue_at_start_date ) / $revenue_at_start_date ) * 100 , 1 );
+            $percentage_change = $revenue_at_start_date == 0 ? 0 : number_format( (($revenue_at_end_date - $revenue_at_start_date) / $revenue_at_start_date) * 100 , 1 );
 
             $products_out = 0;
 

@@ -16,7 +16,7 @@
             return [
                 'name'        => $this -> faker -> firstName() ,
                 'photo'       => $this -> faker -> imageUrl() ,
-                'user_id'     => 1 ,
+                'user_id'     => 427 ,
                 'description' => '10 pcs - 8 types - 3 sizes' ,
             ];
         }

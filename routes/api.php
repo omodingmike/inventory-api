@@ -13,7 +13,6 @@
     use App\Http\Controllers\inventory\UnitController;
     use Illuminate\Support\Facades\Route;
 
-
     Route ::resource( 'products' , ProductController::class );
     Route ::resource( 'expense-categories' , ExpenseCategoryController::class );
     Route ::resource( 'categories' , CategoryController::class );
@@ -36,7 +35,9 @@
     Route ::get( 'getProductCategories' , [ CategoryController::class , 'getCategoryProducts' ] );
 
     Route ::get( 'expenses-incomes' , [ ExpenseController::class , 'expensesAndIncomes' ] );
-//    Route ::get( 'expense-categories' , [ ExpenseController::class , 'expenseCategories' ] );
+    Route ::get( 'daily-expenses' , [ ExpenseController::class , 'daily' ] );
+    Route ::get( 'monthly-expenses-top-section' , [ ExpenseController::class , 'topSection' ] );
+    Route ::get( 'monthly-expenses-bottom-section' , [ ExpenseController::class , 'bottomSection' ] );
 
     Route ::get( 'sale' , [ SaleController::class , 'show' ] );
     Route ::get( 'generate' , [ SmileIDController::class , 'generateSignature' ] );
@@ -46,6 +47,7 @@
 
     Route ::post( 'smile' , [ SmileIDController::class , 'callback' ] ) -> name( 'callback' );
     Route ::get( 'smile' , [ SmileIDController::class , 'generateSignature' ] );
+
     
 
 

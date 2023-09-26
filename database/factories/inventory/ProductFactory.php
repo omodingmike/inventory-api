@@ -6,29 +6,24 @@
 
     class ProductFactory extends Factory
     {
-        /**
-         * Define the model's default state.
-         *
-         * @return array
-         */
         public function definition () : array
         {
             return [
                 'name'             => $this -> faker -> word() ,
-                'user_id'          => 1 ,
-                'category'         => 1 ,
-                'sub_category'     => 1 ,
+                'user_id'          => 427 ,
+                'category'         => $this -> faker -> numberBetween( 1 , 10 ) ,
+                'sub_category'     => $this -> faker -> numberBetween( 1 , 10 ) ,
                 'code'             => $this -> faker -> postcode() ,
                 'photo'            => $this -> faker -> imageUrl() ,
-                'units'            => 1 ,
-                'supplier'         => 1 ,
-                'retail_price'     => $this -> faker -> numberBetween( 10000 , 1000000 ) ,
-                'whole_sale_price' => $this -> faker -> numberBetween( 10000 , 1000000 ) ,
-                'purchase_price'   => $this -> faker -> numberBetween( 10000 , 1000000 ) ,
-                'balance'          => $this -> faker -> numberBetween( 10000 , 1000000 ) ,
-                'quantity'         => $this -> faker -> numberBetween( 50 , 1000 ) ,
-                'discount'         => $this -> faker -> numberBetween( 10 , 60 ) ,
-                'created_at'       => $this -> faker -> dateTimeBetween( '-3 years' ) ,
+                'units'            => $this -> faker -> numberBetween( 1 , 10 ) ,
+                'supplier'         => $this -> faker -> numberBetween( 1 , 10 ) ,
+                'retail_price'     => $this -> faker -> numberBetween( 100 , 1000 ) ,
+                'whole_sale_price' => $this -> faker -> numberBetween( 100 , 1000 ) ,
+                'purchase_price'   => $this -> faker -> numberBetween( 100 , 1000 ) ,
+                'balance'          => $this -> faker -> numberBetween( 100 , 1000 ) ,
+                'quantity'         => $this -> faker -> numberBetween( 1 , 10 ) ,
+                'discount'         => $this -> faker -> numberBetween( 2 , 50 ) ,
+                'created_at'       => $this -> faker -> dateTimeBetween( '2020-01-01 00:00:00' , '2023-12-31 23:59:59' ) ,
             ];
         }
     }
