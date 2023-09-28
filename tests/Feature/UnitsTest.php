@@ -9,11 +9,7 @@
     {
 //        use RefreshDatabase;
 
-        /**
-         * A basic feature test example.
-         *
-         * @return void
-         */
+
         public function testAllUnits ()
         {
             $response = $this -> get( '/api/units' ); // Assuming the endpoint is /api/data

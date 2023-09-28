@@ -23,7 +23,7 @@
             if ( $errors ) return Response ::error( $errors );
             $user_id           = $this -> userID( $request );
             $date_range_errors = $this -> validateDate( $request );
-            if ( $date_range_errors ) return Response ::error( $errors );
+            if ( $date_range_errors ) return Response ::error( $date_range_errors );
             [ $start_date , $end_date ] = $this -> dateRange( $request );
 
             $highest_revenues     = new Collection();
@@ -94,7 +94,8 @@
                     }
                 }
                 $highest_revenues = collect( $highest_revenues ) -> sortBy( 'week' ) -> values();
-            } elseif ( $difference_in_months >= 3 ) {
+
+            } elseif ( $difference_in_months >= 2 ) {
                 $highest_revenues = Sale ::ofUserID( $user_id )
                                          -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
                                          -> selectRaw( 'YEAR(created_at) AS year, MONTHNAME(created_at) AS month' )
@@ -104,31 +105,33 @@
                                          -> orderBy( 'year' )
                                          -> orderBy( 'month_number' )
                                          -> get();
-//                $months           = [];
-//                foreach ( $highest_revenues as $revenue ) {
+
+                $months = [];
+                foreach ( $highest_revenues as $revenue ) {
 //                    $months[] = collect( $revenue ) [ 'month_number' ];
-//                }
-//                $highest_revenues = $highest_revenues -> slice( 0 );
-//                for ( $i = 1 ; $i <= $start_date -> diffInMonths( $end_date ) ; $i++ ) {
-//                    if ( !in_array( $i , $months ) ) {
-//                        $gap = [ 'year' => $i , 'month_number' => $i , 'month' , 'amount' => 0 ];
-//                        $highest_revenues -> push( $gap );
-//                    }
-//                }
-//                $highest_revenues  = collect( $highest_revenues ) -> sortBy( 'week' ) -> values();
-//                $period            = CarbonPeriod ::create( $start_date , $end_date );
-//                $monthsInDateRange = [];
-//                foreach ( $period as $date ) {
-//                    if ( !in_array( $date -> format( 'F Y' ) , $monthsInDateRange ) ) {
-//                        $monthsInDateRange[] = $date -> format( 'F Y' );
-//                    }
-//                }
-//                for ( $i = 1 ; $i <= count( $monthsInDateRange ) ; $i++ ) {
-//                    if ( !in_array( $i , $months ) ) {
-//                        $gap = [ 'year' => $i , 'month_number' => $i , 'month' , 'amount' => 0 ];
-//                        $highest_revenues -> push( $gap );
-//                    }
-//                }
+                    $months[] = collect( $revenue ) [ 'month' ];
+                }
+
+                $highest_revenues  = collect( $highest_revenues ) -> sortBy( 'week' ) -> values();
+                $period            = CarbonPeriod ::create( $start_date , $end_date );
+                $monthsInDateRange = [];
+                foreach ( $period as $date ) {
+                    if ( !in_array( $date -> format( 'F Y' ) , $monthsInDateRange ) ) {
+                        $monthsInDateRange[] = $date -> format( 'F Y' );
+                    }
+                }
+
+                for ( $i = 0 ; $i < count( $monthsInDateRange ) ; $i++ ) {
+                    $month = substr( $monthsInDateRange[ $i ] , 0 , strpos( $monthsInDateRange[ $i ] , ' ' ) );
+                    $year  = substr( $monthsInDateRange[ $i ] , strpos( $monthsInDateRange[ $i ] , ' ' ) + 1 );
+                    if ( !in_array( $month , $months ) ) {
+                        $gap = [ 'year' => (int) $year , 'month_number' => $i + 1 , 'month' => $month , 'amount' => 0 ];
+                        $highest_revenues -> push( $gap );
+                    }
+                }
+                $highest_revenues = collect( $highest_revenues ) -> sortBy( function ( $item ) {
+                    return (int) $item[ 'month_number' ];
+                } ) -> values();
             }
             $products_in = Product ::ofUserID( $user_id )
                                    -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
@@ -152,6 +155,7 @@
 
             if ( $revenues -> count() < 1 ) return Response ::error( 'No Revenues found' );
             $total_revenue = 0;
+
             DB ::table( 'inv_sales' )
                -> where( 'user_id' , $user_id )
                -> whereBetween( 'created_at' , [ $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() ] )
@@ -163,6 +167,7 @@
                                             -> sum( 'quantity' );
                    }
                } );
+
             $data = [
                 'products_in'   => (int) $products_in ,
                 'products_out'  => $products_out ,

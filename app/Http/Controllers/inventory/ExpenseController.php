@@ -26,7 +26,7 @@
             if ( $errors ) return Response ::error( $errors );
             $user_id           = $this -> userID( $request );
             $date_range_errors = $this -> validateDate( $request );
-            if ( $date_range_errors ) return Response ::error( $errors );
+            if ( $date_range_errors ) return Response ::error( $date_range_errors );
             [ $start_date , $end_date ] = $this -> dateRange( $request );
 
             $previous_month_start_date = $start_date -> copy() -> subMonth();
@@ -99,7 +99,7 @@
             if ( $errors ) return Response ::error( $errors );
             $user_id           = $this -> userID( $request );
             $date_range_errors = $this -> validateDate( $request );
-            if ( $date_range_errors ) return Response ::error( $errors );
+            if ( $date_range_errors ) return Response ::error( $date_range_errors );
             [ $start_date , $end_date ] = $this -> dateRange( $request );
 
             $difference_in_days  = $start_date -> diffInDays( $end_date );
@@ -180,7 +180,7 @@
             if ( $errors ) return Response ::error( $errors );
             $user_id           = $this -> userID( $request );
             $date_range_errors = $this -> validateDate( $request );
-            if ( $date_range_errors ) return Response ::error( $errors );
+            if ( $date_range_errors ) return Response ::error( $date_range_errors );
             [ $start_date , $end_date ] = $this -> dateRange( $request );
 
             $total_expenses = DB ::table( 'inv_expenses' )
@@ -213,7 +213,7 @@
             if ( $errors ) return Response ::error( $errors );
             $user_id           = $this -> userID( $request );
             $date_range_errors = $this -> validateDate( $request );
-            if ( $date_range_errors ) return Response ::error( $errors );
+            if ( $date_range_errors ) return Response ::error( $date_range_errors );
             [ $start_date , $end_date ] = $this -> dateRange( $request );
 
             $expenses = DB ::table( 'inv_expenses' )

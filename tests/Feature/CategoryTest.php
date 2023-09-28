@@ -8,11 +8,7 @@
 
     class CategoryTest extends TestCase
     {
-        /**
-         * A basic feature test example.
-         *
-         * @return void
-         */
+
         public function testAllCategories ()
         {
             TestingModels ::createModels();
@@ -39,7 +35,7 @@
 
         public function testNoCategories ()
         {
-            $response = $this -> get( '/api/categories' ); // Assuming the endpoint is /api/data
+            $response = $this -> get( '/api/categories' );
             $response -> assertStatus( 200 )
                       -> assertJsonStructure( [
                           'status' ,
@@ -98,8 +94,6 @@
                           'message' ,
                           'data' ,
                       ] );
-
-
         }
 
         public function testUserIdMissingInCategoryStore ()
@@ -134,8 +128,6 @@
                           'message' ,
                           'data' ,
                       ] );
-
-
         }
 
         public function testDescriptionMissingInCategoryStore ()

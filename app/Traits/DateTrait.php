@@ -8,20 +8,6 @@
 
     trait DateTrait
     {
-        public function validateDate ( Request $request )
-        {
-            $validator = Validator ::make( $request -> all() ,
-                [
-                    'from' => 'bail|required|date' ,
-                    'to'   => 'bail|required|date' ,
-                ]
-            );
-            if ( $validator -> stopOnFirstFailure() -> fails() ) {
-                return $validator -> messages() -> first();
-            }
-            return null;
-        }
-
         public function dateRange ( Request $request ) : array
         {
             $start_date = $this -> startDate( $request );
@@ -42,5 +28,19 @@
         public function daysInMonth ( Request $request ) : int
         {
             return $this -> endDate( $request ) -> daysInMonth;
+        }
+
+        public function validateDate ( Request $request )
+        {
+            $validator = Validator ::make( $request -> all() ,
+                [
+                    'from' => 'bail|required|date' ,
+                    'to'   => 'bail|required|date' ,
+                ]
+            );
+            if ( $validator -> stopOnFirstFailure() -> fails() ) {
+                return $validator -> messages() -> first();
+            }
+            return null;
         }
     }
