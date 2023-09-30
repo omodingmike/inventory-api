@@ -22,6 +22,14 @@
             return null;
         }
 
+        public function getAmountAttribute ( $value )
+        {
+            if ( $value ) {
+                return (int) $value;
+            }
+            return null;
+        }
+
         public function expenseCategory () : BelongsTo
         {
             return $this -> belongsTo( ExpenseCategory::class , 'expense_id' , 'id' );

@@ -25,7 +25,7 @@
             $categories   = DB ::table( 'inv_categories' )
                                -> join( 'inv_products' , 'inv_categories.id' , '=' , 'inv_products.category' )
                                -> selectRaw( 'inv_categories.id,inv_categories.name,inv_categories.photo,inv_categories.description' )
-                               -> selectRaw( 'SUM(inv_products.balance) as stock_value' )
+                               -> selectRaw( 'CAST(SUM(inv_products.balance) AS UNSIGNED) AS stock_value' )
                                -> selectRaw( ('CASE 
                                                 WHEN ((SUM(inv_products.quantity) - SUM(inv_products.sold)) / SUM(inv_products.quantity)) * 100 <= 30 THEN "low"
                                                 WHEN ((SUM(inv_products.quantity) - SUM(inv_products.sold)) / SUM(inv_products.quantity)) * 100 <= 50 THEN "medium"
@@ -42,7 +42,7 @@
                 'categories'   => $categories ,
             ] );
         }
-        
+
         public function store ( StoreCategoryRequest $request )
         {
             try {

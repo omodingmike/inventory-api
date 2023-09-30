@@ -34,7 +34,7 @@
             if ( $difference_in_days <= 1 ) {
                 $highest_revenues = Sale ::ofUserID( $user_id )
                                          -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
-                                         -> selectRaw( 'HOUR(created_at) AS hour, SUM(grand_total) AS amount' )
+                                         -> selectRaw( 'HOUR(created_at) AS hour, CAST(SUM(grand_total) AS UNSIGNED) AS `amount`' )
                                          -> groupBy( 'hour' )
                                          -> get();
 //
@@ -53,7 +53,7 @@
             } elseif ( $difference_in_weeks <= 1 ) {
                 $highest_revenues = Sale ::ofUserID( $user_id )
                                          -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
-                                         -> selectRaw( 'DAYNAME(created_at) AS day,DATE(created_at) AS cdate, SUM(grand_total) AS amount' )
+                                         -> selectRaw( 'DAYNAME(created_at) AS day,DATE(created_at) AS cdate, CAST(SUM(grand_total) AS UNSIGNED) AS amount' )
                                          -> groupBy( 'cdate' , 'day' )
                                          -> orderBy( 'cdate' )
                                          -> get();
@@ -75,7 +75,7 @@
             } elseif ( $difference_in_days > 27 && $difference_in_days < 32 ) {
                 $month_revenues = Sale ::ofUserID( $user_id )
                                        -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
-                                       -> selectRaw( 'WEEK(created_at) AS week,  SUM(grand_total) AS amount' )
+                                       -> selectRaw( 'WEEK(created_at) AS week, CAST(SUM(grand_total) AS UNSIGNED) AS amount' )
                                        -> groupBy( 'week' )
                                        -> get();
 
@@ -100,7 +100,7 @@
                                          -> duration( $start_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
                                          -> selectRaw( 'YEAR(created_at) AS year, MONTHNAME(created_at) AS month' )
                                          -> selectRaw( 'MONTH(created_at) AS month_number' )
-                                         -> selectRaw( 'MAX(grand_total) AS amount' )
+                                         -> selectRaw( 'CAST(MAX(grand_total) AS UNSIGNED) AS  amount' )
                                          -> groupBy( 'year' , 'month' , 'month_number' )
                                          -> orderBy( 'year' )
                                          -> orderBy( 'month_number' )
@@ -145,7 +145,8 @@
                                         -> duration( $end_date -> copy() -> startOfDay() , $end_date -> copy() -> endOfDay() )
                                         -> sum( 'grand_total' );
 
-            $percentage_change = $revenue_at_start_date == 0 ? 0 : number_format( (($revenue_at_end_date - $revenue_at_start_date) / $revenue_at_start_date) * 100 , 1 );
+            $percentage_change = $revenue_at_start_date == 0 ? 0 : round( (($revenue_at_end_date - $revenue_at_start_date) / $revenue_at_start_date) *
+                100 , 1 );
 
             $products_out = 0;
 

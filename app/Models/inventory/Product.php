@@ -27,6 +27,14 @@
             return null;
         }
 
+        public function getDiscountAttribute ( $value )
+        {
+            if ( $value ) {
+                return round( $value , 1 );
+            }
+            return null;
+        }
+
 //        public function getUnitsAttribute ( $value )
 //        {
 //            if ( $value ) {

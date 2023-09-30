@@ -6,7 +6,6 @@
     use App\Http\Controllers\Controller;
     use App\Http\Requests\StoreExpenseRequest;
     use App\Models\inventory\Expense;
-    use App\Models\inventory\ExpenseCategory;
     use App\Models\inventory\Sale;
     use App\Traits\DateTrait;
     use App\Traits\UserTrait;
@@ -73,11 +72,11 @@
             if ( $validator -> fails() ) {
                 return Response ::error( $validator -> errors() -> first() );
             }
-            $validated        = $request -> validated();
-            $expense_category = ExpenseCategory ::create( [
-                'name'    => $validated[ 'name' ] ,
-                'user_id' => $validated[ 'user_id' ] ,
-            ] );
+            $validated = $request -> validated();
+
+            $expense_category = DB ::table( 'inv_expense_categories' )
+                                   -> where( 'id' , $validated[ 'category_id' ] )
+                                   -> first();
             if ( !$expense_category ) return Response ::error( $validator -> errors() -> first() );
 
             $validated[ 'date' ] = date( 'Y-m-d' , strtotime( $request -> date ) );
@@ -89,8 +88,6 @@
             ] );
             if ( !$expense ) return Response ::error( $validator -> errors() -> first() );
             return Response ::success( $expense , 201 );
-
-
         }
 
         public function expensesAndIncomes ( Request $request )
@@ -107,7 +104,7 @@
             $all_weekly_expenses = new Collection();
             if ( $difference_in_days <= 7 ) {
                 $weekly_expenses = DB ::table( 'inv_expenses' )
-                                      -> selectRaw( 'DAYNAME(date) AS day,DATE(date) AS cdate, SUM(amount) AS total' )
+                                      -> selectRaw( 'DAYNAME(date) AS day,DATE(date) AS cdate, CAST(SUM(amount) AS UNSIGNED) AS total' )
                                       -> where( 'inv_expenses.user_id' , $user_id )
                                       -> whereBetween( 'inv_expenses.date' , [ $start_date , $end_date ] )
                                       -> groupBy( 'day' , 'cdate' )
@@ -130,7 +127,7 @@
 
             } else {
                 $monthly_expenses = DB ::table( 'inv_expenses' )
-                                       -> selectRaw( 'YEAR(date) AS year, SUM(amount) AS amount' )
+                                       -> selectRaw( 'YEAR(date) AS year, CAST(SUM(amount) AS UNSIGNED) AS amount' )
                                        -> where( 'inv_expenses.user_id' , $user_id )
                                        -> whereBetween( 'inv_expenses.date' , [ $start_date , $end_date ] )
                                        -> groupBy( 'year' )
@@ -218,7 +215,7 @@
 
             $expenses = DB ::table( 'inv_expenses' )
                            -> join( 'inv_expense_categories' , 'inv_expenses.expense_id' , '=' , 'inv_expense_categories.id' )
-                           -> selectRaw( 'name,SUM(amount) AS total' )
+                           -> selectRaw( 'name,CAST(SUM(amount) AS UNSIGNED) AS total' )
                            -> groupBy( 'name' )
                            -> orderByRaw( 'SUM(amount) DESC' )
                            -> where( 'inv_expenses.user_id' , $user_id )
@@ -229,9 +226,9 @@
                                      -> selectRaw( 'name,amount,date' )
                                      -> orderByRaw( 'inv_expenses.date DESC' )
                                      -> where( 'inv_expenses.user_id' , $user_id )
-                                     -> whereBetween( 'inv_expenses.date' , [ $start_date , $end_date ] ) -> take( 1 ) -> get();
+                                     -> whereBetween( 'inv_expenses.date' , [ $start_date , $end_date ] ) -> take( 1 ) -> first();
 
-            $total_expenses = $expenses -> sum( 'amount' );
+            $total_expenses = (int) $expenses -> sum( 'amount' );
 
             return Response ::success( [
                 'total_expenses'     => $total_expenses ,

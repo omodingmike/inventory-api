@@ -10,29 +10,19 @@
         public    $validator          = null;
         protected $stopOnFirstFailure = true;
 
-        /**
-         * Determine if the user is authorized to make this request.
-         *
-         * @return bool
-         */
         public function authorize () : bool
         {
             return true;
         }
 
-        /**
-         * Get the validation rules that apply to the request.
-         *
-         * @return array
-         */
         public function rules () : array
         {
             return [
-//                'category_id' => 'required|int|exists:inv_expense_categories,id' ,
-                'name'    => 'required|string' ,
-                'amount'  => 'required|int' ,
-                'date'    => 'required|date' ,
-                'user_id' => 'required|int|exists:users,id'
+                'category_id' => 'required|int|exists:inv_expense_categories,id' ,
+                'name'        => 'required|string' ,
+                'amount'      => 'required|int' ,
+                'date'        => 'required|date' ,
+                'user_id'     => 'required|int|exists:users,id'
             ];
         }
 
