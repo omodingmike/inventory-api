@@ -1,5 +1,6 @@
 <?php
 
+    use App\Http\Controllers\Auth\AuthController;
     use App\Http\Controllers\inventory\CategoryController;
     use App\Http\Controllers\inventory\ContactController;
     use App\Http\Controllers\inventory\ExpenseCategoryController;
@@ -26,16 +27,20 @@
     Route ::resource( 'units' , UnitController::class );
 
     Route ::post( 'contact-update' , [ ContactController::class , 'update' ] );
+    Route ::post( 'search-product' , [ ProductController::class , 'search' ] );
 
     Route ::get( 'filter-category-products' , [ ProductController::class , 'filterProducts' ] );
     Route ::post( 'update-product' , [ ProductController::class , 'update' ] );
     Route ::get( 'product-details' , [ ProductController::class , 'details' ] );
 
-    Route ::get( 'category-products' , [ CategoryController::class , 'categoryProducts' ] );
-    Route ::get( 'getProductCategories' , [ CategoryController::class , 'getCategoryProducts' ] );
+    Route ::get( 'all-categories' , [ CategoryController::class , 'all' ] );
+    Route ::get( 'all-subcategories' , [ SubCategoryController::class , 'all' ] );
+    Route ::get( 'all-contacts' , [ ContactController::class , 'all' ] );
 
     Route ::get( 'expenses-incomes' , [ ExpenseController::class , 'expensesAndIncomes' ] );
     Route ::get( 'daily-expenses' , [ ExpenseController::class , 'daily' ] );
+    Route ::get( 'weekly-expenses' , [ ExpenseController::class , 'weekly' ] );
+    Route ::get( 'yearly-expenses' , [ ExpenseController::class , 'yearly' ] );
     Route ::get( 'monthly-expenses-top-section' , [ ExpenseController::class , 'topSection' ] );
     Route ::get( 'monthly-expenses-bottom-section' , [ ExpenseController::class , 'bottomSection' ] );
 
@@ -46,7 +51,14 @@
     Route ::post( 'submit' , [ SmileIDController::class , 'submitJob' ] );
 
     Route ::post( 'smile' , [ SmileIDController::class , 'callback' ] ) -> name( 'callback' );
+    Route ::post( 'upload' , [ SmileIDController::class , 'testUpload' ] ) -> name( 'testUpload' );
+    Route ::get( 'check' , [ SmileIDController::class , 'checkUploadedFile' ] ) -> name( 'check-uploaded-file' );
     Route ::get( 'smile' , [ SmileIDController::class , 'generateSignature' ] );
+
+    Route ::prefix( 'auth' ) -> group( function () {
+        Route ::post( 'login' , [ AuthController::class , 'login' ] ) -> name( 'login' );
+        Route ::post( 'register' , [ AuthController::class , 'register' ] ) -> name( 'register' );
+    } );
 
     
 

@@ -1,0 +1,67 @@
+name: Deploy Laravel to Production
+on:
+  pull_request:
+    branches:
+      - main
+jobs:
+  web-deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_USER: omodingc_sms
+          MYSQL_PASSWORD: TtfQs2r4
+          MYSQL_DATABASE: omodingc_sms
+          MYSQL_ROOT_PASSWORD: TtfQs2r4
+          DB_PORT: ${{ job.services.mysql.ports[3306] }}
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+      - name: Get the latest code
+        uses: actions/checkout@v2.3.2
+      - name: Cache composer dependencies
+        uses: actions/cache@v2
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            composer-
+
+      - uses: actions/setup-node@master
+      - name: Copy .env
+        run: |
+          cp .env.example .env
+
+      - name: Configure Environment Variables
+        run: |
+          echo "APP_URL=https://sms-backend.omoding.com/" >> .env
+          echo "DB_DATABASE=omodingc_sms" >> .env
+          echo "DB_USERNAME=omodingc_sms" >> .env
+          echo "DB_PASSWORD=TtfQs2r4" >> .env
+
+      - name: Install Dependencies
+        run: composer install --no-interaction --no-suggest --ignore-platform-reqs
+
+      - name: Boot Laravel application
+        run: |
+          php artisan key:generate
+      - name: Clear Cache and Optimize
+        run: |
+          php artisan optimize:clear
+        env:
+          DB_CONNECTION: mysql
+          DB_DATABASE: omodingc_sms
+          DB_USERNAME: omodingc_sms
+          DB_PASSWORD: TtfQs2r4
+
+      - name: Sync files
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: omoding.com
+          username: ${{secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+      - name: Deploy Completed
+        run: echo "Deployment completed successfully"

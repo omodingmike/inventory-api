@@ -8,78 +8,106 @@
     use App\Models\inventory\CartItem;
     use App\Models\inventory\Product;
     use App\Models\inventory\Sale;
-    use App\Models\User;
-    use Illuminate\Http\JsonResponse;
+    use App\Traits\DateTrait;
+    use App\Traits\UserTrait;
     use Illuminate\Http\Request;
-    use Illuminate\Support\Carbon;
     use Illuminate\Support\Facades\DB;
     use Illuminate\Support\Facades\Validator;
 
     class SaleController extends Controller
     {
-        /**
-         * Display a listing of the resource.
-         *
-         * @param Request $request
-         * @return JsonResponse
-         */
+        use UserTrait , DateTrait;
+
         public function index ( Request $request )
         {
-            $errors = User ::validateUserId( $request );
+            DB ::enableQueryLog();
+            $errors = $this -> validateUserID( $request );
             if ( $errors ) return Response ::error( $errors );
-            $user_id              = $request -> user_id;
-            $date_range_validator = Validator ::make( $request -> all() ,
-                [
-                    'from' => 'bail|required|date' ,
-                    'to'   => 'bail|required|date' ,
-                ]
-            );
-            if ( $date_range_validator -> fails() ) return Response ::error( $date_range_validator -> errors() -> first() );
-            $startDate = Carbon :: parse( $request -> query( 'from' ) ) -> startOfDay();
-            $endDate   = Carbon ::parse( $request -> query( 'to' ) ) -> endOfDay();
-            $sales     = Sale :: ofUserID( $user_id )
-                              -> without( 'saleItems' )
-                              -> duration( $startDate -> copy() -> startOfDay() , $endDate -> copy() -> endOfDay() )
-                              -> get();
-            if ( $sales -> count() < 1 ) return Response ::error( 'No sales Found' );
-            $total_products = 0;
-            foreach ( $sales as $sale ) {
-                $items = $sale -> saleItems;
-                if ( count( $items ) > 0 ) {
-                    foreach ( $items as $sale_item ) {
-                        $total_products += $sale_item -> quantity;
-                    }
+            $user_id = $this -> userID( $request );
+
+            if ( !empty( $this -> from( $request ) ) && !empty( $this -> to( $request ) ) ) {
+                $date_range_errors = $this -> validateDate( $request );
+                if ( $date_range_errors ) return Response ::error( $date_range_errors );
+                [ $start_date , $end_date ] = $this -> dateRange( $request );
+
+                $sales = Sale ::ofUserID( $user_id )
+                              -> with( 'customer' , 'saleItems.product' )
+                              -> whereBetween( 'inv_sales.created_at' , [ $start_date , $end_date ] );
+
+//                $sales = DB ::table( 'inv_sales' )
+//                            -> select( 'inv_sales.id' , 'inv_sales.sale_id' , 'inv_sales.payment_mode AS mode' , 'inv_sales.grand_total' ,
+//                                DB ::raw( 'DATE_FORMAT(inv_sales.created_at, "%D %b %Y %h:%i% %p") as created_at' ) )
+//                            -> join( 'inv_cart_items' , 'inv_sales.id' , '=' , 'inv_cart_items.sale_id' )
+//                            -> where( 'inv_sales.user_id' , '=' , $user_id )
+//                            -> whereBetween( 'inv_sales.created_at' , [ $start_date , $end_date ] )
+//                            -> groupBy( 'inv_sales.id' , 'inv_sales.sale_id' , 'inv_sales.created_at' , 'inv_sales.payment_mode' , 'inv_sales.grand_total' );
+
+
+            } else {
+//                $sales = DB ::table( 'inv_sales' )
+//                            -> select( 'inv_sales.id' , 'inv_sales.sale_id' , 'inv_sales.payment_mode AS mode' , 'inv_sales.grand_total' ,
+//                                DB ::raw( 'DATE_FORMAT(inv_sales.created_at, "%D %b %Y %h:%i% %p") as created_at' ) )
+//                            -> join( 'inv_cart_items' , 'inv_sales.id' , '=' , 'inv_cart_items.sale_id' )
+//                            -> where( 'inv_sales.user_id' , '=' , $user_id )
+//                            -> groupBy( 'inv_sales.id' , 'inv_sales.sale_id' , 'inv_sales.created_at' );
+//
+                $sales = Sale ::ofUserID( $user_id )
+                              -> with( 'customer' , 'saleItems.product' );
+
+            }
+            $sold_products = 0;
+            foreach ( $sales -> get() as $sale ) {
+                foreach ( $sale -> saleItems as $sale_item ) {
+                    $sold_products += $sale_item -> quantity;
                 }
             }
+
+            info( DB ::getQueryLog() );
+
             $data = [
-                'products_sold' => $total_products ,
-                'sales'         => $sales -> each( function ( $sale ) { $sale -> makeHidden( 'saleItems' ); } )
+//                'products_sold' => (int) $sales -> sum( 'inv_cart_items.quantity' ) ,
+                'products_sold' => $sold_products ,
+                'sales'         => $sales -> orderBy( 'created_at' , 'desc' ) -> get()
             ];
             return Response ::success( $data );
         }
 
         public function show ( Request $request )
         {
-            $errors = User ::validateUserId( $request );
+            $errors = $this -> validateUserID( $request );
             if ( $errors ) return Response ::error( $errors );
-            $user_id         = $request -> user_id;
+            $user_id = $this -> userID( $request );
+
             $validate_saleID = Validator ::make( $request -> all() , [ 'sale_id' => 'bail|required|string|exists:inv_sales,sale_id' ] );
             if ( $validate_saleID -> stopOnFirstFailure() -> fails() ) {
                 return Response ::error( $validate_saleID -> messages() -> first() );
             }
+
             $sale_details = Sale ::where( [ 'user_id' => $user_id , 'sale_id' => $request -> sale_id ] )
                                  -> with( 'customer' )
                                  -> with( 'saleItems.product' ) -> first();
+//            $sale         = DB ::table( 'inv_sales' )
+//                               -> join( 'inv_cart_items' , 'inv_sales.id' , '=' , 'inv_cart_items.sale_id' )
+//                               -> join( 'inv_contacts' , 'inv_sales.contact_id' , '=' , 'inv_contacts.id' )
+//                               -> selectRaw( 'inv_sales.id AS order_no,inv_sales.created_at AS date,inv_contacts.name AS customer_name, inv_sales.payment_mode AS payment_method' )
+//                               -> selectRaw( 'inv_sales.sale_id AS sale_id,inv_sales.grand_total' )
+//                               -> where( 'inv_sales.user_id' , '=' , $user_id )
+//                               -> where( 'inv_sales.sale_id' , '=' , $request -> sale_id )
+//                               -> get();
+//            $products     = DB ::table( 'inv_sales' )
+//                               -> join( 'inv_cart_items' , 'inv_sales.id' , '=' , 'inv_cart_items.sale_id' )
+//                               -> join( 'inv_products' , 'inv_cart_items.product_id' , '=' , 'inv_products.id' )
+//                               -> selectRaw( 'inv_products.name,inv_products.name,inv_cart_items.total' )
+//                               -> where( 'inv_sales.user_id' , '=' , $user_id )
+//                               -> where( 'inv_sales.sale_id' , '=' , $request -> sale_id )
+//                               -> get();
+//            $details      = collect( [ $sale , $products ] );
+//            $sale_details->m
+
             if ( $sale_details ) return Response ::success( $sale_details );
             else return Response ::error( 'No details found' );
         }
 
-        /**
-         * Store a newly created resource in storage.
-         *
-         * @param StoreSaleRequest $request
-         * @return JsonResponse
-         */
         public function store ( StoreSaleRequest $request )
         {
             DB ::beginTransaction();
@@ -97,6 +125,12 @@
                 $product           = Product ::ofUserID( $user_id )
                                              -> where( 'name' , $item [ 'name' ] )
                                              -> first();
+                if ( $product -> quantity < $item [ 'quantity' ] ) {
+                    DB ::rollBack();
+                    $product_name     = $product -> name;
+                    $product_quantity = $product -> quantity;
+                    return Response ::error( "Only $product_quantity items in stock for $product_name " );
+                }
 
                 if ( !$product ) {
                     DB ::rollBack();
@@ -104,11 +138,12 @@
                 }
                 $item[ 'product_id' ] = $product -> id;
                 $product -> increment( 'sold' , $item [ 'quantity' ] );
+                $product -> decrement( 'quantity' , $item [ 'quantity' ] );
                 CartItem ::create( $item );
             }
             DB ::commit();
             $sales = Sale ::with( 'saleItems.product' ) -> where( 'sale_id' , $sale -> sale_id ) -> first();
 
-            return Response ::success( $sales , 201 );
+            return Response ::success( $sales , 200 );
         }
     }

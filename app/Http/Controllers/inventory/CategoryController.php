@@ -3,43 +3,56 @@
     namespace App\Http\Controllers\inventory;
 
     use App\helpers\Response;
+    use App\helpers\Uploads;
     use App\Http\Controllers\Controller;
     use App\Http\Requests\StoreCategoryRequest;
     use App\Models\inventory\Category;
+    use App\Traits\AWSTrait;
     use App\Traits\UserTrait;
     use Illuminate\Database\QueryException;
     use Illuminate\Http\Request;
     use Illuminate\Support\Facades\DB;
-    use Illuminate\Support\Facades\Storage;
-    use Intervention\Image\Facades\Image;
 
     class CategoryController extends Controller
     {
-        use UserTrait;
+        use UserTrait , AWSTrait;
 
         public function index ( Request $request )
         {
             $errors = $this -> validateUserID( $request );
             if ( $errors ) return Response ::error( $errors );
-            $user_id      = $this -> userID( $request );
-            $categories   = DB ::table( 'inv_categories' )
-                               -> join( 'inv_products' , 'inv_categories.id' , '=' , 'inv_products.category' )
-                               -> selectRaw( 'inv_categories.id,inv_categories.name,inv_categories.photo,inv_categories.description' )
-                               -> selectRaw( 'CAST(SUM(inv_products.balance) AS UNSIGNED) AS stock_value' )
-                               -> selectRaw( ('CASE 
-                                                WHEN ((SUM(inv_products.quantity) - SUM(inv_products.sold)) / SUM(inv_products.quantity)) * 100 <= 30 THEN "low"
-                                                WHEN ((SUM(inv_products.quantity) - SUM(inv_products.sold)) / SUM(inv_products.quantity)) * 100 <= 50 THEN "medium"
-                                                ELSE "good" END AS status') )
-                               -> groupBy( 'inv_categories.id' , 'inv_categories.name' )
-                               -> get();
+            $user_id    = $this -> userID( $request );
+            $categories = DB ::table( 'inv_categories' )
+                             -> join( 'inv_products' , 'inv_categories.id' , '=' , 'inv_products.category' )
+                             -> selectRaw( 'inv_categories.id, inv_categories.name, inv_categories.photo, inv_categories.description' )
+                             -> selectRaw( 'CAST(SUM(COALESCE(inv_products.quantity*inv_products.retail_price, 0)) AS UNSIGNED) AS stock_value' )
+                             -> selectRaw( 'CASE 
+                                    WHEN (SUM(COALESCE(inv_products.quantity, 0) - COALESCE(inv_products.sold, 0)) / SUM(COALESCE(inv_products.quantity, 1))) * 100 <= 30 THEN "low"
+                                    WHEN (SUM(COALESCE(inv_products.quantity, 0) - COALESCE(inv_products.sold, 0)) / SUM(COALESCE(inv_products.quantity, 1))) * 100 <= 50 THEN "medium"
+                                    ELSE "good" END AS status' )
+                             -> where( 'inv_products.user_id' , '=' , $user_id )
+                             -> groupBy( 'inv_categories.id' , 'inv_categories.name' , 'inv_categories.photo' , 'description' )
+                             -> get();
+            foreach ( $categories as $category ) {
+                if ( $category -> photo ) {
+                    $category -> photo = $this -> getUri( $category -> photo );
+                }
+            }
+
             $out_of_stock = DB ::table( 'inv_products' )
                                -> where( 'user_id' , '=' , $user_id )
                                -> where( 'quantity' , '<' , 1 )
                                -> count();
 
+            $products = DB ::table( 'inv_products' )
+                           -> where( 'user_id' , $user_id )
+                           -> limit( 10 )
+                           -> get();
+
             return Response ::success( [
                 'out_of_stock' => $out_of_stock ,
                 'categories'   => $categories ,
+                'products'     => $products ,
             ] );
         }
 
@@ -51,12 +64,8 @@
                 if ( $validator -> fails() ) {
                     return Response ::error( $validator -> errors() -> first() );
                 }
-                $validated      = $request -> validated();
-                $uploaded_image = $request -> file( 'photo' );
-                $filename       = 'public/images/' . time() . '.' . $uploaded_image -> getClientOriginalExtension();
-                $image          = Image ::make( $uploaded_image );
-                Storage ::put( $filename , $image -> encode() );
-                $validated[ 'photo' ] = url( '/' ) . Storage ::url( $filename );
+                $validated            = $request -> validated();
+                $validated[ 'photo' ] = Uploads ::uploadFile( $request , 'photo' );
                 $category             = Category ::create( $validated );
                 DB ::commit();
                 if ( $category ) {
@@ -69,5 +78,17 @@
                 DB ::rollBack();
                 return Response ::error( $exception -> getMessage() );
             }
+        }
+
+        public function all ( Request $request )
+        {
+//            $errors = $this -> validateUserID( $request );
+//            if ( $errors ) return Response ::error( $errors );
+//            $user_id    = $this -> userID( $request );
+            $categories = DB ::table( 'inv_categories' )
+//                             -> where( 'user_id' , $user_id )
+                             -> get();
+            if ( $categories ) return Response ::success( $categories );
+            return Response ::error( "No Categories" );
         }
     }

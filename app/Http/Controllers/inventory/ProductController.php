@@ -13,37 +13,60 @@
     use App\Models\inventory\Supplier;
     use App\Models\inventory\Unit;
     use App\Models\User;
+    use App\Traits\DateTrait;
+    use App\Traits\UserTrait;
     use Illuminate\Http\Request;
-    use Illuminate\Support\Carbon;
     use Illuminate\Support\Facades\DB;
     use Illuminate\Support\Facades\Validator;
 
     class ProductController extends Controller
     {
+        use DateTrait , UserTrait;
+
         public function index ( Request $request )
         {
             $errors = User ::validateUserId( $request );
             if ( $errors ) return Response ::error( $errors );
-            $user_id  = $request -> user_id;
+            $user_id = $this -> userID( $request );
+
             $products = Product ::ofUserID( $user_id )
                                 -> with( 'supplier' , 'units' , 'category' , 'subCategory' )
                                 -> get();
+
+            if ( $products -> count() > 0 ) return Response ::success( $products );
+            else return Response ::error( 'No products found' );
+        }
+
+        public function search ( Request $request )
+        {
+            $user_id = $this -> userID( $request );
+            $name    = $request -> name;
+
+            $products = Product ::ofUserID( $user_id )
+                                -> with( 'category' )
+                                -> where( 'name' , 'like' , "%$name%" )
+                                -> get();
+
             if ( $products -> count() > 0 ) return Response ::success( $products );
             else return Response ::error( 'No products found' );
         }
 
         public function details ( Request $request )
         {
-            $errors = User ::validateUserId( $request );
+            $errors = $this -> validateUserID( $request );
             if ( $errors ) return Response ::error( $errors );
-            $user_id              = $request -> user_id;
+            $user_id = $this -> userID( $request );
+
             $validated_product_id = Validator ::make( $request -> all() , [ 'id' => 'required|int|exists:inv_products,id' ] );
+
             if ( $validated_product_id -> stopOnFirstFailure() -> fails() ) return Response ::error( $validated_product_id -> errors() -> first() );
+
             $product = Product ::ofUserID( $user_id )
                                -> ofID( $request -> id )
                                -> with( 'supplier' , 'units' , 'category' , 'subCategory' )
                                -> first();
-            if ( !$product ) return Response ::error( 'No products found' );
+
+            if ( !$product ) return Response ::error( 'No product found' );
             else return Response ::success( $product );
         }
 
@@ -54,29 +77,15 @@
             if ( $validator -> fails() ) {
                 return Response ::error( $validator -> errors() -> first() );
             }
-            $supplier_validator = Validator ::make( $request -> all() , [ 'supplier' => 'required|exists:inv_suppliers,name' ] );
-            if ( $supplier_validator -> stopOnFirstFailure() -> fails() ) {
-                return Response ::error( 'Supplier name not found in database' );
-            }
-            $category_validator = Validator ::make( $request -> all() , [ 'category' => 'required|exists:inv_categories,name' ] );
-            if ( $category_validator -> stopOnFirstFailure() -> fails() ) {
-                return Response ::error( 'category name not found in database' );
-            }
-            $sub_category_validator = Validator ::make( $request -> all() , [ 'sub_category' => 'required|exists:inv_sub_categories,name' ] );
-            if ( $sub_category_validator -> stopOnFirstFailure() -> fails() ) {
-                return Response ::error( 'Sub category name not found in database' );
-            }
-            $units_validator = Validator ::make( $request -> all() , [ 'units' => 'required|exists:inv_units,name' ] );
-            if ( $units_validator -> stopOnFirstFailure() -> fails() ) {
-                return Response ::error( 'Unit name not found in database' );
-            }
-            $store_data              = $request -> validated();
-            $store_data[ 'photo' ]   = Uploads ::upload_image( $request , 'photo' );
-            $store_data              = $this -> getIDsFromNames( $request , $store_data );
-            $store_data[ 'balance' ] = $request -> quantity * $request -> retail_price;
-            $product                 = Product ::create( $store_data );
+
+            $validated                 = $request -> validated();
+            $validated[ 'photo' ]      = Uploads ::uploadFile( $request , 'photo' );
+            $product_data              = $this -> getIDsFromNames( $request , $validated );
+            $product_data[ 'balance' ] = ($request -> quantity) * ($request -> retail_price);
+            $product                   = Product ::create( $product_data );
+
             DB ::commit();
-            if ( $product ) return Response ::success( $product , 201 );
+            if ( $product ) return Response ::success( $product );
             else return Response ::error( 'Product not created' );
         }
 
@@ -91,34 +100,24 @@
 
         public function filterProducts ( Request $request )
         {
-            $errors = User ::validateUserId( $request );
+            $errors = $this -> validateUserID( $request );
             if ( $errors ) return Response ::error( $errors );
-            $date_range_validator = Validator ::make( $request -> all() ,
-                [
-                    'from' => 'sometimes|bail|required|date' ,
-                    'to'   => 'sometimes|bail|required|date' ,
-                ]
-            );
-            if ( $date_range_validator -> fails() ) return Response ::error( $date_range_validator -> errors() -> first() );
-            $user_id = $request -> user_id;
+            $user_id  = $this -> userID( $request );
+            $category = $request -> query( 'category' );
 
-            $from = $request -> query( 'from' );
-            $to   = $request -> query( 'to' );
+            if ( !empty( $this -> from( $request ) ) && !empty( $this -> to( $request ) ) ) {
+                [ $start_date , $end_date ] = $this -> dateRange( $request );
+                $products = Product ::ofUserID( $user_id )
+                                    -> duration( $start_date , $end_date )
+                                    -> with( 'supplier' , 'units' , 'category' , 'subCategory' )
+                                    -> where( 'category' , $category )
+                                    -> get();
 
-            if ( $from && $to ) {
-                $start_date = Carbon ::parse( $from ) -> copy() -> startOfDay();
-                $end_date   = Carbon ::parse( $to ) -> copy() -> endOfDay();
-                $products   = Product ::ofUserID( $user_id )
-                                      -> duration( $start_date , $end_date )
-//                                  -> with( 'supplier' , 'units' , 'category' , 'subCategory' )
-                                      -> where( 'category' , $request -> query( 'category' ) )
-                                      -> get( [ 'id' , 'name' , 'code' , 'quantity' , 'balance' , 'retail_price' ] )
-                                      -> makeHidden( 'retail_price' );
             } else {
                 $products = Product ::ofUserID( $user_id )
-                                    -> where( 'category' , $request -> query( 'category' ) )
-                                    -> get( [ 'id' , 'name' , 'code' , 'quantity' , 'balance' , 'retail_price' ] )
-                                    -> makeHidden( 'retail_price' );
+                                    -> with( 'supplier' , 'units' , 'category' , 'subCategory' )
+                                    -> where( 'category' , $category )
+                                    -> get();
             }
 
             if ( $products -> count() < 1 ) return Response ::error( "No products found" );
@@ -142,22 +141,7 @@
             if ( $validator -> fails() ) {
                 return Response ::error( $validator -> errors() -> first() );
             }
-            $supplier_validator = Validator ::make( $request -> all() , [ 'supplier' => 'required|exists:inv_suppliers,name' ] );
-            if ( $supplier_validator -> stopOnFirstFailure() -> fails() ) {
-                return Response ::error( 'Supplier name not found in database' );
-            }
-            $category_validator = Validator ::make( $request -> all() , [ 'category' => 'required|exists:inv_categories,name' ] );
-            if ( $category_validator -> stopOnFirstFailure() -> fails() ) {
-                return Response ::error( 'category name not found in database' );
-            }
-            $sub_category_validator = Validator ::make( $request -> all() , [ 'sub_category' => 'required|exists:inv_sub_categories,name' ] );
-            if ( $sub_category_validator -> stopOnFirstFailure() -> fails() ) {
-                return Response ::error( 'Sub category name not found in database' );
-            }
-            $units_validator = Validator ::make( $request -> all() , [ 'units' => 'required|exists:inv_units,name' ] );
-            if ( $units_validator -> stopOnFirstFailure() -> fails() ) {
-                return Response ::error( 'Unit name not found in database' );
-            }
+
             $product     = Product ::find( $request -> validated()[ 'id' ] );
             $update_data = $request -> validated();
             $update_data = $this -> getIDsFromNames( $request , $update_data );

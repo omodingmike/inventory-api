@@ -6,15 +6,9 @@
     use App\Http\Controllers\Controller;
     use App\Http\Requests\StoreUnitRequest;
     use App\Models\inventory\Unit;
-    use Illuminate\Http\JsonResponse;
 
     class UnitController extends Controller
     {
-        /**
-         * Display a listing of the resource.
-         *
-         * @return Unit[]
-         */
         public function index ()
         {
             return [
@@ -24,12 +18,6 @@
             ];
         }
 
-        /**
-         * Store a newly created resource in storage.
-         *
-         * @param StoreUnitRequest $request
-         * @return JsonResponse
-         */
         public function store ( StoreUnitRequest $request )
         {
             $validator = $request -> validator;

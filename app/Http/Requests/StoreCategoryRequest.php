@@ -2,7 +2,6 @@
 
     namespace App\Http\Requests;
 
-    use App\Rules\UniqueNameAndUserID;
     use Illuminate\Contracts\Validation\Validator;
     use Illuminate\Foundation\Http\FormRequest;
 
@@ -29,9 +28,9 @@
         public function rules () : array
         {
             return [
-                'photo'       => 'bail|required|image' ,
-                'user_id'     => 'required|int|exists:users,id' ,
-                'name'        => [ 'bail' , 'required' , 'string' , new UniqueNameAndUserID( $this -> input( 'user_id' ) , 'inv_categories' ) ] ,
+                'photo'       => 'bail|sometimes|required|image' ,
+//                'user_id'     => 'bail|sometimes|required|int|exists:users,id' ,
+                'name'        => [ 'bail' , 'required' , 'string' , 'unique:inv_categories' ] ,
                 'description' => 'bail|required|string'
             ];
         }

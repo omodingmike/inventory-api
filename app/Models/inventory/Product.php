@@ -2,6 +2,8 @@
 
     namespace App\Models\inventory;
 
+    use Aws\S3\S3Client;
+    use Exception;
     use Illuminate\Database\Eloquent\Factories\HasFactory;
     use Illuminate\Database\Eloquent\Model;
     use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -35,13 +37,28 @@
             return null;
         }
 
-//        public function getUnitsAttribute ( $value )
-//        {
-//            if ( $value ) {
-//                return $this -> attributes[ 'units' ] = $this -> unit -> name;
-//            }
-//            return null;
-//        }
+        public function getPhotoAttribute ( $value )
+        {
+            if ( $value ) {
+                try {
+                    $awsConfig = [
+                        'version' => '2006-03-01' ,
+                        'region'  => 'us-east-1' ,
+                    ];
+                    $s3Client  = new S3Client( $awsConfig );
+                    $cmd       = $s3Client -> getCommand( 'GetObject' , [
+                        'Bucket' => env( 'AWS_BUCKET' ) ,
+                        'Key'    => $value ,
+                    ] );
+                    $request   = $s3Client -> createPresignedRequest( $cmd , '+480 minutes' );
+                    return (string) $request -> getUri();
+                }
+                catch ( Exception $e ) {
+                    return null;
+                }
+            }
+            return null;
+        }
 
         public function getBalanceAttribute ( $value )
         {

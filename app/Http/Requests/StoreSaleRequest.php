@@ -33,6 +33,7 @@
                 'user_id'      => 'required|int|exists:users,id' ,
                 'payment_mode' => 'required|string' ,
                 'items'        => 'required|array' ,
+                'discount'     => 'sometimes|required|int' ,
             ];
         }
 

@@ -29,7 +29,7 @@
         {
             return [
                 'name'  => 'required|string|unique:inv_suppliers,name' ,
-                'photo' => 'required|image'
+                'photo' => 'sometimes|required|image'
             ];
         }
 

@@ -9,7 +9,9 @@
     {
         use HasFactory;
 
-        protected $fillable = [ 'name' ];
+        protected $fillable = [ 'name' , 'user_id' , 'category_id' ];
         protected $table    = 'inv_sub_categories';
         protected $hidden   = [ 'created_at' , 'updated_at' , 'pivot' ];
+
+
     }

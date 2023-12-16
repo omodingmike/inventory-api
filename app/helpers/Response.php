@@ -8,23 +8,23 @@
     {
         public static function success ( $data , int $status = 200 ) : JsonResponse
         {
-            $response = response() -> json( [
+            return response() -> json( [
                 'status'  => 1 ,
                 'message' => 'success' ,
                 'data'    => $data
-            ] , $status );
-//            info( $response );
-            return $response;
+            ] , $status ) -> withHeaders( [
+                'PHP-version' => phpversion()
+            ] );
         }
 
         public static function error ( string $message ) : JsonResponse
         {
-            $response = response() -> json( [
+            //            info( $response );
+            return response() -> json( [
                 'status'  => 0 ,
                 'message' => $message ,
                 'data'    => null
             ] );
-//            info( $response );
-            return $response;
         }
     }
+    

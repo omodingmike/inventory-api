@@ -1,0 +1,74 @@
+name: Deploy Laravel to Staging
+on:
+  push:
+    branches:
+      - staging
+jobs:
+  web-deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_USER: omodingc_sms-staging
+          MYSQL_PASSWORD: Rc13jVoAd
+          MYSQL_DATABASE: omodingc_sms-staging
+          MYSQL_ROOT_PASSWORD: Rc13jVoAd
+          DB_PORT: ${{ job.services.mysql.ports[3306] }}
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+      - name: Get the latest code
+        uses: actions/checkout@v2.3.2
+
+      - name: Setup PHP
+        id: setup-php
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: Cache composer dependencies
+        uses: actions/cache@v2
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            composer-
+
+      - uses: actions/setup-node@master
+      - name: Copy .env
+        run: |
+          cp .env.example .env
+
+      - name: Configure Environment Variables
+        run: |
+          echo "APP_URL=https://sms-backend-staging.omoding.com/" >> .env
+          echo "DB_DATABASE=omodingc_sms-staging" >> .env
+          echo "DB_USERNAME=omodingc_sms-staging" >> .env
+          echo "DB_PASSWORD=Rc13jVoAd" >> .env
+
+      - name: Install Dependencies
+        run: composer install --no-interaction --no-suggest --ignore-platform-reqs
+
+      - name: Boot Laravel application
+        run: |
+          php artisan key:generate
+      - name: Clear Cache and Optimize
+        run: |
+          php artisan optimize:clear
+        env:
+          DB_CONNECTION: mysql
+          DB_DATABASE: omodingc_sms-staging
+          DB_USERNAME: omodingc_sms-staging
+          DB_PASSWORD: Rc13jVoAd
+
+      - name: Sync files
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: omoding.com
+          username: ${{secrets.STAGING_FTP_USERNAME }}
+          password: ${{ secrets.STAGING_FTP_PASSWORD }}
+      - name: Deploy Completed
+        run: echo "Deployment completed successfully"

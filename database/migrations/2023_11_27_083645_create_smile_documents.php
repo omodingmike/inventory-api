@@ -4,7 +4,7 @@
     use Illuminate\Database\Schema\Blueprint;
     use Illuminate\Support\Facades\Schema;
 
-    class CreateSubCategoriesTable extends Migration
+    class CreateSmileDocuments extends Migration
     {
         /**
          * Run the migrations.
@@ -13,11 +13,11 @@
          */
         public function up ()
         {
-            Schema ::create( 'inv_sub_categories' , function ( Blueprint $table ) {
+            Schema ::create( 'smile_documents' , function ( Blueprint $table ) {
                 $table -> id();
-                $table -> string( 'name' );
-                $table -> integer( 'user_id' );
-                $table -> integer( 'category_id' );
+                $table -> longText( 'selfie' );
+                $table -> longText( 'id_front' );
+                $table -> longText( 'id_back' );
                 $table -> timestamps();
             } );
         }
@@ -29,6 +29,6 @@
          */
         public function down ()
         {
-            Schema ::dropIfExists( 'inv_sub_categories' );
+            Schema ::dropIfExists( 'smile_documents' );
         }
     }

@@ -17,12 +17,22 @@
 
         public function startDate ( Request $request )
         {
-            return Carbon ::createFromFormat( 'd-m-Y' , $request -> query( 'from' ) ) -> copy() -> startOfDay();
+            return Carbon ::createFromFormat( 'd-m-Y' , $this -> from( $request ) ) -> copy() -> startOfDay();
+        }
+
+        public function from ( Request $request )
+        {
+            return $request -> query( 'from' );
         }
 
         public function endDate ( Request $request )
         {
-            return Carbon ::createFromFormat( 'd-m-Y' , $request -> query( 'to' ) ) -> copy() -> endOfDay();
+            return Carbon ::createFromFormat( 'd-m-Y' , $this -> to( $request ) ) -> copy() -> endOfDay();
+        }
+
+        public function to ( Request $request )
+        {
+            return $request -> query( 'to' );
         }
 
         public function daysInMonth ( Request $request ) : int
@@ -34,8 +44,8 @@
         {
             $validator = Validator ::make( $request -> all() ,
                 [
-                    'from' => 'bail|required|date' ,
-                    'to'   => 'bail|required|date' ,
+                    'from' => 'sometimes|bail|required|date' ,
+                    'to'   => 'sometimes|bail|required|date' ,
                 ]
             );
             if ( $validator -> stopOnFirstFailure() -> fails() ) {

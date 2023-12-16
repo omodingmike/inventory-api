@@ -2,7 +2,6 @@
 
     namespace App\Http\Requests;
 
-    use App\Rules\UniqueNameAndUserID;
     use Illuminate\Contracts\Validation\Validator;
     use Illuminate\Foundation\Http\FormRequest;
 
@@ -21,28 +20,22 @@
             return true;
         }
 
-        /**
-         * Get the validation rules that apply to the request.
-         *
-         * @return array
-         */
         public function rules () : array
         {
             return [
-                'name'             => [ 'required' , 'string' , new UniqueNameAndUserID( $this -> input( 'user_id' ) , 'inv_products' ) ] ,
-                'category'         => 'required|string' ,
-                'sub_category'     => 'required|string' ,
+                'name'             => [ 'required' , 'string' ] ,
+                'category'         => 'required|exists:inv_categories,name' ,
+                'sub_category'     => 'required|exists:inv_sub_categories,name' ,
                 'code'             => 'required|string' ,
                 'quantity'         => 'required|int' ,
-                'units'            => 'required|string' ,
+                'units'            => 'required|exists:inv_units,name' ,
                 'retail_price'     => 'required|int' ,
                 'discount'         => 'required|int' ,
                 'whole_sale_price' => 'required|int' ,
                 'purchase_price'   => 'required|int' ,
-                'supplier'         => 'required|string' ,
-//                'photo'            => 'required|image' ,
-//                'user_id'          => 'required|int|exists:users,id' ,
-                'id'               => 'required|int|exists:inv_products,id' ,
+                'supplier'         => 'required|exists:inv_suppliers,name' ,
+                'photo'            => 'required|image' ,
+                'user_id'          => 'required|int|exists:users,id' ,
             ];
         }
 

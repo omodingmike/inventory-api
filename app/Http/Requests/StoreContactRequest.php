@@ -5,34 +5,30 @@
     use App\Rules\Phone;
     use Illuminate\Contracts\Validation\Validator;
     use Illuminate\Foundation\Http\FormRequest;
+    use Illuminate\Validation\Rule;
 
     class StoreContactRequest extends FormRequest
     {
         public    $validator          = null;
         protected $stopOnFirstFailure = true;
 
-        /**
-         * Determine if the user is authorized to make this request.
-         *
-         * @return bool
-         */
         public function authorize () : bool
         {
             return true;
         }
 
-        /**
-         * Get the validation rules that apply to the request.
-         *
-         * @return array
-         */
         public function rules () : array
         {
             return [
                 'name'    => 'required|string' ,
-                'phone'   => [ 'required' , new Phone , 'unique:inv_contacts,phone' ] ,
+                'phone'   => [
+                    'required' , new Phone ,
+                    Rule ::unique( 'inv_contacts' ) -> where( function ( $query ) {
+                        return $query -> where( 'user_id' , $this -> user_id );
+                    } ) ,
+                ] ,
                 'user_id' => 'required|int|exists:users,id' ,
-                'email'   => 'sometimes|email|unique:inv_contacts,email' ,
+                'email'   => 'sometimes|required_if:email,!=,|email|unique:inv_contacts,email'
             ];
         }
 

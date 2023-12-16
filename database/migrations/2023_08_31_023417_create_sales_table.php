@@ -20,6 +20,7 @@
                 $table -> integer( 'grand_total' );
                 $table -> integer( 'contact_id' );
                 $table -> integer( 'user_id' );
+                $table -> integer( 'discount' ) -> default( 0 );
                 $table -> timestamps();
 
             } );

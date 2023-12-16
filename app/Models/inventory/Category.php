@@ -2,14 +2,14 @@
 
     namespace App\Models\inventory;
 
+    use App\Traits\AWSTrait;
     use Illuminate\Database\Eloquent\Factories\HasFactory;
     use Illuminate\Database\Eloquent\Model;
-    use Illuminate\Database\Eloquent\Relations\BelongsToMany;
     use Illuminate\Database\Eloquent\Relations\HasMany;
 
     class Category extends Model
     {
-        use HasFactory;
+        use HasFactory , AWSTrait;
 
 
         protected $fillable = [ 'name' , 'photo' , 'user_id' , 'description' ];
@@ -21,9 +21,21 @@
             return $this -> hasMany( Product::class , 'category' , 'id' );
         }
 
-        public function subCategories () : BelongsToMany
+        public function getPhotoAttribute ( $value )
         {
-            return $this -> belongsToMany( SubCategory::class , 'inv_category_sub_categories' );
+            if ( $value ) {
+                return $this -> getUri( $value );
+            }
+            return null;
+        }
+
+//        public function subCategories () : BelongsToMany
+//        {
+//            return $this -> belongsToMany( SubCategory::class , 'inv_category_sub_categories' );
+//        }
+        public function subCategories () : HasMany
+        {
+            return $this -> hasMany( SubCategory::class , 'category_id' , 'id' );
         }
 
         public function scopeOfUserID ( $query , $user_id )
