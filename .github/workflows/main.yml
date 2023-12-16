@@ -1,6 +1,6 @@
 name: Deploy Laravel to Production
 on:
-  pull_request:
+  push:
     branches:
       - main
 jobs:
@@ -11,10 +11,10 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_USER: omodingc_sms
-          MYSQL_PASSWORD: TtfQs2r4
-          MYSQL_DATABASE: omodingc_sms
-          MYSQL_ROOT_PASSWORD: TtfQs2r4
+          MYSQL_USER: omodingc_inventory-api
+          MYSQL_PASSWORD: 3ctPfDYMPAHz82WgeEwj
+          MYSQL_DATABASE: omodingc_inventory-api
+          MYSQL_ROOT_PASSWORD: 3ctPfDYMPAHz82WgeEwj
           DB_PORT: ${{ job.services.mysql.ports[3306] }}
         ports:
           - 3306:3306
@@ -37,10 +37,10 @@ jobs:
 
       - name: Configure Environment Variables
         run: |
-          echo "APP_URL=https://sms-backend.omoding.com/" >> .env
-          echo "DB_DATABASE=omodingc_sms" >> .env
-          echo "DB_USERNAME=omodingc_sms" >> .env
-          echo "DB_PASSWORD=TtfQs2r4" >> .env
+          echo "APP_URL=https://inventory-api.omoding.com/" >> .env
+          echo "DB_DATABASE=omodingc_inventory-api" >> .env
+          echo "DB_USERNAME=omodingc_inventory-api" >> .env
+          echo "DB_PASSWORD=3ctPfDYMPAHz82WgeEwj" >> .env
 
       - name: Install Dependencies
         run: composer install --no-interaction --no-suggest --ignore-platform-reqs
@@ -53,9 +53,9 @@ jobs:
           php artisan optimize:clear
         env:
           DB_CONNECTION: mysql
-          DB_DATABASE: omodingc_sms
-          DB_USERNAME: omodingc_sms
-          DB_PASSWORD: TtfQs2r4
+          DB_DATABASE: omodingc_inventory-api
+          DB_USERNAME: omodingc_inventory-api
+          DB_PASSWORD: 3ctPfDYMPAHz82WgeEwj
 
       - name: Sync files
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
