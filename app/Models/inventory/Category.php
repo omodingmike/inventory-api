@@ -21,13 +21,13 @@
             return $this -> hasMany( Product::class , 'category' , 'id' );
         }
 
-        public function getPhotoAttribute ( $value )
-        {
-            if ( $value ) {
-                return $this -> getUri( $value );
-            }
-            return null;
-        }
+//        public function getPhotoAttribute ( $value )
+//        {
+//            if ( $value ) {
+//                return $this -> getUri( $value );
+//            }
+//            return null;
+//        }
 
 //        public function subCategories () : BelongsToMany
 //        {
