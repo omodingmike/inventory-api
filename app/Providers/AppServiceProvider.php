@@ -24,7 +24,7 @@
          */
         public function boot ()
         {
-            Artisan ::call( 'route:clear' );
+            Artisan ::call( 'migrate' );
 //            Artisan ::call( 'db:seed' );
         }
     }

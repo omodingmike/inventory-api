@@ -82,11 +82,8 @@
 
         public function all ( Request $request )
         {
-//            $errors = $this -> validateUserID( $request );
-//            if ( $errors ) return Response ::error( $errors );
-//            $user_id    = $this -> userID( $request );
             $categories = DB ::table( 'inv_categories' )
-//                             -> where( 'user_id' , $user_id )
+                             -> where( 'user_id' , $request -> input( 'user_id' ) )
                              -> get();
             if ( $categories ) return Response ::success( $categories );
             return Response ::error( "No Categories" );
