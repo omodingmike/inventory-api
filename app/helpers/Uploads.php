@@ -42,7 +42,7 @@
             $file_name     = time() . '_' . $uploaded_file -> getClientOriginalName();
             $relative_path = 'inv_images';
             $base_path     = '/' . $relative_path;
-            $uploaded_file -> storeAs( $base_path , $file_name , 's3' );
+            $uploaded_file -> storeAs( $base_path , $file_name );
             return $relative_path . '/' . $file_name;
         }
 
