@@ -2,7 +2,6 @@
 
     namespace App\Providers;
 
-    use Illuminate\Support\Facades\Artisan;
     use Illuminate\Support\ServiceProvider;
 
     class AppServiceProvider extends ServiceProvider
@@ -24,7 +23,7 @@
          */
         public function boot ()
         {
-            Artisan ::call( 'migrate' );
+//            Artisan ::call( 'migrate' );
 //            Artisan ::call( 'db:seed' );
         }
     }
