@@ -10,26 +10,16 @@
         public    $validator          = null;
         protected $stopOnFirstFailure = true;
 
-        /**
-         * Determine if the user is authorized to make this request.
-         *
-         * @return bool
-         */
         public function authorize () : bool
         {
             return true;
         }
 
-        /**
-         * Get the validation rules that apply to the request.
-         *
-         * @return array
-         */
         public function rules () : array
         {
             return [
                 'photo'       => 'bail|sometimes|required|image' ,
-//                'user_id'     => 'bail|sometimes|required|int|exists:users,id' ,
+                'user_id'     => 'bail|sometimes|required|int|exists:users,id' ,
                 'name'        => [ 'bail' , 'required' , 'string' , 'unique:inv_categories' ] ,
                 'description' => 'bail|required|string'
             ];
